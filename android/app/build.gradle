@@ -72,7 +72,9 @@ android {
     ndkVersion rootProject.ext.ndkVersion
 
     compileSdkVersion rootProject.ext.compileSdkVersion
-
+    buildFeatures {
+        buildConfig = true
+    }
     namespace "com.coffeeorderingapp"
     defaultConfig {
         applicationId "com.coffeeorderingapp"
