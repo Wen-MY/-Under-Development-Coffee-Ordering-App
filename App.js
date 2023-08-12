@@ -18,7 +18,7 @@ export default class App extends Component{
           initialRouteName='Home'
           screenOptions={{
             tabBarActiveTintColor: 'white',
-            tabBarActiveBackgroundColor: 'blue',
+            tabBarActiveBackgroundColor: '#0f4c81',
             tabBarLabelStyle: {
               fontSize: 22,
             },
@@ -46,6 +46,7 @@ export default class App extends Component{
               tabBarIcon: () => {
                 return <FontAwesomeIcon icon="fa-regular fa-mug-hot" size={20}/>
               }*/
+              headerShown:false
               }
             }
             />
