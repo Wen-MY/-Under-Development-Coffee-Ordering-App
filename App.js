@@ -9,6 +9,8 @@ import HomeScreen from './screens/HomeScreen';
 import ProfileScreen from './screens/ProfileScreen';
 import CartScreen from './screens/CartScreen';
 import MenuScreen from './screens/MenuScreen';
+import SettingScreen from './screens/SettingScreen';
+import CoffeeDetailScreen from './screens/CoffeeDetailScreen';
 const Tab = createBottomTabNavigator ();
 export default class App extends Component{
   render(){
@@ -70,7 +72,6 @@ export default class App extends Component{
               }
             }
             />
-
         </Tab.Navigator>
       </NavigationContainer>
     );
