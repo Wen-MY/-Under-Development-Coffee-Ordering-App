@@ -38,6 +38,7 @@ export default class App extends Component{
               tabBarIcon: () => {
                 return <FontAwesomeIcon icon="fa-sharp fa-regular fa-house-blank" size={20}/>
               }*/
+              headerShown:false
               }
             }
             />
