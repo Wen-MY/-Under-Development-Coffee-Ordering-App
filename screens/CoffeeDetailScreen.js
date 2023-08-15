@@ -27,7 +27,7 @@ const CoffeeDetailScreen = () => {
       <Text style={styles.name}>Coffee Name</Text>
 
       <Image 
-        source={require('../assets/CoffeeImage/black.jpg')}
+        source={require('../assets/CoffeeImage/Americano.png')}
         style={styles.coffeeImage}
       />
 
