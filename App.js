@@ -64,7 +64,7 @@ export default class App extends Component{
             }
             />
             <Tab.Screen
-            name = 'Profile'
+            name = 'Order'
             component = {ProfileScreen}
             options={{/*
               tabBarIcon: () => {

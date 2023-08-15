@@ -3,11 +3,15 @@ import {StyleSheet,Text,View} from "react-native";
 import { SectionGrid } from "react-native-super-grid";
 import SearchBar from "../components/SearchBar";
 
+let SQLite = require('react-native-sqlite-storage');
+
+
 export default class MenuScreen extends Component{
     constructor(props){
         super(props);
         this.state = {
-            items: [
+            items: [],
+            fake_items: [
                 { name: 'Americano', code: '#a67c52' },
                 { name: 'Latte', code: '#6b3e1a' },
                 { name: 'Cappuccino', code: '#be8f68' },
@@ -43,8 +47,73 @@ export default class MenuScreen extends Component{
               clicked: isClicked,
             });
         };
+
+        this._query = this._query.bind(this);
+        this.databasePrepare = this._databasePrepare.bind(this);
+        this.db = SQLite.openDatabase(
+            {name: 'coffeeDatabase'},
+            this.openCallback,
+            this.errorCallback,
+        )
+    }
+    componentDidMount(){
+        this._databasePrepare();
+        this._query();
+    }
+    _databasePrepare() {
+        this.db.transaction(tx =>{
+            tx.executeSql(
+                'CREATE TABLE items (id INTEGER PRIMARY KEY AUTOINCREMENT,name VARCHAR(20),description TEXT, base_price DECIMAL(6,2) ,type VARCHAR(30))',
+                [],
+                (sqlTxn,res)=>{
+                    console.log('items table ready');
+                },
+                error=>{
+                    console.log('error on creating items table' + error.message);
+                },
+            );
+        })
+        this.db.transaction(tx=>
+            tx.executeSql(
+                'SELECT * FROM items',
+                [],
+                (tx,results) => {
+                    if(results.rows.length == 0){
+                        tx.executeSql(
+                            'INSERT INTO items(name,description,base_price,type) VALUES("Americano","For a milder coffee experience, the Americano is the perfect choice. It\'s crafted by adding hot water to a shot or two of espresso, diluting the intensity while preserving the coffee\'s authentic taste. The result is a light and flavorful drink with a slightly nutty undertone.Ingredients: Freshly brewed espresso, hot water.",7.90,"Classic"'
+                            //more default data insert here
+                        ,
+                        [],
+                        (tx, results) => {
+                            if (results.rowsAffected > 0) {
+                              console.log('dummy data inserted successfully');
+                              this._query();
+                            } else {
+                              console.log('error in inserting data');
+                            }
+                          },
+                        );
+                    }else {
+                        console.log('table filled,default insertion ignored');
+                    }
+                }
+            ),
+        );
+    }
+    _query(){
+        this.db.transaction(tx =>
+            tx.executeSql('SELECT * FROM items'),[],(tx,results) =>
+            this.setState({items: results.rows.raw()}),
+        );
+    }
+    openCallback(){
+        console.log('database open sucess');
+    }
+    errorCallback(err){
+        console.log('Error in opening database :' + err);
     }
     render(){
+        console.log(this.state.items); //debug purpose
         return(
             <View style={styles.container}>
             <View>
@@ -60,23 +129,23 @@ export default class MenuScreen extends Component{
                 sections={[
                     {
                     title: 'Classics',
-                    data: this.state.items.slice(0, 4),
+                    data: this.state.fake_items.slice(0, 4),
                     },
                     {
                     title: 'Specialties',
-                    data: this.state.items.slice(4, 8),
+                    data: this.state.fake_items.slice(4, 8),
                     },
                     {
                     title: 'Unique Brews',
-                    data: this.state.items.slice(8, 12),
+                    data: this.state.fake_items.slice(8, 12),
                     },
                     {
                     title: 'Iced Delights',
-                    data: this.state.items.slice(12, 16),
+                    data: this.state.fake_items.slice(12, 16),
                     },
                     {
                     title: 'Short and Strong',
-                    data: this.state.items.slice(16, 20),
+                    data: this.state.fake_items.slice(16, 20),
                     },
                 ]}
                 style={styles.gridView}
