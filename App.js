@@ -7,7 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
 
 import HomeScreen from './screens/HomeScreen';
 import ProfileScreen from './screens/TermsAndConditions';
-import CartScreen from './screens/CoffeeDetailScreen';
+import CartScreen from './screens/PaymentScreen';
 import MenuScreen from './screens/MenuScreen';
 import SettingScreen from './screens/SettingScreen';
 import CoffeeDetailScreen from './screens/CoffeeDetailScreen';
