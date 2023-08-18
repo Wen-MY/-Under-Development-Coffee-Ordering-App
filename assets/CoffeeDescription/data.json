@@ -3,220 +3,120 @@
         "name": "Americano",
         "description": "For a milder coffee experience, the Americano is the perfect choice. It's crafted by adding hot water to a shot or two of espresso, diluting the intensity while preserving the coffee's authentic taste. The result is a light and flavorful drink with a slightly nutty undertone.",
         "price": 3.99,
-        "type": "Classics",
-        "milk": ["Regular", "None"],
-        "temperature": ["Hot", "Cold"],
-        "topping": ["None", "Cinnamon", "Caramel Drizzle"],
-        "whipped_cream": ["Add", "None"],
-        "shots": 1
+        "type": "Classics"
     },
     {
         "name": "Latte",
         "description": "Indulge in the creamy and comforting embrace of a Latte. This popular coffee drink starts with one or two shots of espresso, combined with a generous amount of steamed milk. Topped with a thin layer of milk foam, the Latte strikes a harmonious balance between the robustness of espresso and the velvety smoothness of milk.",
         "price": 4.49,
-        "type": "Classics",
-        "milk": ["Regular", "None"],
-        "temperature": ["Hot", "Cold"],
-        "topping": ["None", "Cinnamon", "Caramel Drizzle"],
-        "whipped_cream": ["Add", "None"],
-        "shots": 1
+        "type": "Classics"
     },
     {
         "name": "Cappuccino",
         "description": "A classic Italian espresso-based beverage, the cappuccino combines the intensity of espresso with the richness of steamed milk and milk foam. Created by layering equal parts of espresso, steamed milk, and velvety milk foam, the cappuccino offers a perfect balance of bold coffee flavors and creamy textures. Topped with a dusting of cocoa powder, it's a delight for both your taste buds and your senses. Whether enjoyed as a morning pick-me-up or an afternoon indulgence, the cappuccino's harmonious blend of coffee and milk is a timeless favorite.",
         "price": 4.29,
-        "type": "Classics",
-        "milk": ["Regular", "None"],
-        "temperature": ["Hot", "Cold"],
-        "topping": ["None", "Cinnamon", "Caramel Drizzle"],
-        "whipped_cream": ["Add", "None"],
-        "shots": 1
+        "type": "Classics"
     },
     {
         "name": "Espresso",
         "description": "Espresso is the heart and soul of coffee, delivering an intense and bold flavor in a concentrated shot. Created by forcing hot water through finely ground coffee beans, a true espresso showcases the essence of freshly roasted coffee. Served in a small demitasse cup, it is the base for various coffee drinks and stands tall on its own, boasting a distinctive layer of crema, a velvety froth, on top.",
         "price": 2.99,
-        "type": "Short and Strong",
-        "milk": ["Regular", "None"],
-        "temperature": ["Hot", "Cold"],
-        "topping": ["None", "Cinnamon", "Caramel Drizzle"],
-        "whipped_cream": ["Add", "None"],
-        "shots": 1
+        "type": "Short and Strong"
     },
     {
         "name": "Mocha",
         "description": "A delightful treat for chocolate and coffee lovers alike, the Mocha is a heavenly fusion of flavors. It starts with a shot of espresso, infused with steamed milk and rich chocolate syrup or cocoa powder. Optionally, it can be crowned with a dollop of whipped cream, adding a touch of decadence to this sweet and velvety coffee delight.",
         "price": 4.99,
-        "type": "Specialties",
-        "milk": ["Regular", "None"],
-        "temperature": ["Hot", "Cold"],
-        "topping": ["None", "Cinnamon", "Caramel Drizzle"],
-        "whipped_cream": ["Add", "None"],
-        "shots": 1
+        "type": "Specialties"
     },
     {
         "name": "Macchiato",
         "description": "Derived from the Italian word 'macchiare,' meaning 'to stain' or 'to mark,' the macchiato is a delightful espresso-based drink that's known for its simplicity and bold flavor. A macchiato features a shot of rich espresso 'stained' or 'marked' with a small amount of either milk or milk foam, creating a beautifully contrasting layering of flavors. This minimalist approach allows the strength of the espresso to shine through, while the gentle touch of milk or foam adds a touch of creaminess and balance. Often finished with a drizzle of caramel, the macchiato is a small but potent beverage that captures the essence of espresso in every sip.",
         "price": 3.79,
-        "type": "Short and Strong",
-        "milk": ["Regular", "None"],
-        "temperature": ["Hot", "Cold"],
-        "topping": ["None", "Cinnamon", "Caramel Drizzle"],
-        "whipped_cream": ["Add", "None"],
-        "shots": 1
+        "type": "Short and Strong"
     },
     {
         "name": "Flat White",
         "description": "Hailing from down under, the Flat White is an Australian and New Zealand specialty that has captured the hearts of coffee enthusiasts worldwide. It boasts a double shot of espresso, complemented by velvety microfoam milk. With a higher coffee-to-milk ratio than a latte, the Flat White highlights the robust coffee flavor while caressing the palate with its creamy texture.",
         "price": 4.79,
-        "type": "Classics",
-        "milk": ["Regular", "None"],
-        "temperature": ["Hot", "Cold"],
-        "topping": ["None", "Cinnamon", "Caramel Drizzle"],
-        "whipped_cream": ["Add", "None"],
-        "shots": 1
+        "type": "Classics"
     },
     {
         "name": "Irish Coffee",
         "description": "A heartwarming blend of flavors, the Irish Coffee marries the robust character of coffee with the spirited warmth of Irish whiskey. This classic cocktail-inspired coffee begins with a base of brewed coffee, elegantly spiked with a measure of smooth Irish whiskey. Sweetened with a touch of sugar and transformed with the velvety richness of whipped cream, the Irish Coffee is a comforting indulgence that provides a delightful balance of rich coffee aromas and the gentle heat of whiskey. It's the perfect choice for sipping on cozy evenings or as a delightful accompaniment to dessert, offering a moment of relaxation with every sip.",
         "price": 5.99,
-        "type": "Specialties",
-        "milk": ["Regular", "None"],
-        "temperature": ["Hot", "Cold"],
-        "topping": ["None", "Cinnamon", "Caramel Drizzle"],
-        "whipped_cream": ["Add", "None"],
-        "shots": 1
+        "type": "Specialties"
     },
     {
         "name": "Café au Lait",
         "description": "A classic French coffee preparation, the Cafe-au-Lait brings simplicity and warmth to your coffee experience. It's made by combining equal parts of freshly brewed coffee and hot milk, delivering a smooth, uncomplicated flavor.",
         "price": 4.29,
-        "type": "Classics",
-        "milk": ["Regular", "None"],
-        "temperature": ["Hot", "Cold"],
-        "topping": ["None", "Cinnamon", "Caramel Drizzle"],
-        "whipped_cream": ["Add", "None"],
-        "shots": 1
+        "type": "Classics"
     },
     {
         "name": "Café Bombón",
         "description": "Experience a sweet and indulgent moment with the Café Bombón, a delightful Spanish-inspired coffee treat. This beverage combines the boldness of espresso with the richness of sweetened condensed milk. The result is a harmonious balance of strong coffee flavors and creamy sweetness, making every sip a decadent experience. Whether served hot or cold, the Café Bombón offers a unique combination of contrast and comfort that is sure to satisfy your taste for both coffee and dessert.",
         "price": 4.79,
-        "type": "Specialties",
-        "milk": ["Regular", "None"],
-        "temperature": ["Hot", "Cold"],
-        "topping": ["None", "Cinnamon", "Caramel Drizzle"],
-        "whipped_cream": ["Add", "None"],
-        "shots": 1
+        "type": "Specialties"
     },
     {
         "name": "Café con Leche",
         "description": "Drawing from the rich coffee traditions of Spain and Latin America, the Café con Leche is a comforting blend of brewed coffee and scalded milk. This hearty and satisfying beverage boasts the robust flavors of coffee complemented by the creamy embrace of steamed milk. Often enjoyed as a breakfast staple or an afternoon treat, the Café con Leche provides a delightful balance of strength and comfort, making it a true companion for moments of relaxation and warmth.",
         "price": 4.49,
-        "type": "Classics",
-        "milk": ["Regular", "None"],
-        "temperature": ["Hot", "Cold"],
-        "topping": ["None", "Cinnamon", "Caramel Drizzle"],
-        "whipped_cream": ["Add", "None"],
-        "shots": 1
+        "type": "Classics"
     },
     {
         "name": "Café Cubano",
         "description": "Indulge in the bold and spirited essence of Cuba with the Café Cubano, a strong and flavorful coffee experience. This traditional Cuban drink features a shot of espresso sweetened with sugar, creating a harmonious blend of robust coffee flavors and delightful sweetness. The result is a beverage that packs a punch while offering a touch of comfort, making the Café Cubano a popular choice for those who appreciate a strong cup of coffee with a twist of Cuban flair.",
         "price": 3.99,
-        "type": "Strong Flavour",
-        "milk": ["Regular", "None"],
-        "temperature": ["Hot", "Cold"],
-        "topping": ["None", "Cinnamon", "Caramel Drizzle"],
-        "whipped_cream": ["Add", "None"],
-        "shots": 1
+        "type": "Strong Flavour"
     },
     {
         "name": "Turkish Coffee",
         "description": "Travel back in time to the rich coffee heritage of Turkey with the Turkish Coffee, a time-honored preparation that celebrates both tradition and taste. Finely ground coffee is simmered with water and sugar, creating a strong and aromatic brew that is both invigorating and fragrant. Often enjoyed as a symbol of hospitality and social connection, Turkish Coffee offers a sensory experience that combines the allure of finely ground coffee with the art of preparation, making it a truly unique and cherished beverage.",
         "price": 4.79,
-        "type": "Strong Flavour",
-        "milk": ["Regular", "None"],
-        "temperature": ["Hot", "Cold"],
-        "topping": ["None", "Cinnamon", "Caramel Drizzle"],
-        "whipped_cream": ["Add", "None"],
-        "shots": 1
+        "type": "Strong Flavour"
     },
     {
         "name": "Cold Brew",
         "description": "Embrace the refreshing side of coffee with the Cold Brew, a chilled and invigorating option perfect for warmer days. Cold-brewed over an extended period, this coffee is characterized by its smoothness and low acidity. Served over ice, the Cold Brew offers a cool and revitalizing experience that highlights the natural flavors of coffee without the bitterness. It's the ideal companion for those seeking a crisp and refreshing coffee option to quench their thirst and awaken their senses.",
         "price": 4.79,
-        "type": "Unique Brews",
-        "milk": ["Regular", "None"],
-        "temperature": ["Hot", "Cold"],
-        "topping": ["None", "Cinnamon", "Caramel Drizzle"],
-        "whipped_cream": ["Add", "None"],
-        "shots": 2
+        "type": "Unique Brews"
     },
     {
         "name": "Nitro Coffee",
         "description": "Elevate your coffee experience with the Nitro Coffee, a true sensory adventure that marries the smoothness of cold brew with the effervescence of nitrogen infusion. The result is a velvety and frothy coffee with a rich texture that dances on your palate. Served cold and straight from the tap, Nitro Coffee offers a unique and delightful twist on traditional coffee, making it a sought-after choice for those who appreciate innovation and the art of brewing.",
         "price": 5.29,
-        "type": "Unique Brews",
-        "milk": ["Regular", "None"],
-        "temperature": ["Hot", "Cold"],
-        "topping": ["None", "Cinnamon", "Caramel Drizzle"],
-        "whipped_cream": ["Add", "None"],
-        "shots": 2
+        "type": "Unique Brews"
     },
     {
         "name": "Vienna Coffee",
         "description": "Transport yourself to the grand cafés of Vienna with the Vienna Coffee, an opulent and indulgent coffee creation. This elegant drink features a shot of espresso topped with a generous dollop of whipped cream, creating a luxurious contrast of strong coffee and velvety richness. Often adorned with delicate chocolate shavings, the Vienna Coffee offers a harmonious blend of flavors and textures, making it a lavish treat for those seeking a moment of refined pleasure.",
         "price": 4.99,
-        "type": "Specialties",
-        "milk": ["Regular", "None"],
-        "temperature": ["Hot", "Cold"],
-        "topping": ["None", "Cinnamon", "Caramel Drizzle"],
-        "whipped_cream": ["Add", "None"],
-        "shots": 1
+        "type": "Specialties"
     },
     {
         "name": "Affogato",
         "description": "An indulgent Italian classic, the Affogato is a delightful coffee-based dessert. It starts with a scoop of rich vanilla gelato or ice cream, which is then lovingly drowned in a shot of freshly brewed espresso. The contrast between the hot espresso and cold gelato creates a harmonious blend of flavors, making it a perfect treat for coffee lovers with a sweet tooth.",
         "price": 5.49,
-        "type": "Specialties",
-        "milk": ["Regular", "None"],
-        "temperature": ["Hot", "Cold"],
-        "topping": ["None", "Cinnamon", "Caramel Drizzle"],
-        "whipped_cream": ["Add", "None"],
-        "shots": 1
+        "type": "Specialties"
     },
     {
         "name": "Ristretto",
         "description": "Experience the essence of espresso in its purest form with the Ristretto, a concentrated and bold coffee delight. Brewed with a shorter extraction, this 'short pull' of espresso captures the most intense and vibrant flavors of coffee. With its robust and full-bodied taste, the Ristretto is perfect for those who appreciate a stronger and more aromatic cup. Whether enjoyed as a quick jolt of energy or sipped slowly to savor its complexity, the Ristretto is a testament to the rich diversity of coffee flavors.",
         "price": 3.79,
-        "type": "Short and Strong",
-        "milk": ["Regular", "None"],
-        "temperature": ["Hot", "Cold"],
-        "topping": ["None", "Cinnamon", "Caramel Drizzle"],
-        "whipped_cream": ["Add", "None"],
-        "shots": 1
+        "type": "Short and Strong"
     },
     {
         "name": "Long Black",
         "description": "Elevate the art of simplicity with the Long Black, a revered coffee preparation that highlights the essence of espresso in a larger and more invigorating serving. Created by pouring hot water over a double shot of espresso, the Long Black preserves the rich coffee flavors while offering a more dilute and extended experience. With a balanced strength and a pleasing level of bitterness, this drink is a versatile choice that can be enjoyed with or without milk. The Long Black celebrates the purity of coffee while delivering a satisfying and revitalizing sip.",
         "price": 4.49,
-        "type": "Classics",
-        "milk": ["Regular", "None"],
-        "temperature": ["Hot", "Cold"],
-        "topping": ["None", "Cinnamon", "Caramel Drizzle"],
-        "whipped_cream": ["Add", "None"],
-        "shots": 2
+        "type": "Classics"
     },
     {
         "name": "Cortado",
         "description": "Discover the art of harmony in the Cortado, a captivating blend of espresso and steamed milk that combines strength and subtlety in every sip. With equal parts espresso and milk, the Cortado strikes the perfect balance between bold coffee flavors and gentle creaminess. This coffee is designed for those who appreciate the fullness of espresso without its intensity, making it an ideal choice for both coffee enthusiasts and those new to the world of specialty coffees. With its inviting and approachable character, the Cortado invites you to savor the best of both coffee worlds.",
         "price": 4.29,
-        "type": "Short and Strong",
-        "milk": ["Regular", "None"],
-        "temperature": ["Hot", "Cold"],
-        "topping": ["None", "Cinnamon", "Caramel Drizzle"],
-        "whipped_cream": ["Add", "None"],
-        "shots": 1
+        "type": "Short and Strong"
     }
 ]

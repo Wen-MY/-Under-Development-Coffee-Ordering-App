@@ -1,5 +1,5 @@
 import React, {Component} from "react";
-import {StyleSheet,Text,View} from "react-native";
+import {StyleSheet,Text,View,Image} from "react-native";
 import { SectionGrid } from "react-native-super-grid";
 import SearchBar from "../components/SearchBar";
 
@@ -49,7 +49,6 @@ export default class MenuScreen extends Component{
         };
 
         this._query = this._query.bind(this);
-        this.databasePrepare = this._databasePrepare.bind(this);
         this.db = SQLite.openDatabase(
             {name: 'coffeeDatabase'},
             this.openCallback,
@@ -57,63 +56,33 @@ export default class MenuScreen extends Component{
         )
     }
     componentDidMount(){
-        this._databasePrepare();
         this._query();
-    }
-    _databasePrepare() {
-        this.db.transaction(tx =>{
-            tx.executeSql(
-                'CREATE TABLE items (id INTEGER PRIMARY KEY AUTOINCREMENT,name VARCHAR(20),description TEXT, base_price DECIMAL(6,2) ,type VARCHAR(30))',
-                [],
-                (sqlTxn,res)=>{
-                    console.log('items table ready');
-                },
-                error=>{
-                    console.log('error on creating items table' + error.message);
-                },
-            );
-        })
-        this.db.transaction(tx=>
-            tx.executeSql(
-                'SELECT * FROM items',
-                [],
-                (tx,results) => {
-                    if(results.rows.length == 0){
-                        tx.executeSql(
-                            'INSERT INTO items(name,description,base_price,type) VALUES("Americano","For a milder coffee experience, the Americano is the perfect choice. It\'s crafted by adding hot water to a shot or two of espresso, diluting the intensity while preserving the coffee\'s authentic taste. The result is a light and flavorful drink with a slightly nutty undertone.Ingredients: Freshly brewed espresso, hot water.",7.90,"Classic"'
-                            //more default data insert here
-                        ,
-                        [],
-                        (tx, results) => {
-                            if (results.rowsAffected > 0) {
-                              console.log('dummy data inserted successfully');
-                              this._query();
-                            } else {
-                              console.log('error in inserting data');
-                            }
-                          },
-                        );
-                    }else {
-                        console.log('table filled,default insertion ignored');
-                    }
-                }
-            ),
-        );
     }
     _query(){
         this.db.transaction(tx =>
-            tx.executeSql('SELECT * FROM items'),[],(tx,results) =>
-            this.setState({items: results.rows.raw()}),
-        );
+            tx.executeSql('SELECT * FROM items', [], (tx, results) => {
+                const itemsArray = [];
+                for (let i = 0; i < results.rows.length; i++) {
+                    const item = results.rows.item(i);
+                    const { id, name, description, base_price: price } = item;
+                    itemsArray.push({ id, name, desc: description, price });
+                }
+                this.setState({
+                    items: itemsArray
+                }, () => {
+                    console.log(this.state.items); // Debug purpose
+                });
+            }
+            ));
     }
     openCallback(){
-        console.log('database open sucess');
+        console.log('database open success');
     }
     errorCallback(err){
         console.log('Error in opening database :' + err);
     }
     render(){
-        console.log(this.state.items); //debug purpose
+       
         return(
             <View style={styles.container}>
             <View>
@@ -129,8 +98,9 @@ export default class MenuScreen extends Component{
                 sections={[
                     {
                     title: 'Classics',
-                    data: this.state.fake_items.slice(0, 4),
+                    data: this.state.items,
                     },
+                    
                     {
                     title: 'Specialties',
                     data: this.state.fake_items.slice(4, 8),
@@ -147,12 +117,17 @@ export default class MenuScreen extends Component{
                     title: 'Short and Strong',
                     data: this.state.fake_items.slice(16, 20),
                     },
+                    
                 ]}
                 style={styles.gridView}
                 renderItem={({ item, section, index }) => (
-                    <View style={[styles.itemContainer, { backgroundColor: item.code }]}>
+                    <View style={[styles.itemContainer]}>
+                        
+                         <Image
+                            source={require('../assets/CoffeeImage/Americano.png')} // Update the path accordingly
+                            style={{ width: 50, height:100 ,alignSelf: 'center'}}
+                        />
                     <Text style={styles.itemName}>{item.name}</Text>
-                    <Text style={styles.itemCode}>{item.code}</Text>
                     </View>
                 )}
                 renderSectionHeader={({ section }) => (

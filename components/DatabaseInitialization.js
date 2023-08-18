@@ -1,16 +1,34 @@
 import SQLite from 'react-native-sqlite-storage';
+import jsonData from '../assets/CoffeeDescription/data.json'
 
 class DatabaseInitialization{
+    
      _initializeDatabase() {
+    
+        SQLite.deleteDatabase( //debug purpose
+            {
+              name: 'coffeeDatabase',
+              location: 'default',
+            },
+            () => {
+              console.log('Database deleted successfully.');
+          
+            },
+            error => {
+              console.log('Error deleting database:', error);
+            }
+          )
+
         this.db = SQLite.openDatabase(
         { name: 'coffeeDatabase', location: 'default' },
         this._openCallback,
         this._errorCallback
     );
+    
     this._databasePrepare();
     }
     _databasePrepare() {
-        this.db.transaction(tx =>{
+        this.db.transaction(tx =>
             //Create item table if not exist
             tx.executeSql(
                 'CREATE TABLE items (id INTEGER PRIMARY KEY AUTOINCREMENT,name VARCHAR(20),description TEXT, base_price DECIMAL(6,2) ,type VARCHAR(30))',
@@ -21,9 +39,9 @@ class DatabaseInitialization{
                 error=>{
                     console.log('error on creating items table' /*+ error.message*/);
                 },
-            )}
+            )
         )
-        this.db.transaction(tx =>{
+        this.db.transaction(tx =>
             // Create 'users' table
             tx.executeSql(
                 'CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, email VARCHAR(255), password VARCHAR(16))',
@@ -34,9 +52,9 @@ class DatabaseInitialization{
                 error => {
                     console.log('error on creating users table'/* + error.message*/);
                 },
-            )}
+            )
         )
-        this.db.transaction(tx =>{
+        this.db.transaction(tx =>
             //Create 'orders' table
             tx.executeSql(
                 'CREATE TABLE IF NOT EXISTS orders (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER, total_price DECIMAL(10,2))',
@@ -47,9 +65,9 @@ class DatabaseInitialization{
                 error => {
                   console.log('error on creating orders table'/* + error.message*/);
                 },
-            )}
+            )
         )
-        this.db.transaction(tx =>{
+        this.db.transaction(tx =>
              // Create 'cart' table 
              // item_options is stored the json data (option of the coffee)
             tx.executeSql(
@@ -61,33 +79,50 @@ class DatabaseInitialization{
                 error => {
                 console.log('error on creating cart table'/* + error.message*/);
                 },
-            )}
+            )
         )
+        
         this.db.transaction(tx=>
             tx.executeSql(
                 'SELECT * FROM items',
                 [],
                 (tx,results) => {
                     if(results.rows.length == 0){
+                        jsonData.forEach(item => {
+                            const {name, description, price, type } = item;
                         tx.executeSql(
-                            'INSERT INTO items(name,description,base_price,type) VALUES("Americano","For a milder coffee experience, the Americano is the perfect choice. It\'s crafted by adding hot water to a shot or two of espresso, diluting the intensity while preserving the coffee\'s authentic taste. The result is a light and flavorful drink with a slightly nutty undertone.Ingredients: Freshly brewed espresso, hot water.",7.90,"Classic"'
-                            //more default data insert here
+                            'INSERT INTO items(name,description,base_price,type) VALUES(?,?,?,?)'
                         ,
-                        [],
+                        [item.name,item.description,item.price,item.type],
                         (tx, results) => {
-                            if (results.rowsAffected > 0) {
-                              console.log('dummy data inserted successfully');
-                              this._query();
-                            } else {
-                              console.log('error in inserting data');
-                            }
-                          },
+                              console.log(item.name +' inserted successfully'); //debug purpose
+                        },
+                        error =>{
+                            console.log('error in inserting data');
+                        }
                         );
-                    }else {
+                    });
+                    }
+                    else {
                         console.log('table filled,default insertion ignored');
+                        
                     }
                 }
             ),
+        )
+        //debug purpose
+        this.db.transaction(tx=>
+            tx.executeSql(
+                'SELECT id,name FROM items',
+                [],
+                (tx, results) => {
+                const items = results.rows.raw();
+                console.log('All items in the table:', items);
+                },
+                error => {
+                console.log('Error retrieving items:', error);
+                }
+            )
         );
     }
     openCallback(){
