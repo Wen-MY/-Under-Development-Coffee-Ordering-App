@@ -2,6 +2,7 @@ import {Text, StyleSheet} from 'react-native';
 import React, {Component} from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {NavigationContainer} from '@react-navigation/native';
+import DatabaseInitialization from './components/DatabaseInitialization'
 
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
 
@@ -13,6 +14,10 @@ import SettingScreen from './screens/SettingScreen';
 import CoffeeDetailScreen from './screens/CoffeeDetailScreen';
 const Tab = createBottomTabNavigator ();
 export default class App extends Component{
+  componentDidMount(){
+    const dbInit = new DatabaseInitialization();
+    dbInit._initializeDatabase();
+  }
   render(){
     return(
       <NavigationContainer>
