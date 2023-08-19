@@ -1,5 +1,5 @@
-import React, {Component} from "react";
-import {Text,View,StyleSheet,Dimensions} from "react-native";
+import React, { Component } from "react";
+import { Text, View, StyleSheet, Dimensions, Button } from "react-native";
 import Carousel from "react-native-reanimated-carousel";
 
 
@@ -41,7 +41,6 @@ export default class HomeScreen extends Component{
                     />
                     <View style={styles.boxContainer}>
                         <Text style={styles.primaryTextBold}>Welcome , "username "</Text>
-                        
                     </View>
             </View>
 
