@@ -8,7 +8,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { Avatar } from 'react-native-paper';
 import HomeScreen from './screens/HomeScreen';
 import MenuScreen from './screens/MenuScreen';
-import CartScreen from './screens/PaymentScreen';
+import CartScreen from './screens/CartScreen';
 import TermAndConditionsScreen from './screens/TermsAndConditions';
 import ProfileScreen from './screens/ProfileScreen';
 import SettingScreen from './screens/SettingScreen';
