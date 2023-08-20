@@ -15,6 +15,8 @@ import SettingScreen from './screens/SettingScreen';
 import LoginScreen from './screens/LoginScreen';
 import ChangePassword from './screens/ChangePasswordScreen';
 import ChangeUsername from './screens/ChangeUsernameScreen';
+import OrderHistoryScreen from './screens/OrderHistoryScreen';
+import PaymentScreen from './screens/PaymentScreen'; // Import your PaymentScreen component
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -106,7 +108,7 @@ function AppBottomStack() {
       />
       <Tab.Screen
       name = 'Order'
-      component = {TermAndConditionsScreen}
+      component = {OrderHistoryScreen}
       options={{/*
         tabBarIcon: () => {
           return <FontAwesomeIcon icon="fa-regular fa-user" size={20}/>
@@ -144,6 +146,7 @@ export default function App() {
     <NavigationContainer>
       <Stack.Navigator>
         <Stack.Screen name="AppDrawerStack" component={AppDrawerStack} options={{ headerShown: false }} />
+        <Stack.Screen name="PaymentScreen" component={PaymentScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

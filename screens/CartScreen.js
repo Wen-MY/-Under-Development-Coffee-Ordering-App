@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { View, Text, Image, TouchableOpacity, Button, StyleSheet } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-//const latteImage = require('./assets/CoffeeImage/dirty_latte.png');
-//const americanoImage = require('./assets/CoffeeImage/Americano.png');
+const latteImage = require('../assets/CoffeeImage/dirty_latte.png');
+const americanoImage = require('../assets/CoffeeImage/Americano.png');
 const coffeeItems = [
   {
     "name": "Latte",
-    //"image": latteImage,
+    "image": latteImage,
     "price": 4.49,
     "type": "Classics",
     "milk": "None",
@@ -17,7 +18,7 @@ const coffeeItems = [
   },
   {
     "name": "Americano",
-    //"image": americanoImage,
+    "image": americanoImage,
     "price": 3.99,
     "type": "Classics",
     "milk": "None",
@@ -122,7 +123,10 @@ const CartScreen = ({ navigation }) => {
       <Text style={styles.total}>Total for all items: ${calculateTotal().toFixed(2)}</Text>
       <Button
         title="Proceed to Payment"
-        onPress={() => navigation.navigate('Payment')}
+        onPress={async () => {
+          await AsyncStorage.setItem('cartItems', JSON.stringify(cartItems));
+          navigation.navigate('PaymentScreen', { cartItems });
+        }}
       />
     </View>
   );

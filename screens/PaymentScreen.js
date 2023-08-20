@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { View, Text, TextInput, Button, StyleSheet,ScrollView  } from 'react-native';
 import {Picker} from '@react-native-picker/picker';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 class PaymentScreen extends Component {
   constructor(props) {
@@ -15,6 +16,7 @@ class PaymentScreen extends Component {
       voucher: '',
       validUntilMonth: '01', // Default valid until month
       validUntilYear: '2023', // Default valid until year
+      storedCartItems: [],
     };
   }
 
@@ -47,7 +49,17 @@ class PaymentScreen extends Component {
       cvvRegex
     );
   };
-  
+
+  async componentDidMount() {
+    try {
+      const storedCartItems = await AsyncStorage.getItem('cartItems');
+      if (storedCartItems !== null) {
+        this.setState({ storedCartItems: JSON.parse(storedCartItems) });
+      }
+    } catch (error) {
+      console.error('Error retrieving cart items:', error);
+    }
+  }
 
   render() {
     const subtotal = 30;
