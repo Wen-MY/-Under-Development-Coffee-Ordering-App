@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, Switch, StyleSheet } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
 const SettingScreen = () => {
   const [pushNotification, setPushNotification] = useState(false);
+
+  const navigation = useNavigation();
 
   const togglePushNotification = () => {
     setPushNotification(!pushNotification);
@@ -24,11 +27,11 @@ const SettingScreen = () => {
 
       {/* Account */}
       <Text style={styles.sectionHeader}>Account</Text>
-      <TouchableOpacity style={styles.optionRow} onPress={() => {}}>
+      <TouchableOpacity style={styles.optionRow} onPress={() => navigation.navigate('Change Username')}>
         <Text style={styles.optionLabel}>Change Username</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.optionRow} onPress={() => {}}>
+      <TouchableOpacity style={styles.optionRow} onPress={() => navigation.navigate('Change Password')}>
         <Text style={styles.optionLabel}>Change Password</Text>
       </TouchableOpacity>
 
