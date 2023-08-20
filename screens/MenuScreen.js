@@ -2,6 +2,7 @@ import React, {Component} from "react";
 import {StyleSheet,Text,View,Image} from "react-native";
 import { SectionGrid } from "react-native-super-grid";
 import SearchBar from "../components/SearchBar";
+import { commonStyles } from '../style/CommonStyle';
 
 let SQLite = require('react-native-sqlite-storage');
 
@@ -84,8 +85,8 @@ export default class MenuScreen extends Component{
     render(){
        
         return(
-            <View style={styles.container}>
-            <View>
+            <View style={commonStyles.container}>
+            <View style={commonStyles.searchBarContainer}>
             <SearchBar
                 searchPhrase={this.state.searchPhrase}
                 setSearchPhrase={this.handleSearchPhraseChange}
@@ -119,19 +120,19 @@ export default class MenuScreen extends Component{
                     },
                     
                 ]}
-                style={styles.gridView}
+                style={commonStyles.gridView}
                 renderItem={({ item, section, index }) => (
-                    <View style={[styles.itemContainer]}>
+                    <View style={[commonStyles.itemContainer]}>
                         
                          <Image
                             source={require('../assets/CoffeeImage/Americano.png')} // Update the path accordingly
                             style={{ width: 50, height:100 ,alignSelf: 'center'}}
                         />
-                    <Text style={styles.itemName}>{item.name}</Text>
+                    <Text style={commonStyles.itemName}>{item.name}</Text>
                     </View>
                 )}
                 renderSectionHeader={({ section }) => (
-                    <Text style={styles.sectionHeader}>{section.title}</Text>
+                    <Text style={commonStyles.sectionHeader}>{section.title}</Text>
                 )}
                 />
                 </View>
