@@ -31,7 +31,7 @@ class DatabaseInitialization{
         this.db.transaction(tx =>
             //Create item table if not exist
             tx.executeSql(
-                'CREATE TABLE items (id INTEGER PRIMARY KEY AUTOINCREMENT,name VARCHAR(20),description TEXT, base_price DECIMAL(6,2) ,type VARCHAR(30))',
+                'CREATE TABLE IF NOT EXISTS items (id INTEGER PRIMARY KEY AUTOINCREMENT,name VARCHAR(20),description TEXT, base_price DECIMAL(6,2) ,type VARCHAR(30))',
                 [],
                 (sqlTxn,res)=>{
                     console.log('items table ready');

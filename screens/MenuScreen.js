@@ -3,6 +3,7 @@ import {StyleSheet,Text,View,Image} from "react-native";
 import { SectionGrid } from "react-native-super-grid";
 import SearchBar from "../components/SearchBar";
 import { commonStyles } from '../style/CommonStyle';
+import imageMapping from "../utils/imageMapping";
 
 let SQLite = require('react-native-sqlite-storage');
 
@@ -12,43 +13,9 @@ export default class MenuScreen extends Component{
         super(props);
         this.state = {
             items: [],
-            fake_items: [
-                { name: 'Americano', code: '#a67c52' },
-                { name: 'Latte', code: '#6b3e1a' },
-                { name: 'Cappuccino', code: '#be8f68' },
-                { name: 'Espresso', code: '#3a1c0f' },
-                { name: 'Mocha', code: '#7d5235' },
-                { name: 'Macchiato', code: '#c19776' },
-                { name: 'Flat White', code: '#b59060' },
-                { name: 'Irish Coffee', code: '#8e5b29' },
-                { name: 'Café au Lait', code: '#bc9060' },
-                { name: 'Café Bombón', code: '#6e4a1f' },
-                { name: 'Café con Leche', code: '#94602e' },
-                { name: 'Café Cubano', code: '#6f4c25' },
-                { name: 'Turkish Coffee', code: '#612e0a' },
-                { name: 'Cold Brew', code: '#3d2111' },
-                { name: 'Nitro Coffee', code: '#1d0d05' },
-                { name: 'Vienna Coffee', code: '#7f5747' },
-                { name: 'Affogato', code: '#7d5f3c' },
-                { name: 'Ristretto', code: '#27150c' },
-                { name: 'Long Black', code: '#a5714c' },
-                { name: 'Cortado', code: '#9e6d3f' },
-            ],
             searchPhrase: "",
             clicked: false,
-            fakeData: undefined,
         };
-        handleSearchPhraseChange = (newSearchPhrase) => {
-            this.setState({
-              searchPhrase: newSearchPhrase,
-            });
-        };
-        setClicked = (isClicked) => {
-            this.setState({
-              clicked: isClicked,
-            });
-        };
-
         this._query = this._query.bind(this);
         this.db = SQLite.openDatabase(
             {name: 'coffeeDatabase'},
@@ -56,17 +23,27 @@ export default class MenuScreen extends Component{
             this.errorCallback,
         )
     }
+    handleSearchPhraseChange = (newSearchPhrase) => {
+        this.setState({
+          searchPhrase: newSearchPhrase,
+        });
+    };
+    setClicked = (isClicked) => {
+        this.setState({
+          clicked: isClicked,
+        });
+    };
     componentDidMount(){
         this._query();
     }
     _query(){
         this.db.transaction(tx =>
-            tx.executeSql('SELECT * FROM items', [], (tx, results) => {
+            tx.executeSql('SELECT id, name, base_price, type FROM items', [], (tx, results) => {
                 const itemsArray = [];
                 for (let i = 0; i < results.rows.length; i++) {
                     const item = results.rows.item(i);
-                    const { id, name, description, base_price: price } = item;
-                    itemsArray.push({ id, name, desc: description, price });
+                    const { id, name, base_price: price, type} = item;
+                    itemsArray.push({ id, name, price, type });
                 }
                 this.setState({
                     items: itemsArray
@@ -82,53 +59,49 @@ export default class MenuScreen extends Component{
     errorCallback(err){
         console.log('Error in opening database :' + err);
     }
+    organizeDataIntoSections(data) {
+        const sections = {};
+    
+        // Organize items into sections based on their types
+        data.forEach(item => {
+            if (!sections[item.type]) {
+                sections[item.type] = [];
+            }
+            sections[item.type].push(item);
+        });
+    
+        // Convert sections object into an array of sections
+        const sectionArray = Object.keys(sections).map(type => ({
+            title: type,
+            data: sections[type],
+        }));
+    
+        return sectionArray;
+    }
     render(){
        
         return(
             <View style={commonStyles.container}>
-            <View style={commonStyles.searchBarContainer}>
+            <View>
             <SearchBar
                 searchPhrase={this.state.searchPhrase}
                 setSearchPhrase={this.handleSearchPhraseChange}
-                clicked={this.state.clickedclicked}
+                clicked={this.state.clicked}
                 setClicked={this.setClicked}
             />
             </View>
             <SectionGrid
                 itemDimension={120}
-                sections={[
-                    {
-                    title: 'Classics',
-                    data: this.state.items,
-                    },
-                    
-                    {
-                    title: 'Specialties',
-                    data: this.state.fake_items.slice(4, 8),
-                    },
-                    {
-                    title: 'Unique Brews',
-                    data: this.state.fake_items.slice(8, 12),
-                    },
-                    {
-                    title: 'Iced Delights',
-                    data: this.state.fake_items.slice(12, 16),
-                    },
-                    {
-                    title: 'Short and Strong',
-                    data: this.state.fake_items.slice(16, 20),
-                    },
-                    
-                ]}
+                sections={this.organizeDataIntoSections(this.state.items)}
                 style={commonStyles.gridView}
                 renderItem={({ item, section, index }) => (
                     <View style={[commonStyles.itemContainer]}>
-                        
                          <Image
-                            source={require('../assets/CoffeeImage/Americano.png')} // Update the path accordingly
+                            source={imageMapping[item.name]} // Update the path accordingly
                             style={{ width: 50, height:100 ,alignSelf: 'center'}}
                         />
                     <Text style={commonStyles.itemName}>{item.name}</Text>
+                    <Text style={commonStyles.itemName}>RM {item.price}</Text>
                     </View>
                 )}
                 renderSectionHeader={({ section }) => (

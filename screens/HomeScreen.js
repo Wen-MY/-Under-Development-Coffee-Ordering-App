@@ -1,25 +1,40 @@
 import React, { Component } from "react";
-import { Text, View, StyleSheet, Dimensions, Button } from "react-native";
+import { Text, View, StyleSheet, Dimensions, Button,Image } from "react-native";
 import Carousel from "react-native-reanimated-carousel";
-
+import {commonStyles} from "../style/CommonStyle"
+const imagePaths = [
+  require('../assets/otherImg/CarouselAd/0.png'),
+  require('../assets/otherImg/CarouselAd/1.png'),
+  require('../assets/otherImg/CarouselAd/2.png'),
+  require('../assets/otherImg/CarouselAd/3.png'),
+  require('../assets/otherImg/CarouselAd/4.png'),
+  require('../assets/otherImg/CarouselAd/5.png'),
+];
 
 export default class HomeScreen extends Component{
     constructor(props){
         super(props);
         this.state = {
-            width : Dimensions.get('screen').width
+            width : Dimensions.get('screen').width,
+            balance : "0.00"
         };
     }
+    handleOrderNowPress = () => {
+      this.props.navigation.navigate('Menu'); // Navigate to the 'Menu' tab
+  };
     render(){
+      
         return(
             <View style={styles.container}>
+                {/* Carousel Slide Advertisement box here */}
                 <Carousel
                     loop
                     width = {this.state.width}
                     height = {this.state.width/2}
                     autoPlay = {true}
                     data={[...new Array(6).keys()]} // will change to photo if assets added
-                    scrollAnimationDuration={1000}
+                    //data = {[...new Array(6).keys()].map(index => `../assets/otherImg/CarouselAd/${index}.png`)}
+                    scrollAnimationDuration={1200}
                     mode="parallax"
                     pagingEnabled={true}
                     //onSnapToItem={(index) => console.log('current index:', index)} //debug purpose
@@ -27,20 +42,31 @@ export default class HomeScreen extends Component{
                         <View
                             style={{
                                 flex: 1,
-                                borderWidth: 1,
+                                //borderWidth: 0,
                                 justifyContent: 'center',
                                 //backgroundColor : 'black',
-                            }}
-                        >
-                           <Text style={{ textAlign: 'center', fontSize: 30 }}>
-                                {index}
-                            </Text>
-                            
+                            }}>
+                                 <Image 
+                                 source={imagePaths[index]} 
+                                 style={{ width: '100%', height: '100%' }} />
+                          
                         </View>
                     )}// will change to image if exist
                     />
+                    {/* Balance Box here */}
                     <View style={styles.boxContainer}>
                         <Text style={styles.primaryTextBold}>Welcome , "username "</Text>
+                        <Text style={{marginTop: 10}}>Balance</Text>  
+                        <Text style={styles.primaryTextBold}>RM <Text style={{fontSize: 24}}>{this.state.balance}</Text></Text> 
+                        {/* will add responsive balance later */}
+                    </View>
+                    {/* Order Now Box here */}
+                    <View style={styles.boxContainer}>
+                      <Text style={{textAlign:'center'}}>Our Nearest Store At</Text>
+                      <Text style={[styles.primaryTextBold,{textAlign:'center'}]}>NEStar Coffee -Bandar Sungai Long</Text>
+                      <View style={{marginTop: 30, marginHorizontal:70}}>
+                      <Button color='#43a047' title="Order Now" onPress={this.handleOrderNowPress}/>
+                      </View>
                     </View>
             </View>
 

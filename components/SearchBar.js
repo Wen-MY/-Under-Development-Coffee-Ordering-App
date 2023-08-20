@@ -2,7 +2,7 @@ import React from "react";
 import { StyleSheet, TextInput, View, Keyboard, Button } from "react-native";
 
 
-const SearchBar = ({clicked, searchPhrase, setSearchPhrase, setCLicked}) => {
+const SearchBar = ({clicked, searchPhrase, setSearchPhrase, setClicked}) => {
   return (
     <View style={styles.container}>
       <View
@@ -23,19 +23,17 @@ const SearchBar = ({clicked, searchPhrase, setSearchPhrase, setCLicked}) => {
           onFocus={() => {
             setClicked(true);
           }}
+          onBlur={() =>{
+            setClicked(false);
+          }}
         />
-        {/* cross Icon, depending on whether the search bar is clicked or not */}
-        {clicked && (
-          <Entypo name="cross" size={20} color="black" style={{ padding: 1 }} onPress={() => {
-              setSearchPhrase("")
-          }}/>
-        )}
       </View>
       {/* cancel button, depending on whether the search bar is clicked or not */}
       {clicked && (
-        <View>
+        <View style={{padding :20}}>
           <Button
-            title="Cancel"
+            title="X"
+            color= "#43A047"
             onPress={() => {
               Keyboard.dismiss();
               setClicked(false);
@@ -51,7 +49,7 @@ export default SearchBar;
 // styles
 const styles = StyleSheet.create({
   container: {
-    margin: 15,
+    margin: 5,
     justifyContent: "flex-start",
     alignItems: "center",
     flexDirection: "row",

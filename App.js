@@ -17,6 +17,7 @@ import ChangePassword from './screens/ChangePasswordScreen';
 import ChangeUsername from './screens/ChangeUsernameScreen';
 import OrderHistoryScreen from './screens/OrderHistoryScreen';
 import PaymentScreen from './screens/PaymentScreen'; // Import your PaymentScreen component
+import DatabaseInitialization from './components/DatabaseInitialization'; 
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -142,7 +143,10 @@ function AppDrawerStack() {
 }
 
 export default function App() {
+  const dbInit = new DatabaseInitialization();
+  dbInit._initializeDatabase();
   return (
+    
     <NavigationContainer>
       <Stack.Navigator>
         <Stack.Screen name="AppDrawerStack" component={AppDrawerStack} options={{ headerShown: false }} />

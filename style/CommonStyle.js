@@ -59,20 +59,20 @@ export const commonStyles = StyleSheet.create({
     marginTop: 20,
     flex: 1,
   },
-  searchBarContainer: {
-    marginBottom: 20,
-  },
   itemContainer: {
     justifyContent: 'flex-end',
     borderRadius: 5,
     padding: 10,
     height: 150,
+    borderWidth: 1,
+    borderColor: '#43a047',
   },
   itemName: {
     fontFamily: 'Lora-Regular',
     fontSize: 16,
-    color: 'white',
+    color: 'black',
     fontWeight: '600',
+    textAlign: 'center',
   },
   itemCode: {
     fontFamily: 'Montserrat-Regular',
@@ -88,6 +88,14 @@ export const commonStyles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 20,
   },
+  primaryButton:{
+    backgroundColor: '#43a047',
+    padding: 10,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+
+  }
 });
 
 

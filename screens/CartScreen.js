@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, Image, TouchableOpacity, Button, StyleSheet } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const latteImage = require('../assets/CoffeeImage/dirty_latte.png');
+const latteImage = require('../assets/CoffeeImage/Latte.png');
 const americanoImage = require('../assets/CoffeeImage/Americano.png');
 const coffeeItems = [
   {
