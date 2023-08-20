@@ -10,6 +10,7 @@ import HomeScreen from './screens/HomeScreen';
 import MenuScreen from './screens/MenuScreen';
 import CartScreen from './screens/CartScreen';
 import TermAndConditionsScreen from './screens/TermsAndConditions';
+import CoffeeDetailScreen from './screens/CoffeeDetailScreen';
 import ProfileScreen from './screens/ProfileScreen';
 import SettingScreen from './screens/SettingScreen';
 import LoginScreen from './screens/LoginScreen';
@@ -57,6 +58,12 @@ const SettingStack = () => (
     <Stack.Screen name="Change Password" component={ChangePassword} />
   </Stack.Navigator>
 );
+const MenuStack = () => (
+  <Stack.Navigator initialRouteName='Menu'>
+    <Stack.Screen name="Menu" component={MenuScreen} />
+    <Stack.Screen name="Coffee" component={CoffeeDetailScreen} />
+  </Stack.Navigator>
+);
 
 function AppBottomStack() {
   return (
@@ -88,7 +95,7 @@ function AppBottomStack() {
       />
     <Tab.Screen
       name = 'Menu'
-      component = {MenuScreen}
+      component = {MenuStack}
       options={{/*
         tabBarIcon: () => {
           return <FontAwesomeIcon icon="fa-regular fa-mug-hot" size={20}/>

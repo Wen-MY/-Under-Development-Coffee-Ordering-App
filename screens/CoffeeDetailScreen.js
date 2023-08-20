@@ -1,15 +1,45 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { TouchableOpacity, View, Text, Image, StyleSheet, ScrollView } from 'react-native';
-import { RadioButton, Checkbox } from 'react-native-paper';
+import { RadioButton, Checkbox, configureFonts } from 'react-native-paper';
+import imageMapping from "../utils/imageMapping";
+import SQLite from 'react-native-sqlite-storage';
+import { commonStyles } from '../style/CommonStyle';
 
-const CoffeeDetailScreen = () => {
+const CoffeeDetailScreen = ({route}) => {
+  const {itemId} = route.params;
+  const [coffeeDetails, setCoffeeDetails] = useState({
+    name: '',
+    basePrice: 0,
+    type: '',
+    description: '',
+  });
   const [iceLevel, setIceLevel] = useState('Default Ice');
   const [whippedCream, setWhippedCream] = useState(false);
   const [sweetness, setSweetness] = useState('Default Sugar');
+  useEffect(() => {
+    const db = SQLite.openDatabase({ name: 'coffeeDatabase'});
 
+    db.transaction((tx) => {
+      tx.executeSql(
+        'SELECT * FROM items WHERE id = ?',
+        [itemId],
+        (tx, results) => {
+          const item = results.rows.item(0);
+          setCoffeeDetails({
+              name: item.name,
+              basePrice: item.base_price,
+              type: item.type,
+              description: item.description,
+            });
+        },
+        (error) => {
+          console.log('Error fetching item details', error);
+        }
+      );
+    });
+  }, [itemId]);
   const calculatePrice = () => {
-    let price = 3.99; // Base price
-
+    let price = parseFloat(coffeeDetails.basePrice); // Base price
     // Additional charges based on options
     if (whippedCream) {
       price += 0.7;
@@ -17,6 +47,7 @@ const CoffeeDetailScreen = () => {
 
     return price.toFixed(2);
   };
+
   const handlePlaceOrder = () => {
     // Place order logic
     // You can navigate to a checkout screen or perform any desired action
@@ -24,15 +55,15 @@ const CoffeeDetailScreen = () => {
 
   return (
     <ScrollView style={styles.container}>
-      <Text style={styles.name}>Coffee Name</Text>
+      <Text style={styles.name}>{coffeeDetails.name}</Text>
 
       <Image 
-        source={require('../assets/CoffeeImage/Americano.png')}
+        source={imageMapping[coffeeDetails.name]}
         style={styles.coffeeImage}
       />
 
       <Text style={styles.description}>
-        A delicious cup of coffee with rich flavor and aroma.
+        {coffeeDetails.description}
       </Text>
 
       <View style={styles.section}>
@@ -121,14 +152,17 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   coffeeImage: {
-    width: '100%',
-    height: 200,
+    width: 200,
+    height: 350,
     marginBottom: 20,
-    resizeMode: 'cover',
+    //resizeMode: 'center',
+    alignSelf: 'center'
   },
   description: {
     fontSize: 16,
-    marginBottom: 20,
+    marginHorizontal: 20,
+    marginBottom:20,
+    textAlign: 'center',
   },
   section: {
     marginBottom: 20,

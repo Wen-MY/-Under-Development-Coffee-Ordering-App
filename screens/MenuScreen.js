@@ -1,12 +1,11 @@
 import React, {Component} from "react";
-import {StyleSheet,Text,View,Image} from "react-native";
+import {StyleSheet,Text,View,Image,TouchableOpacity} from "react-native";
 import { SectionGrid } from "react-native-super-grid";
 import SearchBar from "../components/SearchBar";
 import { commonStyles } from '../style/CommonStyle';
 import imageMapping from "../utils/imageMapping";
 
 let SQLite = require('react-native-sqlite-storage');
-
 
 export default class MenuScreen extends Component{
     constructor(props){
@@ -78,9 +77,12 @@ export default class MenuScreen extends Component{
     
         return sectionArray;
     }
+    handleItemDetail = (itemId) => {
+        this.props.navigation.navigate("Coffee",{itemId});
+    }
     render(){
-       
         return(
+            
             <View style={commonStyles.container}>
             <View>
             <SearchBar
@@ -95,6 +97,7 @@ export default class MenuScreen extends Component{
                 sections={this.organizeDataIntoSections(this.state.items)}
                 style={commonStyles.gridView}
                 renderItem={({ item, section, index }) => (
+                    <TouchableOpacity onPress={() => this.handleItemDetail(item.id)}>
                     <View style={[commonStyles.itemContainer]}>
                          <Image
                             source={imageMapping[item.name]} // Update the path accordingly
@@ -103,6 +106,7 @@ export default class MenuScreen extends Component{
                     <Text style={commonStyles.itemName}>{item.name}</Text>
                     <Text style={commonStyles.itemName}>RM {item.price}</Text>
                     </View>
+                    </TouchableOpacity>
                 )}
                 renderSectionHeader={({ section }) => (
                     <Text style={commonStyles.sectionHeader}>{section.title}</Text>
