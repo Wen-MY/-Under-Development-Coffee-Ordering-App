@@ -2,12 +2,13 @@ import React, { Component } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, ScrollView ,Image } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-//const VisaIcon = '../assets/CardImg/visa_icon.png';
-//const MasterCardIcon = '../assets/CardImg/mastercard_icon.png';
-//const CirrusIcon = '../assets/CardImg/cirrus_icon.png';
-//const MaestroIcon = '../assets/CardImg/maestro_icon.png';
-//const PaypalIcon = '../assets/CardImg/paypal_icon.png';
-//const EbayIcon = '../assets/CardImg/ebay_icon.png';
+
+const VisaIcon = require('../assets/CardImage/visa_icon.png');
+const MasterCardIcon = require('../assets/CardImage/mastercard_icon.png');
+const CirrusIcon = require('../assets/CardImage/cirrus_icon.png');
+const MaestroIcon = require('../assets/CardImage/maestro_icon.png');
+const PaypalIcon = require('../assets/CardImage/paypal_icon.png');
+const EbayIcon = require('../assets/CardImage/ebay_icon.png');
 
 class PaymentScreen extends Component {
   constructor(props) {
@@ -81,9 +82,7 @@ class PaymentScreen extends Component {
         <Text style={styles.heading}>Order Confirmation</Text>
 
         <View style={styles.paymentMethodContainer}>
-          <Text style={styles.label}>Payment Method</Text>
-          
-          
+          <Text style={styles.label}>Payment Method</Text>         
           <Picker
             selectedValue={this.state.paymentMethod}
             onValueChange={(itemValue) => this.setState({ paymentMethod: itemValue })}
@@ -96,6 +95,15 @@ class PaymentScreen extends Component {
             <Picker.Item label="Maestro" value="Maestro" />
             <Picker.Item label="Cirrus" value="Cirrus" />
           </Picker>
+          
+          <View style={styles.cardIconsRow}>
+          <Image source={MasterCardIcon} style={styles.cardIcon} />
+          <Image source={VisaIcon} style={styles.cardIcon} />
+          <Image source={EbayIcon} style={styles.cardIcon} />
+          <Image source={PaypalIcon} style={styles.cardIcon} />
+          <Image source={MaestroIcon} style={styles.cardIcon} />
+          <Image source={CirrusIcon} style={styles.cardIcon} />
+          </View>
         </View>
         <Text style={styles.heading1}>Card Information</Text>
         <Text style={styles.label}>First Name</Text>
@@ -247,6 +255,17 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 10, // Adjust the margin as needed
+  },
+  cardIconsRow: {
+    flexDirection: 'row', // Create a row layout for card icons
+    alignItems: 'center', // Align card icons vertically in the center
+    marginBottom: 10, // Add some spacing between card icons and picker
+  },
+
+  cardIcon: {
+    width: 40, // Adjust the width as needed
+    height: 25, // Adjust the height as needed
+    marginRight: 10, // Add some spacing between card icons
   },
 });
 
