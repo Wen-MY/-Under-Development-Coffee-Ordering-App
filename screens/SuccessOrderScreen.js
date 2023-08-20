@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { View, Text, Button, StyleSheet } from 'react-native';
-import Icon from 'react-native-vector-icons/FontAwesome';
+import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
+
 
 class SuccessOrderScreen extends Component {
   navigateToMenuScreen = () => {
@@ -15,7 +16,7 @@ class SuccessOrderScreen extends Component {
 
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <Icon name="check-circle" size={50} color="green" />
+        <FontAwesomeIcon name="check-circle" size={50} color="green" />
         <Text style={styles.successText}>Your order has been placed successfully!</Text>
 
         <View style={styles.transactionContainer}>
@@ -32,6 +33,8 @@ class SuccessOrderScreen extends Component {
 
 const styles = StyleSheet.create({
   successText: {
+    fontFamily: 'Montserrat',
+    color: '#4A4A4A',
     marginTop: 10,
     fontSize: 18,
   },
@@ -42,8 +45,18 @@ const styles = StyleSheet.create({
     padding: 10,
     borderWidth: 1,
     borderColor: 'lightgray',
-    borderRadius: 8,
+    borderRadius: 10,
     marginBottom:40,
+    shadowColor: '#000000', // Shadow color
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.2, // Shadow opacity
+    shadowRadius: 4, // Shadow radius
+    elevation: 5, // Android shadow elevation
+    backgroundColor: '#ffffff',
+    
   },
   transactionLabel: {
     marginTop: 5,

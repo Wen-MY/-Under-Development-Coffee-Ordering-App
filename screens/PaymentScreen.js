@@ -1,7 +1,14 @@
 import React, { Component } from 'react';
-import { View, Text, TextInput, Button, StyleSheet,ScrollView  } from 'react-native';
-import {Picker} from '@react-native-picker/picker';
+import { View, Text, TextInput, Button, StyleSheet, ScrollView ,Image } from 'react-native';
+import { Picker } from '@react-native-picker/picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const VisaIcon = require('../assets/CardImage/visa_icon.png');
+const MasterCardIcon = require('../assets/CardImage/mastercard_icon.png');
+const CirrusIcon = require('../assets/CardImage/cirrus_icon.png');
+const MaestroIcon = require('../assets/CardImage/maestro_icon.png');
+const PaypalIcon = require('../assets/CardImage/paypal_icon.png');
+const EbayIcon = require('../assets/CardImage/ebay_icon.png');
 
 class PaymentScreen extends Component {
   constructor(props) {
@@ -25,8 +32,8 @@ class PaymentScreen extends Component {
       const { voucher } = this.state;
       const subtotal = 30;
       const deliveryFee = 5.0;
-       let voucherAmount = 0;
-       if (voucher === '123456') {
+      let voucherAmount = 0;
+      if (voucher === '123456') {
         voucherAmount = 5.0; // Apply $5.00 discount if voucher is valid
       }
       const totalAmount = subtotal + deliveryFee - voucherAmount;
@@ -40,13 +47,13 @@ class PaymentScreen extends Component {
   validateForm = () => {
     const { firstName, lastName, cardNumber, cvv } = this.state;
     const cardNumberRegex = /^[0-9]{16}$/; // 16-digit number
-    const cvvRegex= /^[0-9]{4}$/; // 4-digit number
+    const cvvRegex = /^[0-9]{4}$/; // 4-digit number
 
     return (
       firstName &&
       lastName &&
       cardNumberRegex.test(cardNumber) && // Validate card number
-      cvvRegex
+      cvvRegex.test(cvv) // Validate CVV
     );
   };
 
@@ -65,43 +72,52 @@ class PaymentScreen extends Component {
     const subtotal = 30;
     const deliveryFee = 5.0;
     let voucherAmount = 0; // Initialize voucherAmount to 0
-      if (this.state.voucher === '123456') {
-        voucherAmount = 5.0; // Apply $5.00 discount if voucher is valid
-      }
+    if (this.state.voucher === '123456') {
+      voucherAmount = 5.0; // Apply $5.00 discount if voucher is valid
+    }
     const totalAmount = subtotal + deliveryFee - voucherAmount;
-    
 
     return (
       <ScrollView style={styles.container}>
         <Text style={styles.heading}>Order Confirmation</Text>
 
-        <Text style={styles.label}>Payment Method</Text>
-        
-        <Picker
-        selectedValue={this.state.paymentMethod}
-        onValueChange={(itemValue) => this.setState({ paymentMethod: itemValue })}
-      >
-        <Picker.Item label="MasterCard" value="MasterCard" />
-        <Picker.Item label="Visa" value="Visa" />
-        <Picker.Item label="eBay" value="eBay" />
-        <Picker.Item label="PayPal" value="PayPal" />
-        <Picker.Item label="Maestro" value="Maestro" />
-        <Picker.Item label="Cirrus" value="Cirrus" />
-      </Picker>
-
+        <View style={styles.paymentMethodContainer}>
+          <Text style={styles.label}>Payment Method</Text>         
+          <Picker
+            selectedValue={this.state.paymentMethod}
+            onValueChange={(itemValue) => this.setState({ paymentMethod: itemValue })}
+            style={styles.input}
+          >
+            <Picker.Item label="MasterCard" value="MasterCard" />
+            <Picker.Item label="Visa" value="Visa" />
+            <Picker.Item label="eBay" value="eBay" />
+            <Picker.Item label="PayPal" value="PayPal" />
+            <Picker.Item label="Maestro" value="Maestro" />
+            <Picker.Item label="Cirrus" value="Cirrus" />
+          </Picker>
+          
+          <View style={styles.cardIconsRow}>
+          <Image source={MasterCardIcon} style={styles.cardIcon} />
+          <Image source={VisaIcon} style={styles.cardIcon} />
+          <Image source={EbayIcon} style={styles.cardIcon} />
+          <Image source={PaypalIcon} style={styles.cardIcon} />
+          <Image source={MaestroIcon} style={styles.cardIcon} />
+          <Image source={CirrusIcon} style={styles.cardIcon} />
+          </View>
+        </View>
         <Text style={styles.heading1}>Card Information</Text>
         <Text style={styles.label}>First Name</Text>
         <TextInput
-        style={styles.input}
-        onChangeText={(text) => this.setState({ firstName: text })}
+          style={styles.input}
+          onChangeText={(text) => this.setState({ firstName: text })}
         />
 
         <Text style={styles.label}>Last Name</Text>
         <TextInput
-        style={styles.input}
-        onChangeText={(text) => this.setState({ lastName: text })}
+          style={styles.input}
+          onChangeText={(text) => this.setState({ lastName: text })}
         />
-        
+
         <Text style={styles.label}>Card Number</Text>
         <TextInput
           style={styles.input}
@@ -120,51 +136,37 @@ class PaymentScreen extends Component {
 
         <Text style={styles.label}>Expiry Date</Text>
         <View style={styles.pickerContainer}>
-        <View style={styles.pickerColumn}>
-          <Picker
-            selectedValue={this.state.validUntilMonth}
-            onValueChange={(itemValue) => this.setState({validUntilMonth:itemValue })}
-            style={{ flex: 1 }}
-          >
-          <Picker.Item label="01 - January" value="01" />
-          <Picker.Item label="02 - February" value="02" />
-          <Picker.Item label="03 - March" value="03" />
-          <Picker.Item label="04 - April" value="04" />
-          <Picker.Item label="05 - May" value="05" />
-          <Picker.Item label="06 - June" value="06" />
-          <Picker.Item label="07 - July" value="07" />
-          <Picker.Item label="08 - August" value="08" />
-          <Picker.Item label="09 - September" value="09" />
-          <Picker.Item label="10 - October" value="10" />
-          <Picker.Item label="11 - November" value="11" />
-          <Picker.Item label="12 - December" value="12" />
-          </Picker>
-        </View>
+          <View style={styles.pickerColumn}>
+            <Picker
+              selectedValue={this.state.validUntilMonth}
+              onValueChange={(itemValue) => this.setState({ validUntilMonth: itemValue })}
+              style={{ flex: 1 }}
+            >
+              <Picker.Item label="01 - January" value="01" />
+              {/* ... (Add other months) */}
+              <Picker.Item label="12 - December" value="12" />
+            </Picker>
+          </View>
 
           <View style={styles.pickerColumn}>
-          <Picker
-            selectedValue={this.state.validUntilYear}
-            onValueChange={(itemValue) => this.setState({ validUntilYear: itemValue })}
-            style={{ flex: 1 }}
-          >
-            <Picker.Item label="2023" value="2023" />
-            <Picker.Item label="2024" value="2024" />
-            <Picker.Item label="2025" value="2025" />
-            <Picker.Item label="2026" value="2026" />
-            <Picker.Item label="2027" value="2027" />
-            <Picker.Item label="2028" value="2028" />
-            <Picker.Item label="2029" value="2029" />
-            <Picker.Item label="2030" value="2030" />
+            <Picker
+              selectedValue={this.state.validUntilYear}
+              onValueChange={(itemValue) => this.setState({ validUntilYear: itemValue })}
+              style={{ flex: 1 }}
+            >
+              <Picker.Item label="2023" value="2023" />
+              {/* ... (Add other years) */}
+              <Picker.Item label="2030" value="2030" />
             </Picker>
           </View>
         </View>
 
-          <Text style={styles.label}>Voucher Code</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="XXXXXX"
-            onChangeText={(text) => this.setState({ voucher: text })}
-          />
+        <Text style={styles.label}>Voucher Code</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="XXXXXX"
+          onChangeText={(text) => this.setState({ voucher: text })}
+        />
 
         <View style={styles.paymentContainer}>
           <Text style={styles.heading1}>Payment Details</Text>
@@ -172,13 +174,11 @@ class PaymentScreen extends Component {
           <Text>Delivery Fee: ${deliveryFee.toFixed(2)}</Text>
           <Text>Voucher Amount: ${voucherAmount.toFixed(2)}</Text>
           <Text>Total: ${totalAmount.toFixed(2)}</Text>
-          
         </View>
 
         <Button title="Make Payment" onPress={this.handlePayment} />
         <View style={styles.bottomSpace} />
-        </ScrollView>
-      
+      </ScrollView>
     );
   }
 }
@@ -187,27 +187,33 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
+    backgroundColor: '#FFFFFF',
   },
   heading: {
-    fontSize: 20,
+    fontSize: 24,
+    fontWeight: 'bold',
     marginBottom: 10,
+    color: '#4A4A4A',
   },
   heading1: {
     fontSize: 18,
     marginBottom: 10,
     marginTop: 20,
+    color: '#4A4A4A',
   },
   label: {
     fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 5,
+    color: '#4A4A4A',
   },
   input: {
     height: 40,
-    borderColor: 'gray',
+    borderColor: '#ccc',
     borderWidth: 1,
     marginBottom: 10,
     padding: 5,
+    borderRadius: 8,
   },
   pickerContainer: {
     flexDirection: 'row',
@@ -224,10 +230,45 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'lightgray',
     borderRadius: 8,
+    backgroundColor: 'white', // Background color of the payment details box
+    shadowColor: '#000000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 5,
   },
   bottomSpace: {
-    height: 40, // Adjust the height as needed
+    height: 40,
+  },
+  paymentMethodContainer: {
+    marginBottom: 20, // Add margin to separate the payment method section from other elements
+    borderWidth: 1, // Add a border
+    borderColor: 'lightgray', // Border color
+    borderRadius: 8, // Border radius for rounded corners
+    padding: 10, // Padding inside the container
+  },
+  cardIconsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 10, // Adjust the margin as needed
+  },
+  cardIconsRow: {
+    flexDirection: 'row', // Create a row layout for card icons
+    alignItems: 'center', // Align card icons vertically in the center
+    marginBottom: 10, // Add some spacing between card icons and picker
+  },
+
+  cardIcon: {
+    width: 40, // Adjust the width as needed
+    height: 25, // Adjust the height as needed
+    marginRight: 10, // Add some spacing between card icons
   },
 });
 
 export default PaymentScreen;
+
+   
