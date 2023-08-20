@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, Image, TouchableOpacity, Button, StyleSheet } from 'react-native';
+import { View, Text, Image, TouchableOpacity, Button, StyleSheet,ScrollView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const latteImage = require('../assets/CoffeeImage/dirty_latte.png');
@@ -32,8 +32,19 @@ const CartScreen = ({ navigation }) => {
   const [cartItems, setCartItems] = useState([]);
 
   const addItemToCart = (index) => {
-    const newCartItem = { ...coffeeItems[index], quantity: 1 };
-    setCartItems([...cartItems, newCartItem]);
+    const itemName = coffeeItems[index].name;
+    const existingItemIndex = cartItems.findIndex((item) => item.name === itemName);
+  
+    if (existingItemIndex !== -1) {
+      // If the item already exists in the cart, update its quantity
+      const newCartItems = [...cartItems];
+      newCartItems[existingItemIndex].quantity += 1;
+      setCartItems(newCartItems);
+    } else {
+      // If it's a new item, add it to the cart with a quantity of 1
+      const newCartItem = { ...coffeeItems[index], quantity: 1 };
+      setCartItems([...cartItems, newCartItem]);
+    }
   };
 
   const increaseQuantity = (index) => {
@@ -64,15 +75,15 @@ const CartScreen = ({ navigation }) => {
     return total;
   };
 
-   return (
-    <View style={styles.container}>
-      <Text style={styles.heading}>Testing</Text>
+  return (
+    <ScrollView contentContainerStyle={styles.container}>
+      <Text style={styles.heading}>Coffee Menu</Text>
       {coffeeItems.map((item, index) => (
         <View key={index} style={styles.itemContainer}>
           <Image source={item.image} style={styles.itemImage} />
           <View style={styles.itemInfo}>
-            <Text>{item.name}</Text>
-            <Text>{item.description}</Text>
+            <Text style={styles.itemName}>{item.name}</Text>
+            <Text style={styles.itemDescription}>{item.description}</Text>
             <Text style={styles.price}>Price: ${item.price.toFixed(2)}</Text>
             <TouchableOpacity onPress={() => addItemToCart(index)}>
               <Text style={styles.addButton}>Add to Cart</Text>
@@ -81,17 +92,14 @@ const CartScreen = ({ navigation }) => {
         </View>
       ))}
 
-
       <Text style={styles.heading}>Your Cart</Text>
       {cartItems.map((item, index) => (
         <View key={index} style={styles.cartItemContainer}>
           <Image source={item.image} style={styles.cartItemImage} />
           <View style={styles.cartItemInfo}>
-            <Text>{item.name}</Text>
-            <Text>{item.description}</Text>
-            <Text style={styles.unitPrice}>
-              Unit Price: ${item.price.toFixed(2)}
-            </Text>
+            <Text style={styles.itemName}>{item.name}</Text>
+            <Text style={styles.itemDescription}>{item.description}</Text>
+            <Text style={styles.unitPrice}>Unit Price: ${item.price.toFixed(2)}</Text>
             <View style={styles.actionRow}>
               <TouchableOpacity
                 style={styles.smallButton}
@@ -99,14 +107,15 @@ const CartScreen = ({ navigation }) => {
               >
                 <Text style={styles.buttonText}>-</Text>
               </TouchableOpacity>
-              <Text style={[styles.quantityText, styles.quantityMargin]}>{item.quantity}</Text>
+              <Text style={[styles.quantityText, styles.quantityMargin]}>
+                {item.quantity}
+              </Text>
               <TouchableOpacity
                 style={styles.smallButton}
                 onPress={() => increaseQuantity(index)}
               >
                 <Text style={styles.buttonText}>+</Text>
               </TouchableOpacity>
-              <View style={styles.spacer} />
               <TouchableOpacity
                 style={styles.removeButton}
                 onPress={() => removeItem(index)}
@@ -128,7 +137,7 @@ const CartScreen = ({ navigation }) => {
           navigation.navigate('PaymentScreen', { cartItems });
         }}
       />
-    </View>
+    </ScrollView>
   );
 };
 
@@ -136,8 +145,6 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: '#f4f4f4',
     padding: 20,
-    borderRadius: 8,
-    margin: 20,
   },
   heading: {
     fontSize: 24,
@@ -157,9 +164,26 @@ const styles = StyleSheet.create({
     height: 70,
     marginRight: 10,
   },
+  itemName: {
+    fontWeight: 'bold',
+    fontSize: 18,
+  },
+  itemDescription: {
+    fontSize: 14,
+  },
   price: {
     fontWeight: 'bold',
-  },  
+    fontSize: 16,
+    marginTop: 5,
+  },
+  addButton: {
+    backgroundColor: '#FF6F61',
+    color: 'white',
+    padding: 5,
+    borderRadius: 5,
+    marginTop: 10,
+    textAlign: 'center',
+  },
   cartItemContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -176,17 +200,17 @@ const styles = StyleSheet.create({
   cartItemInfo: {
     flex: 1,
   },
- 
-
+  unitPrice: {
+    fontWeight: 'bold',
+    fontSize: 14,
+    marginTop: 5,
+  },
   actionRow: {
     flexDirection: 'row',
     alignItems: 'center',
     marginTop: 5,
   },
-  spacer: {
-    width: 20,
-  },
-    smallButton: {
+  smallButton: {
     width: 30,
     height: 30,
     justifyContent: 'center',
@@ -198,30 +222,38 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
   },
-  total: {
-    fontWeight: 'bold',
-    marginTop: 20, // Add margin to separate from the button
+  quantityText: {
+    fontSize: 16,
   },
-    removeButton: {
+  quantityMargin: {
+    marginHorizontal: 10,
+  },
+  removeButton: {
     width: 75,
     height: 30,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'red',
+    backgroundColor: '#FF6F61',
     paddingHorizontal: 5,
     paddingVertical: 5,
     borderRadius: 4,
-    marginLeft: 5, // Add some space between the buttons
+    marginLeft: 5,
   },
   removeButtonText: {
     color: 'white',
     fontWeight: 'bold',
   },
-  quantityMargin: {
-    marginHorizontal: 10, // Add horizontal margin to quantity text
+  totalPrice: {
+    fontWeight: 'bold',
+    fontSize: 16,
+    marginTop: 10,
   },
-  
+  total: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginTop: 20,
+    textAlign: 'center',
+  },
 });
-
 
 export default CartScreen;
