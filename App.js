@@ -23,15 +23,6 @@ import DatabaseInitialization from './components/DatabaseInitialization';
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 const Drawer = createDrawerNavigator();
-const SettingSubStack = createStackNavigator();
-
-const SettingSubNavigator = () => (
-  <SettingSubStack.Navigator>
-    <SettingSubStack.Screen name="Settings" component={SettingScreen} />
-    <SettingSubStack.Screen name="Change Username" component={ChangeUsername} />
-    <SettingSubStack.Screen name="Change Password" component={ChangePassword} />
-  </SettingSubStack.Navigator>
-);
 
 const CustomDrawerContent = (props) => {
   return (
@@ -53,15 +44,22 @@ const CustomDrawerContent = (props) => {
 };
 
 const SettingStack = () => (
-  <Stack.Navigator>
+  <Stack.Navigator initialRouteName='SettingsStackHome'>
+    <Stack.Screen name="SettingsStackHome" component={SettingScreen} />
     <Stack.Screen name="Change Username" component={ChangeUsername} />
     <Stack.Screen name="Change Password" component={ChangePassword} />
   </Stack.Navigator>
 );
 const MenuStack = () => (
-  <Stack.Navigator initialRouteName='Menu'>
-    <Stack.Screen name="Menu" component={MenuScreen} />
+  <Stack.Navigator initialRouteName='MenuStackHome'>
+    <Stack.Screen name="MenuStackHome" component={MenuScreen} options={{headerShown:false}}/>
     <Stack.Screen name="Coffee" component={CoffeeDetailScreen} />
+  </Stack.Navigator>
+);
+const CartStack = () => (
+  <Stack.Navigator initialRouteName='Your Cart'>
+    <Stack.Screen name="Your Cart" component={CartScreen}/>
+    <Stack.Screen name="PaymentScreen" component={PaymentScreen} />
   </Stack.Navigator>
 );
 
@@ -106,11 +104,12 @@ function AppBottomStack() {
       />
        <Tab.Screen
       name = 'Cart'
-      component = {CartScreen}
+      component = {CartStack}
       options={{/*
         tabBarIcon: () => {
           return <FontAwesomeIcon icon="fa-regular fa-cart-shopping" size={20}/>
         }*/
+        headerShown:false
         }
       }
       />
@@ -141,9 +140,9 @@ function AppDrawerStack() {
       drawerContent={CustomDrawerContent}
     >
       {/* Your Drawer Screens */}
-      <Drawer.Screen name ='Home' component={AppBottomStack} options={{ headerShown: false }} />
+      <Drawer.Screen name ='Home Screen' component={AppBottomStack} options={{ headerShown: false }} />
       <Drawer.Screen name="Profile" component={ProfileScreen} />
-      <Drawer.Screen name="Settings" component={SettingSubNavigator} />
+      <Drawer.Screen name="Settings" component={SettingStack} />
       <Drawer.Screen name="Sign Out" component={LoginScreen}/>
     </Drawer.Navigator>
   );
@@ -157,7 +156,6 @@ export default function App() {
     <NavigationContainer>
       <Stack.Navigator>
         <Stack.Screen name="AppDrawerStack" component={AppDrawerStack} options={{ headerShown: false }} />
-        <Stack.Screen name="PaymentScreen" component={PaymentScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

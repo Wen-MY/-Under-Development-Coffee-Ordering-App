@@ -41,6 +41,7 @@ class DatabaseInitialization{
                 },
             )
         )
+        /* user table will create in another database
         this.db.transaction(tx =>
             // Create 'users' table
             tx.executeSql(
@@ -50,10 +51,11 @@ class DatabaseInitialization{
                 console.log('users table ready');
                 },
                 error => {
-                    console.log('error on creating users table'/* + error.message*/);
+                    console.log('error on creating users table' + error.message);
                 },
             )
-        )
+        )*/
+        
         this.db.transaction(tx =>
             //Create 'orders' table
             tx.executeSql(
@@ -81,7 +83,7 @@ class DatabaseInitialization{
                 },
             )
         )
-        
+        //!!Default Insertion!!
         this.db.transaction(tx=>
             tx.executeSql(
                 'SELECT * FROM items',

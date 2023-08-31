@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Text, View, StyleSheet, Dimensions, Button,Image } from "react-native";
 import Carousel from "react-native-reanimated-carousel";
 import {commonStyles} from "../style/CommonStyle"
+import { TouchableOpacity } from "react-native-gesture-handler";
 const imagePaths = [
   require('../assets/otherImg/CarouselAd/0.png'),
   require('../assets/otherImg/CarouselAd/1.png'),
@@ -16,6 +17,7 @@ export default class HomeScreen extends Component{
         super(props);
         this.state = {
             width : Dimensions.get('screen').width,
+            username : "Guest User",
             balance : "0.00"
         };
     }
@@ -55,7 +57,7 @@ export default class HomeScreen extends Component{
                     />
                     {/* Balance Box here */}
                     <View style={styles.boxContainer}>
-                        <Text style={styles.primaryTextBold}>Welcome , "username "</Text>
+                        <Text style={styles.primaryTextBold}>Welcome, {this.state.username}</Text>
                         <Text style={{marginTop: 10}}>Balance</Text>  
                         <Text style={styles.primaryTextBold}>RM <Text style={{fontSize: 24}}>{this.state.balance}</Text></Text> 
                         {/* will add responsive balance later */}
@@ -65,7 +67,9 @@ export default class HomeScreen extends Component{
                       <Text style={{textAlign:'center'}}>Our Nearest Store At</Text>
                       <Text style={[styles.primaryTextBold,{textAlign:'center'}]}>NEStar Coffee -Bandar Sungai Long</Text>
                       <View style={{marginTop: 30, marginHorizontal:70}}>
-                      <Button color='#43a047' title="Order Now" onPress={this.handleOrderNowPress}/>
+                      <TouchableOpacity onPress={this.handleOrderNowPress} style={commonStyles.primaryButton}>
+                      <Text style={[commonStyles.itemCode,{fontSize: 16}]} >Order Now</Text>
+                      </TouchableOpacity>
                       </View>
                     </View>
             </View>

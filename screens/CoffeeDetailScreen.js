@@ -54,7 +54,8 @@ const CoffeeDetailScreen = ({route}) => {
   };
 
   return (
-    <ScrollView style={styles.container}>
+    <View style={styles.container}>
+    <ScrollView >
       <Text style={styles.name}>{coffeeDetails.name}</Text>
 
       <Image 
@@ -124,17 +125,18 @@ const CoffeeDetailScreen = ({route}) => {
           <Text>Add Whipped Cream</Text>
         </View>
       </View>
-
-      {/* Price button */}
-      <TouchableOpacity
-        style={styles.priceButton}
-        onPress={handlePlaceOrder}
-      >
-        <Text style={styles.priceButtonLabel}>Place Order</Text>
-        <Text style={styles.priceButtonPrice}>RM {calculatePrice()}</Text>
-      </TouchableOpacity>
-      <View style={styles.spacingBelowButton} />
     </ScrollView>
+
+    {/* Price button */}
+    <View style ={styles.priceContainer}>
+      <View style={styles.priceSection}>
+        <Text style={styles.priceButtonPrice}>RM {calculatePrice()}</Text>
+        <TouchableOpacity onPress={handlePlaceOrder} style={styles.priceButton}>
+          <Text style={styles.priceButtonLabel}>Add to Cart</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+    </View>
   );
 };
 
@@ -178,29 +180,31 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   priceButton: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    padding : 10,
     alignItems: 'center',
-    backgroundColor: '#fff',
-    borderTopWidth: 1,
-    borderTopColor: '#ccc',
-    paddingHorizontal: 16,
-    paddingVertical: 20,
-    bottom: 0,
-    left: 0,
-    right: 0,
+    backgroundColor: "#43A047",
+    borderRadius: 8, 
   },
   priceButtonLabel: {
     fontSize: 18,
     fontWeight: 'bold',
+    color : 'white'
   },
   priceButtonPrice: {
     fontSize: 18,
     fontWeight: 'bold',
   },
-  spacingBelowButton: {
-    height: 20, // Adjust the value as needed
+  priceSection: {
+    flexDirection: 'row', // Arrange items in a row
+    justifyContent: 'space-between', // Align items with space between
+    alignItems: 'center', // Align items vertically
   },
+  priceContainer: {
+    backgroundColor: 'lightgrey', 
+    padding: 8, 
+    borderRadius: 8, 
+    marginBottom: 16
+  }
 });
 
 export default CoffeeDetailScreen;

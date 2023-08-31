@@ -94,8 +94,7 @@ export const commonStyles = StyleSheet.create({
     borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
-
-  }
+  },
 });
 
 
