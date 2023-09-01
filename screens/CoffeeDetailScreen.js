@@ -1,22 +1,32 @@
 import React, { useState, useEffect } from 'react';
-import { Alert, TouchableOpacity, View, Text, Image, StyleSheet, ScrollView } from 'react-native';
+import {
+  View,
+  Text,
+  Image,
+  TouchableOpacity,
+  StyleSheet,
+  ScrollView,
+} from 'react-native';
 import { RadioButton, Checkbox } from 'react-native-paper';
 import SQLite from 'react-native-sqlite-storage';
-import imageMapping from "../utils/imageMapping";
-import { commonStyles } from '../style/CommonStyle';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import imageMapping from '../utils/imageMapping';
 
 const CoffeeDetailScreen = ({ route, navigation }) => {
   const { itemId, cartItems, setCartItems } = route.params;
+
   const [coffeeDetails, setCoffeeDetails] = useState({
     name: '',
     basePrice: 0,
     type: '',
     description: '',
   });
+
   const [iceLevel, setIceLevel] = useState('Default Ice');
   const [whippedCream, setWhippedCream] = useState(false);
   const [sweetness, setSweetness] = useState('Default Sugar');
+  const [quantity, setQuantity] = useState(1);
+  const [coffeeInfo, setCoffeeInfo] = useState('');
 
   useEffect(() => {
     const db = SQLite.openDatabase({ name: 'coffeeDatabase' });
@@ -41,20 +51,8 @@ const CoffeeDetailScreen = ({ route, navigation }) => {
     });
   }, [itemId]);
 
-  const calculatePrice = () => {
-    let price = parseFloat(coffeeDetails.basePrice); // Base price
-    // Additional charges based on options
-    if (whippedCream) {
-      price += 0.7;
-    }
-
-    return price.toFixed(2);
-  };
-
-  //testing purpose
   const clearCart = async () => {
     try {
-      // Clear the cart items in AsyncStorage
       await AsyncStorage.removeItem('cartItems');
       Alert.alert('Cart Cleared', 'Your cart has been cleared successfully.');
     } catch (error) {
@@ -62,10 +60,29 @@ const CoffeeDetailScreen = ({ route, navigation }) => {
     }
   };
 
+  const calculatePrice = () => {
+    let price = parseFloat(coffeeDetails.basePrice);
+
+    if (whippedCream) {
+      price += 0.7;
+    }
+
+    return (price * quantity).toFixed(2);
+  };
+
+  const increaseQuantity = () => {
+    setQuantity(quantity + 1);
+  };
+
+  const decreaseQuantity = () => {
+    if (quantity > 1) {
+      setQuantity(quantity - 1);
+    }
+  };
+
   const addToCart = async () => {
     const price = calculatePrice();
-  
-    // Create the coffee item to add to the cart
+
     const coffeeItem = {
       ...coffeeDetails,
       iceLevel,
@@ -73,24 +90,35 @@ const CoffeeDetailScreen = ({ route, navigation }) => {
       sweetness,
       price: parseFloat(price),
     };
-  
+
+    const selectedOptions = [];
+    if (iceLevel !== 'Default Ice') {
+      selectedOptions.push(iceLevel);
+    }
+    if (sweetness !== 'Default Sugar') {
+      selectedOptions.push(sweetness);
+    }
+    if (whippedCream) {
+      selectedOptions.push('+ Whipped Cream');
+    }
+
+    const coffeeInfoText = selectedOptions.join(' | ');
+    setCoffeeInfo(coffeeInfoText);
+
     try {
-      // Load existing cart items from AsyncStorage
       const existingCartItemsJSON = await AsyncStorage.getItem('cartItems');
       let existingCartItems = [];
-  
+
       if (existingCartItemsJSON) {
         existingCartItems = JSON.parse(existingCartItemsJSON);
       }
-  
-      // Add the new coffee item to the cart
+
+      coffeeItem.coffeeInfo = coffeeInfoText;
+
       existingCartItems.push(coffeeItem);
-  
-      // Save the updated cart items back to AsyncStorage
+
       await AsyncStorage.setItem('cartItems', JSON.stringify(existingCartItems));
-  
-      // Navigate back to the MenuScreen or perform any other navigation logic
-      navigation.goBack();
+      navigation.navigate('CartScreen');
     } catch (error) {
       console.error('Error adding item to cart:', error);
     }
@@ -168,17 +196,25 @@ const CoffeeDetailScreen = ({ route, navigation }) => {
         </View>
       </ScrollView>
 
-      {/* Price button */}
       <View style={styles.priceContainer}>
-      <View style={styles.priceSection}>
-          <Text style={styles.priceButtonPrice}>RM {calculatePrice()}</Text>
-          <TouchableOpacity onPress={addToCart} style={styles.priceButton}>
-            <Text style={styles.priceButtonLabel}>Add to Cart</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={clearCart} style={styles.clearCartButton}>
-            <Text style={styles.clearCartButtonText}>Clear Cart</Text>
-          </TouchableOpacity>
+        <View style={styles.priceSection}>
+          <Text style={styles.priceButtonLabel}>Price: RM {calculatePrice()}</Text>
+          <View style={styles.quantityContainer}>
+            <TouchableOpacity onPress={decreaseQuantity} style={styles.quantityButton}>
+              <Text style={styles.quantityButtonText}>-</Text>
+            </TouchableOpacity>
+            <Text style={styles.quantityText}>{quantity}</Text>
+            <TouchableOpacity onPress={increaseQuantity} style={styles.quantityButton}>
+              <Text style={styles.quantityButtonText}>+</Text>
+            </TouchableOpacity>
+          </View>
         </View>
+        <TouchableOpacity onPress={addToCart} style={styles.priceButton}>
+          <Text style={styles.priceButtonLabel}>Add to Cart</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={clearCart} style={styles.clearCartButton}>
+          <Text style={styles.clearCartButtonText}>Clear Cart</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -232,6 +268,8 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     color: 'white',
+    marginTop: 5,
+    marginBottom: 5,
   },
   priceButtonPrice: {
     fontSize: 18,
@@ -244,9 +282,32 @@ const styles = StyleSheet.create({
   },
   priceContainer: {
     backgroundColor: 'lightgrey',
-    padding: 8,
+    padding: 8, // Updated padding
     borderRadius: 8,
     marginBottom: 16,
+  },
+  quantityContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginLeft: 20, // Adjust the margin to your preference
+    marginRight: 20, // Adjust the margin to your preference
+  },
+  quantityText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginRight: 10,
+    marginLeft: 10,
+  },
+  quantityButton: {
+    backgroundColor: '#43A047',
+    borderRadius: 20,
+    padding: 10, // Updated padding
+    margin: 5, // Adjust the margin to your preference
+  },
+  quantityButtonText: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: 'white',
   },
 });
 

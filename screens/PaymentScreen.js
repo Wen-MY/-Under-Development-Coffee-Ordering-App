@@ -26,22 +26,20 @@ class PaymentScreen extends Component {
       storedCartItems: [],
     };
   }
+  
 
   handlePayment = async () => {
     if (this.validateForm()) {
       const { voucher, storedCartItems } = this.state;
-      const subtotal = storedCartItems.reduce(
-        (total, item) => total + item.price * item.quantity,
-        0
-      );
+      const subtotal = parseFloat(this.props.route.params.subtotal); // Convert subtotal to a floating-point number
       const deliveryFee = 5.0;
-      let voucherAmount = 0;
-      
-      if (voucher === '123456') {
-        voucherAmount = 5.0;
+      let voucherAmount = 0; // Initialize voucherAmount to 0
+      if (this.state.voucher === '123456') {
+        voucherAmount = 5.0; // Apply $5.00 discount if voucher is valid
       }
-      
       const totalAmount = subtotal + deliveryFee - voucherAmount;
+      const formattedTotalAmount = totalAmount.toFixed(2);
+      
       
       // Create an order object with relevant details
       const order = {
@@ -102,13 +100,15 @@ class PaymentScreen extends Component {
   }
 
   render() {
-    const subtotal = 30;
+    const subtotal = parseFloat(this.props.route.params.subtotal); // Convert subtotal to a floating-point number
     const deliveryFee = 5.0;
     let voucherAmount = 0; // Initialize voucherAmount to 0
     if (this.state.voucher === '123456') {
       voucherAmount = 5.0; // Apply $5.00 discount if voucher is valid
     }
     const totalAmount = subtotal + deliveryFee - voucherAmount;
+    const formattedTotalAmount = totalAmount.toFixed(2);
+    
 
     return (
       <ScrollView style={styles.container}>
@@ -176,7 +176,16 @@ class PaymentScreen extends Component {
               style={{ flex: 1 }}
             >
               <Picker.Item label="01 - January" value="01" />
-              {/* ... (Add other months) */}
+              <Picker.Item label="02 - Febuary" value="02" />
+              <Picker.Item label="03 - March" value="03" />
+              <Picker.Item label="04 - April" value="04" />
+              <Picker.Item label="05 - May" value="05" />
+              <Picker.Item label="06 - June" value="06" />
+              <Picker.Item label="07 - July" value="07" />
+              <Picker.Item label="08 - August" value="08" />
+              <Picker.Item label="09 - September" value="09" />
+              <Picker.Item label="10 - October" value="10" />
+              <Picker.Item label="11 - November" value="11" />
               <Picker.Item label="12 - December" value="12" />
             </Picker>
           </View>
@@ -188,7 +197,12 @@ class PaymentScreen extends Component {
               style={{ flex: 1 }}
             >
               <Picker.Item label="2023" value="2023" />
-              {/* ... (Add other years) */}
+              <Picker.Item label="2024" value="2024" />
+              <Picker.Item label="2025" value="2025" />
+              <Picker.Item label="2026" value="2026" />
+              <Picker.Item label="2027" value="2027" />
+              <Picker.Item label="2028" value="2028" />
+              <Picker.Item label="2029" value="2029" />
               <Picker.Item label="2030" value="2030" />
             </Picker>
           </View>
@@ -203,11 +217,12 @@ class PaymentScreen extends Component {
 
         <View style={styles.paymentContainer}>
           <Text style={styles.heading1}>Payment Details</Text>
-          <Text>Subtotal: ${subtotal.toFixed(2)}</Text>
+          <Text>Subtotal: ${subtotal}</Text>
           <Text>Delivery Fee: ${deliveryFee.toFixed(2)}</Text>
           <Text>Voucher Amount: ${voucherAmount.toFixed(2)}</Text>
           <Text>Total: ${totalAmount.toFixed(2)}</Text>
         </View>
+
 
         <Button title="Make Payment" onPress={this.handlePayment} />
         <View style={styles.bottomSpace} />

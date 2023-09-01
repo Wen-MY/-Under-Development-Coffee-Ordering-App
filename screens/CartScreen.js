@@ -3,7 +3,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { View, Text, Image, TouchableOpacity, Button, StyleSheet, ScrollView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const CartScreen = ({ navigation }) => {
+const CartScreen = ({ navigation, route }) => {
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -30,77 +30,58 @@ const CartScreen = ({ navigation }) => {
     }, [])
   );
 
-  const increaseQuantity = (index) => {
+  const removeItem = (itemId) => {
     const newCartItems = [...cartItems];
-    newCartItems[index].quantity += 1;
-    setCartItems(newCartItems);
-  };
-
-   const decreaseQuantity = (index) => {
-    if (cartItems[index].quantity > 1) {
-      const newCartItems = [...cartItems];
-      newCartItems[index].quantity -= 1;
+    const itemIndex = newCartItems.findIndex((item) => item.id === itemId);
+    if (itemIndex !== -1) {
+      newCartItems.splice(itemIndex, 1); // Remove the item at itemIndex
       setCartItems(newCartItems);
+      saveCartItems(newCartItems);
     }
   };
 
-  const removeItem = (itemId) => {
-    const newCartItems = cartItems.filter((item) => item.id !== itemId);
-    setCartItems(newCartItems);
+  const saveCartItems = async (items) => {
+    try {
+      await AsyncStorage.setItem('cartItems', JSON.stringify(items));
+    } catch (error) {
+      console.error('Error saving cart items:', error);
+    }
   };
 
   const calculateTotal = () => {
-    let total = 0;
-    for (let i = 0; i < cartItems.length; i++) {
-      total += cartItems[i].price * cartItems[i].quantity;
+    let subtotal = 0;
+    for (const item of cartItems) {
+      subtotal += item.price;
     }
-    return total;
+    return subtotal.toFixed(2);
   };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.heading}>Your Cart</Text>
-      {cartItems.map((item, index) => (
-        <View key={index} style={styles.cartItemContainer}>
-          <Image source={item.image} style={styles.cartItemImage} />
+      {cartItems.map((item) => (
+        <View key={item.id} style={styles.cartItemContainer}>
+          <Image source={{ uri: item.image }} style={styles.cartItemImage} />
           <View style={styles.cartItemInfo}>
             <Text style={styles.itemName}>{item.name}</Text>
             <Text style={styles.unitPrice}>Unit Price: ${item.price.toFixed(2)}</Text>
             <View style={styles.actionRow}>
               <TouchableOpacity
-                style={styles.smallButton}
-                onPress={() => decreaseQuantity(index)}
-              >
-                <Text style={styles.buttonText}>-</Text>
-              </TouchableOpacity>
-              <Text style={[styles.quantityText, styles.quantityMargin]}>
-                {item.quantity}
-              </Text>
-              <TouchableOpacity
-                style={styles.smallButton}
-                onPress={() => increaseQuantity(index)}
-              >
-                <Text style={styles.buttonText}>+</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
                 style={styles.removeButton}
-                onPress={() => removeItem(index)}
+                onPress={() => removeItem(item.id)}
               >
                 <Text style={styles.removeButtonText}>Remove</Text>
               </TouchableOpacity>
             </View>
-            <Text style={styles.totalPrice}>
-              Total Price: ${(item.price * item.quantity).toFixed(2)}
-            </Text>
           </View>
         </View>
       ))}
-      <Text style={styles.total}>Total for all items: ${calculateTotal().toFixed(2)}</Text>
+      <Text style={styles.total}>Total for all items: ${calculateTotal()}</Text>
       <Button
-        title="Proceed to Payment"
-        onPress={() => {
-          navigation.navigate('PaymentScreen', { cartItems });
-        }}
+      title="Proceed to Payment"
+      onPress={() => {
+        navigation.navigate('PaymentScreen', { subtotal: calculateTotal() });
+      }}
       />
     </ScrollView>
   );

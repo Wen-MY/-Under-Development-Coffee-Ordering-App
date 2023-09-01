@@ -62,7 +62,7 @@ class DatabaseInitialization{
              // Create 'cart' table 
              // item_options is stored the json data (option of the coffee)
             tx.executeSql(
-                'CREATE TABLE IF NOT EXISTS cart (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER, item_id INTEGER, item_options TEXT, quantity INTEGER, FOREIGN KEY(user_id) REFERENCES users(id), FOREIGN KEY(item_id) REFERENCES items(id))',
+                'CREATE TABLE IF NOT EXISTS cart (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER, item_id INTEGER, item_options TEXT, coffeeInfo TEXT, quantity INTEGER, FOREIGN KEY(user_id) REFERENCES users(id), FOREIGN KEY(item_id) REFERENCES items(id))',
                 [],
                 (sqlTxn, res) => {
                 console.log('cart table ready');
