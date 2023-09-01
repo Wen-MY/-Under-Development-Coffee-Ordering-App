@@ -27,18 +27,51 @@ class PaymentScreen extends Component {
     };
   }
 
-  handlePayment = () => {
+  handlePayment = async () => {
     if (this.validateForm()) {
-      const { voucher } = this.state;
-      const subtotal = 30;
+      const { voucher, storedCartItems } = this.state;
+      const subtotal = storedCartItems.reduce(
+        (total, item) => total + item.price * item.quantity,
+        0
+      );
       const deliveryFee = 5.0;
       let voucherAmount = 0;
+      
       if (voucher === '123456') {
-        voucherAmount = 5.0; // Apply $5.00 discount if voucher is valid
+        voucherAmount = 5.0;
       }
+      
       const totalAmount = subtotal + deliveryFee - voucherAmount;
-
-      this.props.navigation.navigate('SuccessOrder', { totalAmount });
+      
+      // Create an order object with relevant details
+      const order = {
+        firstName: this.state.firstName,
+        lastName: this.state.lastName,
+        cardNumber: this.state.cardNumber,
+        cvv: this.state.cvv,
+        paymentMethod: this.state.paymentMethod,
+        voucher,
+        validUntilMonth: this.state.validUntilMonth,
+        validUntilYear: this.state.validUntilYear,
+        subtotal,
+        deliveryFee,
+        voucherAmount,
+        totalAmount,
+        orderItems: storedCartItems,
+      };
+  
+      try {
+        // Save the order details in AsyncStorage
+        await AsyncStorage.setItem('orderHistory', JSON.stringify(order));
+  
+        // Clear the cart (optional)
+        await AsyncStorage.removeItem('cartItems');
+  
+        // Navigate to the OrderHistory screen and pass the order object
+        this.props.navigation.navigate('OrderHistoryScreen', { order });
+      } catch (error) {
+        console.error('Error saving order details:', error);
+      }
     } else {
       alert('Please fill out all fields correctly.');
     }

@@ -56,19 +56,8 @@ class DatabaseInitialization{
             )
         )*/
         
-        this.db.transaction(tx =>
-            //Create 'orders' table
-            tx.executeSql(
-                'CREATE TABLE IF NOT EXISTS orders (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER, total_price DECIMAL(10,2))',
-                [],
-                (sqlTxn, res) => {
-                  console.log('orders table ready');
-                },
-                error => {
-                  console.log('error on creating orders table'/* + error.message*/);
-                },
-            )
-        )
+        //Create 'orders' table
+        
         this.db.transaction(tx =>
              // Create 'cart' table 
              // item_options is stored the json data (option of the coffee)

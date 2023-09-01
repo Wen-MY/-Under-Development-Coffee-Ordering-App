@@ -17,6 +17,7 @@ import LoginScreen from './screens/LoginScreen';
 import ChangePassword from './screens/ChangePasswordScreen';
 import ChangeUsername from './screens/ChangeUsernameScreen';
 import OrderHistoryScreen from './screens/OrderHistoryScreen';
+import OrderDetailsScreen from './screens/OrderDetailsScreen';
 import PaymentScreen from './screens/PaymentScreen'; // Import your PaymentScreen component
 import DatabaseInitialization from './components/DatabaseInitialization'; 
 
@@ -156,6 +157,7 @@ export default function App() {
     <NavigationContainer>
       <Stack.Navigator>
         <Stack.Screen name="AppDrawerStack" component={AppDrawerStack} options={{ headerShown: false }} />
+        <Stack.Screen name="OrderDetails" component={OrderDetailsScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

@@ -1,51 +1,34 @@
-import React, { useState } from 'react';
-import { View, Text, Image, TouchableOpacity, Button, StyleSheet,ScrollView } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
+import { View, Text, Image, TouchableOpacity, Button, StyleSheet, ScrollView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const latteImage = require('../assets/CoffeeImage/Latte.png');
-const americanoImage = require('../assets/CoffeeImage/Americano.png');
-const coffeeItems = [
-  {
-    "name": "Latte",
-    "image": latteImage,
-    "price": 4.49,
-    "type": "Classics",
-    "milk": "None",
-    "temperature":"Hot",
-    "topping":"None",
-    "whipped_cream": "None",
-    "shots": 1
-  },
-  {
-    "name": "Americano",
-    "image": americanoImage,
-    "price": 3.99,
-    "type": "Classics",
-    "milk": "None",
-    "temperature":"Hot",
-    "topping":"None",
-    "whipped_cream": "None",
-    "shots": 1
-  }
-];
 const CartScreen = ({ navigation }) => {
   const [cartItems, setCartItems] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const addItemToCart = (index) => {
-    const itemName = coffeeItems[index].name;
-    const existingItemIndex = cartItems.findIndex((item) => item.name === itemName);
-  
-    if (existingItemIndex !== -1) {
-      // If the item already exists in the cart, update its quantity
-      const newCartItems = [...cartItems];
-      newCartItems[existingItemIndex].quantity += 1;
-      setCartItems(newCartItems);
-    } else {
-      // If it's a new item, add it to the cart with a quantity of 1
-      const newCartItem = { ...coffeeItems[index], quantity: 1 };
-      setCartItems([...cartItems, newCartItem]);
+  const loadCartItems = async () => {
+    try {
+      const cartItemsJSON = await AsyncStorage.getItem('cartItems');
+      if (cartItemsJSON !== null) {
+        setCartItems(JSON.parse(cartItemsJSON));
+      }
+    } catch (error) {
+      console.error('Error loading cart items:', error);
+    } finally {
+      setLoading(false);
     }
   };
+
+  useEffect(() => {
+    loadCartItems();
+  }, []);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      loadCartItems(); // Load cart items whenever the screen comes into focus
+    }, [])
+  );
 
   const increaseQuantity = (index) => {
     const newCartItems = [...cartItems];
@@ -53,7 +36,7 @@ const CartScreen = ({ navigation }) => {
     setCartItems(newCartItems);
   };
 
-  const decreaseQuantity = (index) => {
+   const decreaseQuantity = (index) => {
     if (cartItems[index].quantity > 1) {
       const newCartItems = [...cartItems];
       newCartItems[index].quantity -= 1;
@@ -61,9 +44,8 @@ const CartScreen = ({ navigation }) => {
     }
   };
 
-  const removeItem = (index) => {
-    const newCartItems = [...cartItems];
-    newCartItems.splice(index, 1);
+  const removeItem = (itemId) => {
+    const newCartItems = cartItems.filter((item) => item.id !== itemId);
     setCartItems(newCartItems);
   };
 
@@ -77,28 +59,12 @@ const CartScreen = ({ navigation }) => {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.heading}>Coffee Menu</Text>
-      {coffeeItems.map((item, index) => (
-        <View key={index} style={styles.itemContainer}>
-          <Image source={item.image} style={styles.itemImage} />
-          <View style={styles.itemInfo}>
-            <Text style={styles.itemName}>{item.name}</Text>
-            <Text style={styles.itemDescription}>{item.description}</Text>
-            <Text style={styles.price}>Price: ${item.price.toFixed(2)}</Text>
-            <TouchableOpacity onPress={() => addItemToCart(index)}>
-              <Text style={styles.addButton}>Add to Cart</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      ))}
-
       <Text style={styles.heading}>Your Cart</Text>
       {cartItems.map((item, index) => (
         <View key={index} style={styles.cartItemContainer}>
           <Image source={item.image} style={styles.cartItemImage} />
           <View style={styles.cartItemInfo}>
             <Text style={styles.itemName}>{item.name}</Text>
-            <Text style={styles.itemDescription}>{item.description}</Text>
             <Text style={styles.unitPrice}>Unit Price: ${item.price.toFixed(2)}</Text>
             <View style={styles.actionRow}>
               <TouchableOpacity
@@ -132,8 +98,7 @@ const CartScreen = ({ navigation }) => {
       <Text style={styles.total}>Total for all items: ${calculateTotal().toFixed(2)}</Text>
       <Button
         title="Proceed to Payment"
-        onPress={async () => {
-          await AsyncStorage.setItem('cartItems', JSON.stringify(cartItems));
+        onPress={() => {
           navigation.navigate('PaymentScreen', { cartItems });
         }}
       />
@@ -151,39 +116,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 10,
   },
-  itemContainer: {
-    backgroundColor: 'white',
-    padding: 15,
-    borderRadius: 8,
-    marginTop: 10,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  itemImage: {
-    width: 70,
-    height: 70,
-    marginRight: 10,
-  },
-  itemName: {
-    fontWeight: 'bold',
-    fontSize: 18,
-  },
-  itemDescription: {
-    fontSize: 14,
-  },
-  price: {
-    fontWeight: 'bold',
-    fontSize: 16,
-    marginTop: 5,
-  },
-  addButton: {
-    backgroundColor: '#FF6F61',
-    color: 'white',
-    padding: 5,
-    borderRadius: 5,
-    marginTop: 10,
-    textAlign: 'center',
-  },
   cartItemContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -199,6 +131,10 @@ const styles = StyleSheet.create({
   },
   cartItemInfo: {
     flex: 1,
+  },
+  itemName: {
+    fontWeight: 'bold',
+    fontSize: 18,
   },
   unitPrice: {
     fontWeight: 'bold',

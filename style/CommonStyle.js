@@ -3,30 +3,29 @@ import { StyleSheet } from 'react-native';
 export const commonStyles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#f6f6f6',
     padding: 20,
   },
   boxContainer: {
-    backgroundColor: '#ffffff', // Background color of the box , white
-    borderRadius: 10, // Rounded corners
+    flex: 1,
+    backgroundColor: '#ffffff',
+    borderRadius: 10,
     margin: 10,
-    padding: 20, // Padding inside the box
-    shadowColor: '#000000', // Shadow color
+    padding: 20,
+    shadowColor: '#000000',
     shadowOffset: {
       width: 0,
       height: 2,
     },
-    shadowOpacity: 0.2, // Shadow opacity
-    shadowRadius: 4, // Shadow radius
-    elevation: 5, // Android shadow elevation
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 5,
   },
   title: {
     fontFamily: 'Montserrat-Bold',
     fontSize: 24,
     color: '#4A4A4A',
-    marginBottom: 10,
+    marginBottom: 20,  // increased margin-bottom for better spacing
   },
   subtitle: {
     fontFamily: 'Montserrat-Regular',
@@ -94,6 +93,43 @@ export const commonStyles = StyleSheet.create({
     borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  orderBoxContainer: {
+    backgroundColor: 'white',
+    marginVertical: 5,
+    padding: 15,
+    borderRadius: 8,
+    shadowColor: "#000",
+    shadowOffset: {
+        width: 0,
+        height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  orderItemContainer: {
+    flexDirection: 'column',
+  },
+  orderItemText: {
+    fontSize: 18,
+    color: '#444',
+    fontFamily: 'Montserrat-Regular',
+    marginBottom: 5,
+  },
+  orderDateTimeText: {
+    fontFamily: 'Montserrat-Regular',
+    fontSize: 14,
+    color: '#777',
+  },
+  orderTotalText: {
+    fontFamily: 'Montserrat-Regular',
+    fontSize: 16,
+    color: '#333',
+    marginTop: 10,
+  },
+  iconText: {
+    marginRight: 5,
   },
 });
 

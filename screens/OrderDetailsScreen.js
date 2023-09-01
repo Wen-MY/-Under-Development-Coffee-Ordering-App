@@ -20,10 +20,12 @@ export default class OrderDetailsScreen extends Component {
   }
 
   componentDidMount() {
+    // Use the passed order ID from the props
     const orderId = this.props.route.params.orderId;
     this.fetchOrderDetails(orderId);
   }
 
+  
   fetchOrderDetails(orderId) {
     this.db.transaction((tx) => {
       tx.executeSql('SELECT * FROM order_details WHERE order_id = ?', [orderId], (tx, results) => {
