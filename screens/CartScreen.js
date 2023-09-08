@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import { View, Text, Image, TouchableOpacity, Button, StyleSheet, ScrollView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import imageMapping from '../utils/imageMapping';
 
-const CartScreen = ({ navigation, route }) => {
+const CartScreen = ({ navigation }) => {
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -61,9 +62,17 @@ const CartScreen = ({ navigation, route }) => {
       <Text style={styles.heading}>Your Cart</Text>
       {cartItems.map((item) => (
         <View key={item.id} style={styles.cartItemContainer}>
-          <Image source={{ uri: item.image }} style={styles.cartItemImage} />
+          <Image
+            source={imageMapping[item.name]}
+            style={styles.cartItemImage}
+          />
+
           <View style={styles.cartItemInfo}>
             <Text style={styles.itemName}>{item.name}</Text>
+            
+            {item.customizations && (
+              <Text style={styles.customizations}> {item.customizations}</Text>
+            )}
             <Text style={styles.unitPrice}>Unit Price: ${item.price.toFixed(2)}</Text>
             <View style={styles.actionRow}>
               <TouchableOpacity
@@ -78,14 +87,16 @@ const CartScreen = ({ navigation, route }) => {
       ))}
       <Text style={styles.total}>Total for all items: ${calculateTotal()}</Text>
       <Button
-      title="Proceed to Payment"
-      onPress={() => {
-        navigation.navigate('PaymentScreen', { subtotal: calculateTotal() });
-      }}
+        title="Proceed to Payment"
+        onPress={() => {
+          navigation.navigate('PaymentScreen', { subtotal: calculateTotal() });
+        }}
       />
     </ScrollView>
   );
 };
+  
+
 
 const styles = StyleSheet.create({
   container: {
@@ -107,7 +118,7 @@ const styles = StyleSheet.create({
   },
   cartItemImage: {
     width: 60,
-    height: 60,
+    height: 90,
     marginRight: 10,
   },
   cartItemInfo: {

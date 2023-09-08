@@ -9,11 +9,13 @@ class SuccessOrderScreen extends Component {
   };
 
   render() {
+    // Receive both totalAmount and paymentMethod as parameters from navigation props
+    const { route } = this.props;
+    const { totalAmount, paymentMethod } = route.params;
     // Example transaction details (you can replace this with actual data)
     const transactionNumber = 'TRX123456789';
-    const amountPaid = '$35.00';
-    const paymentMethod = 'MasterCard';
-
+    const amountPaid = totalAmount;
+   
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <FontAwesomeIcon name="check-circle" size={50} color="green" />

@@ -66,7 +66,11 @@ class PaymentScreen extends Component {
         await AsyncStorage.removeItem('cartItems');
   
         // Navigate to the OrderHistory screen and pass the order object
-        this.props.navigation.navigate('OrderHistoryScreen', { order });
+  //    this.props.navigation.navigate('OrderHistoryScreen', { order });
+
+        // Inside the handlePayment method
+        this.props.navigation.navigate('SuccessOrderScreen', { totalAmount: formattedTotalAmount });
+
       } catch (error) {
         console.error('Error saving order details:', error);
       }
