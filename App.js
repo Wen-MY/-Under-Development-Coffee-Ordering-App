@@ -63,6 +63,7 @@ const CartStack = () => (
   <Stack.Navigator initialRouteName='Your Cart'>
     <Stack.Screen name="Your Cart" component={CartScreen}/>
     <Stack.Screen name="PaymentScreen" component={PaymentScreen} />
+    <Stack.Screen name="SuccessOrderScreen" component={SuccessOrderScreen} />
   </Stack.Navigator>
 );
 

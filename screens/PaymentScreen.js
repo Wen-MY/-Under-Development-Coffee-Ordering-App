@@ -69,7 +69,10 @@ class PaymentScreen extends Component {
   //    this.props.navigation.navigate('OrderHistoryScreen', { order });
 
         // Inside the handlePayment method
-        this.props.navigation.navigate('SuccessOrderScreen', { totalAmount: formattedTotalAmount });
+        this.props.navigation.navigate('SuccessOrderScreen', {
+          totalAmount: formattedTotalAmount,
+          paymentMethod: this.state.paymentMethod, // Pass the payment method
+        });
 
       } catch (error) {
         console.error('Error saving order details:', error);

@@ -23,7 +23,7 @@ class SuccessOrderScreen extends Component {
 
         <View style={styles.transactionContainer}>
           <Text style={styles.transactionLabel}>Transaction Number: {transactionNumber}</Text>
-          <Text style={styles.transactionLabel}>Amount Paid: {amountPaid}</Text>
+          <Text style={styles.transactionLabel}>Amount Paid: ${totalAmount}</Text>
           <Text style={styles.transactionLabel}>Payment Method: {paymentMethod}</Text>
         </View>
 
