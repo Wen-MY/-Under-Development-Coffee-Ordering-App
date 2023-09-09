@@ -36,8 +36,6 @@ class PaymentScreen extends Component {
       orderInserted: false, // Track whether the order was successfully inserted
     };
   }
-<<<<<<< HEAD
-=======
   
 
   handlePayment = async () => {
@@ -93,7 +91,6 @@ class PaymentScreen extends Component {
       alert('Please fill out all fields correctly.');
     }
   };
->>>>>>> b3e5154bcac568e1ff2c2a63d28468b4fa38fa2c
 
   validateForm = () => {
     const { firstName, lastName, cardNumber, cvv } = this.state;
@@ -206,8 +203,6 @@ class PaymentScreen extends Component {
 
   render() {
     const subtotal = parseFloat(this.props.route.params.subtotal); // Convert subtotal to a floating-point number
-<<<<<<< HEAD
-=======
     const deliveryFee = 5.0;
     let promocodeAmount = 0; // Initialize promocodeAmount to 0
     if (this.state.promocode === '123456') {
@@ -216,7 +211,6 @@ class PaymentScreen extends Component {
     const totalAmount = subtotal + deliveryFee - promocodeAmount;
     const formattedTotalAmount = totalAmount.toFixed(2);
     
->>>>>>> b3e5154bcac568e1ff2c2a63d28468b4fa38fa2c
 
     return (
       <ScrollView style={styles.container}>
@@ -313,15 +307,9 @@ class PaymentScreen extends Component {
         <View style={styles.paymentContainer}>
           <Text style={styles.heading1}>Payment Details</Text>
           <Text>Subtotal: ${subtotal}</Text>
-<<<<<<< HEAD
-          <Text>Delivery Fee: $5.00</Text>
-          <Text>Voucher Amount: ${this.state.voucherAmount.toFixed(2)}</Text>
-          <Text>Total: ${(subtotal + 5.0 - this.state.voucherAmount).toFixed(2)}</Text>
-=======
           <Text>Delivery Fee: ${deliveryFee.toFixed(2)}</Text>
           <Text>Discount: ${promocodeAmount.toFixed(2)}</Text>
           <Text>Total: ${totalAmount.toFixed(2)}</Text>
->>>>>>> b3e5154bcac568e1ff2c2a63d28468b4fa38fa2c
         </View>
 
         <Button title="Make Payment" onPress={() => this.handlePayment(subtotal)} />

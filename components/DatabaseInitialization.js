@@ -4,6 +4,7 @@ import jsonData from '../assets/CoffeeDescription/data.json';
 class DatabaseInitialization {
   _initializeDatabase() {
     // Delete the database for debugging purposes
+    /*
     SQLite.deleteDatabase(
       {
         name: 'coffeeDatabase',
@@ -16,14 +17,14 @@ class DatabaseInitialization {
         console.log('Error deleting database:', error);
       }
     );
-
+    */
     // Open the database
     this.db = SQLite.openDatabase(
       { name: 'coffeeDatabase', location: 'default' },
       this._openCallback,
       this._errorCallback
     );
-
+    
     // Prepare the database schema
     this._prepareDatabaseSchema();
   }
@@ -56,7 +57,7 @@ class DatabaseInitialization {
 
       // Create 'order_items' table if it does not exist
       tx.executeSql(
-        'CREATE TABLE IF NOT EXISTS order_items (id INTEGER PRIMARY KEY AUTOINCREMENT, order_id INTEGER, item_id INTEGER, quantity INTEGER, FOREIGN KEY(order_id) REFERENCES orders(id), FOREIGN KEY(item_id) REFERENCES items(id))',
+        'CREATE TABLE IF NOT EXISTS order_items (id INTEGER PRIMARY KEY AUTOINCREMENT, order_id INTEGER, item_name VARCHAR(20), quantity INTEGER, FOREIGN KEY(order_id) REFERENCES orders(id))',
         [],
         (sqlTxn, res) => {
           console.log('Order_items table ready');
@@ -68,7 +69,7 @@ class DatabaseInitialization {
 
       // Create 'cart' table if it does not exist
       tx.executeSql(
-        'CREATE TABLE IF NOT EXISTS cart (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER, item_id INTEGER, item_options TEXT, coffeeInfo TEXT, quantity INTEGER, FOREIGN KEY(user_id) REFERENCES users(id), FOREIGN KEY(item_id) REFERENCES items(id))',
+        'CREATE TABLE IF NOT EXISTS cart (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER, item_name VARCHAR(20), item_options TEXT, quantity INTEGER, unit_price DECIMAL(8,2), FOREIGN KEY(user_id) REFERENCES users(id))',
         [],
         (sqlTxn, res) => {
           console.log('Cart table ready');

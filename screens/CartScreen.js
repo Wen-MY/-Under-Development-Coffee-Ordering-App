@@ -84,17 +84,10 @@ const CartScreen = ({ navigation }) => {
       ))}
       <Text style={styles.total}>Total Price: ${calculateTotal()}</Text>
       <Button
-<<<<<<< HEAD
-      title="Proceed to Payment"
-      onPress={() => {
-        navigation.navigate('PaymentScreen', { subtotal: calculateTotal(), cartItems });
-      }}
-=======
         title="Proceed to Payment"
         onPress={() => {
           navigation.navigate('PaymentScreen', { subtotal: calculateTotal() });
         }}
->>>>>>> b3e5154bcac568e1ff2c2a63d28468b4fa38fa2c
       />
     </ScrollView>
   );  
