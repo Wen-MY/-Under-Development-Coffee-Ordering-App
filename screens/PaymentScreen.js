@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, ScrollView ,Image, Alert } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 let SQLite = require('react-native-sqlite-storage');
 
 const VisaIcon = require('../assets/CardImage/visa_icon.png');
@@ -20,8 +19,6 @@ class PaymentScreen extends Component {
         this.errorCallback,
     )
 
-    const cartItems = this.props.route.params.cartItems;
-
     this.state = {
       firstName: '',
       lastName: '',
@@ -31,67 +28,86 @@ class PaymentScreen extends Component {
       promocode: '',
       validUntilMonth: '01', // Default valid until month
       validUntilYear: '2023', // Default valid until year
-      storedCartItems: [],
       voucherAmount: 0,
-      orderInserted: false, // Track whether the order was successfully inserted
     };
   }
   
 
-  handlePayment = async () => {
+  handlePayment = (subtotal) => {
+    const deliveryFee = 5.0;
+    let voucherAmount = 0; // Initialize voucherAmount to 0
+    if (this.state.promocode === '123456') {
+      voucherAmount = 5.0; // Apply $5.00 discount if voucher is valid
+    }
+    const totalAmount = subtotal + deliveryFee - voucherAmount;
+  
     if (this.validateForm()) {
-      const { promocode, storedCartItems } = this.state;
-      const subtotal = parseFloat(this.props.route.params.subtotal); // Convert subtotal to a floating-point number
-      const deliveryFee = 5.0;
-      let promocodeAmount = 0; // Initialize promocodeAmount to 0
-      if (this.state.promocode === '123456') {
-        promocodeAmount = 5.0; // Apply $5.00 discount if promocode is valid
-      }
-      const totalAmount = subtotal + deliveryFee - promocodeAmount;
-      const formattedTotalAmount = totalAmount.toFixed(2);
-      
-      
-      // Create an order object with relevant details
-      const order = {
-        firstName: this.state.firstName,
-        lastName: this.state.lastName,
-        cardNumber: this.state.cardNumber,
-        cvv: this.state.cvv,
-        paymentMethod: this.state.paymentMethod,
-        promocode,
-        validUntilMonth: this.state.validUntilMonth,
-        validUntilYear: this.state.validUntilYear,
-        subtotal,
-        deliveryFee,
-        promocodeAmount,
-        totalAmount,
-        orderItems: storedCartItems,
-      };
+      // Start a database transaction
+      this.db.transaction((tx) => {
+        // Insert order into the 'orders' table
+        tx.executeSql(
+          'INSERT INTO orders (total_amount) VALUES (?)',
+          [totalAmount],
+          (tx, result) => {
+            const orderId = result.insertId; // Get the inserted order ID
   
-      try {
-        // Save the order details in AsyncStorage
-        await AsyncStorage.setItem('orderHistory', JSON.stringify(order));
+            // Fetch all items from the cart table
+            tx.executeSql(
+              'SELECT * FROM cart',
+              [],
+              (tx, resultSet) => {
+                const rows = resultSet.rows;
+                for (let i = 0; i < rows.length; i++) {
+                  const item = rows.item(i);
   
-        // Clear the cart (optional)
-        await AsyncStorage.removeItem('cartItems');
+                  // Insert each item into the 'order_items' table
+                  tx.executeSql(
+                    'INSERT INTO order_items (order_id, item_name, quantity) VALUES (?, ?, ?)',
+                    [orderId, item.item_name, item.quantity],
+                    null, // Success callback, you can add a callback if needed
+                    (tx, error) => {
+                      console.error('Error inserting order items:', error);
+                      // Handle the error
+                      Alert.alert('Order Items Error', 'An error occurred while inserting order items.');
+                    }
+                  );
+                }
   
-        // Navigate to the OrderHistory screen and pass the order object
-  //    this.props.navigation.navigate('OrderHistoryScreen', { order });
-
-        // Inside the handlePayment method
-        this.props.navigation.navigate('SuccessOrderScreen', {
-          totalAmount: formattedTotalAmount,
-          paymentMethod: this.state.paymentMethod, // Pass the payment method
-        });
-
-      } catch (error) {
-        console.error('Error saving order details:', error);
-      }
+                // Clear the cart (optional)
+                tx.executeSql('DELETE FROM cart', [], () => {
+                  // Cart items deleted successfully
+                });
+              },
+              (tx, error) => {
+                console.error('Error fetching cart items:', error);
+                // Handle the error
+                Alert.alert('Payment Error', 'An error occurred while processing your payment.');
+              }
+            );
+  
+            // Show a success message using Alert
+            Alert.alert('Payment Successful', 'Your order has been placed successfully.', [
+              {
+                text: 'OK',
+                onPress: () => {
+                  // Navigate to the OrderHistoryScreen after payment success
+                  this.props.navigation.navigate('OrderHistoryScreen'); // Make sure the screen name matches your navigator configuration
+                },
+              },
+            ]);
+          },
+          (tx, error) => {
+            console.error('Error inserting order:', error);
+            // Handle the error
+            Alert.alert('Payment Error', 'An error occurred while processing your payment.');
+          }
+        );
+      });
     } else {
-      alert('Please fill out all fields correctly.');
+      Alert.alert('Invalid Input', 'Please fill out all fields correctly.');
     }
   };
-
+  
   validateForm = () => {
     const { firstName, lastName, cardNumber, cvv } = this.state;
     const cardNumberRegex = /^[0-9]{16}$/; // 16-digit number
@@ -104,102 +120,6 @@ class PaymentScreen extends Component {
       cvvRegex.test(cvv) // Validate CVV
     );
   };
-
-  handlePayment = async (subtotal) => {
-    // Calculate the total amount and voucherAmount
-    const deliveryFee = 5.0;
-    let voucherAmount = 0; // Initialize voucherAmount to 0
-    if (this.state.voucher === '123456') {
-      voucherAmount = 5.0; // Apply $5.00 discount if voucher is valid
-    }
-    const totalAmount = subtotal + deliveryFee - voucherAmount;
-  
-    if (this.validateForm()) {
-      try {
-        // Create an order object with relevant details
-        const order = {
-          firstName: this.state.firstName,
-          lastName: this.state.lastName,
-          cardNumber: this.state.cardNumber,
-          cvv: this.state.cvv,
-          paymentMethod: this.state.paymentMethod,
-          voucher: this.state.voucher,
-          validUntilMonth: this.state.validUntilMonth,
-          validUntilYear: this.state.validUntilYear,
-          subtotal,
-          deliveryFee,
-          voucherAmount,
-          totalAmount,
-          orderItems: this.state.storedCartItems,
-        };
-  
-        // Start a database transaction
-        this.db.transaction(async (tx) => {
-          // Insert order into the 'orders' table
-          tx.executeSql(
-            'INSERT INTO orders (total_amount) VALUES (?)',
-            [order.totalAmount],
-            async (tx, result) => {
-              const orderId = result.insertId;
-  
-              // Insert order items into the 'order_items' table
-              for (const item of order.orderItems) {
-                await new Promise((resolve, reject) => {
-                  tx.executeSql(
-                    'INSERT INTO order_items (order_id, item_id, quantity) VALUES (?, ?, ?)',
-                    [orderId, item.id, 1], // Assuming quantity is always 1
-                    (tx) => {
-                      resolve(); // Resolve the promise when insertion is successful
-                    },
-                    (tx, error) => {
-                      console.error('Error inserting order items:', error);
-                      reject(error); // Reject the promise if there's an error
-                    }
-                  );
-                });
-              }
-  
-              // Clear the cart (optional)
-              await AsyncStorage.removeItem('cartItems');
-  
-              // Show a success message using Alert
-              Alert.alert('Payment Successful', 'Your order has been placed successfully.', [
-                {
-                  text: 'OK',
-                  onPress: () => {
-                    // Navigate to the OrderHistoryScreen after payment success
-                    this.props.navigation.navigate('Order'); // Make sure the screen name matches your navigator configuration
-                  },
-                },
-              ]);
-            },
-            (tx, error) => {
-              console.error('Error inserting order:', error);
-              // Handle the error
-              Alert.alert('Payment Error', 'An error occurred while processing your payment.');
-            }
-          );
-        });
-      } catch (error) {
-        console.error('Error saving order details:', error);
-        // Show an error message using Alert
-        Alert.alert('Payment Error', 'An error occurred while processing your payment.');
-      }
-    } else {
-      alert('Please fill out all fields correctly.');
-    }
-  };
-
-  async componentDidMount() {
-    try {
-      const storedCartItems = await AsyncStorage.getItem('cartItems');
-      if (storedCartItems !== null) {
-        this.setState({ storedCartItems: JSON.parse(storedCartItems) });
-      }
-    } catch (error) {
-      console.error('Error retrieving cart items:', error);
-    }
-  }
 
   render() {
     const subtotal = parseFloat(this.props.route.params.subtotal); // Convert subtotal to a floating-point number

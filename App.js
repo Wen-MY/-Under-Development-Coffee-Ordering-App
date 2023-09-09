@@ -67,6 +67,13 @@ const CartStack = () => (
     <Stack.Screen name="SuccessOrderScreen" component={SuccessOrderScreen} />
   </Stack.Navigator>
 );
+const OrderStack = () => (
+  <Stack.Navigator initialRouteName='OrderHistoryScreen'>
+    <Stack.Screen name="OrderHistoryScreen" component={OrderHistoryScreen}/>
+    <Stack.Screen name="OrderDetails" component={OrderDetailsScreen} />
+  </Stack.Navigator>
+);
+
 
 function AppBottomStack() {
   return (
@@ -120,7 +127,7 @@ function AppBottomStack() {
       />
       <Tab.Screen
       name = 'Order'
-      component = {SuccessOrderScreen}
+      component = {OrderStack}
       options={{/*
         tabBarIcon: () => {
           return <FontAwesomeIcon icon="fa-regular fa-user" size={20}/>
@@ -161,7 +168,6 @@ export default function App() {
     <NavigationContainer>
       <Stack.Navigator>
         <Stack.Screen name="AppDrawerStack" component={AppDrawerStack} options={{ headerShown: false }} />
-        <Stack.Screen name="OrderDetails" component={OrderDetailsScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

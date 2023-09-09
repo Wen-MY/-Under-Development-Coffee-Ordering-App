@@ -4,7 +4,7 @@ import jsonData from '../assets/CoffeeDescription/data.json';
 class DatabaseInitialization {
   _initializeDatabase() {
     // Delete the database for debugging purposes
-    /*
+    
     SQLite.deleteDatabase(
       {
         name: 'coffeeDatabase',
@@ -17,7 +17,6 @@ class DatabaseInitialization {
         console.log('Error deleting database:', error);
       }
     );
-    */
     // Open the database
     this.db = SQLite.openDatabase(
       { name: 'coffeeDatabase', location: 'default' },

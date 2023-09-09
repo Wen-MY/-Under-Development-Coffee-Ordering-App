@@ -13,7 +13,7 @@ import SQLite from 'react-native-sqlite-storage';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import imageMapping from '../utils/imageMapping';
 
-const CoffeeDetailScreen = ({ route}) => {
+const CoffeeDetailScreen = ({route}) => {
   const { itemId } = route.params;
 
   const [coffeeDetails, setCoffeeDetails] = useState({
@@ -115,7 +115,7 @@ const CoffeeDetailScreen = ({ route}) => {
               ,coffeeDetails.name
               ,iceLevel.toString + whippedCream.toString + sweetness.toString
               ,quantity
-              ,((calculatePrice)/quantity).parseFloat
+              ,calculatePrice()
             ],
             (tx, results) => {
               console.log(coffeeDetails.name + "inserted in cart table successfully")
@@ -320,4 +320,3 @@ const styles = StyleSheet.create({
 });
 
 export default CoffeeDetailScreen;
-
