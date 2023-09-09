@@ -28,7 +28,7 @@ class PaymentScreen extends Component {
       cardNumber: '',
       cvv: '',
       paymentMethod: 'MasterCard', // Default payment method
-      voucher: '',
+      promocode: '',
       validUntilMonth: '01', // Default valid until month
       validUntilYear: '2023', // Default valid until year
       storedCartItems: [],
@@ -36,6 +36,64 @@ class PaymentScreen extends Component {
       orderInserted: false, // Track whether the order was successfully inserted
     };
   }
+<<<<<<< HEAD
+=======
+  
+
+  handlePayment = async () => {
+    if (this.validateForm()) {
+      const { promocode, storedCartItems } = this.state;
+      const subtotal = parseFloat(this.props.route.params.subtotal); // Convert subtotal to a floating-point number
+      const deliveryFee = 5.0;
+      let promocodeAmount = 0; // Initialize promocodeAmount to 0
+      if (this.state.promocode === '123456') {
+        promocodeAmount = 5.0; // Apply $5.00 discount if promocode is valid
+      }
+      const totalAmount = subtotal + deliveryFee - promocodeAmount;
+      const formattedTotalAmount = totalAmount.toFixed(2);
+      
+      
+      // Create an order object with relevant details
+      const order = {
+        firstName: this.state.firstName,
+        lastName: this.state.lastName,
+        cardNumber: this.state.cardNumber,
+        cvv: this.state.cvv,
+        paymentMethod: this.state.paymentMethod,
+        promocode,
+        validUntilMonth: this.state.validUntilMonth,
+        validUntilYear: this.state.validUntilYear,
+        subtotal,
+        deliveryFee,
+        promocodeAmount,
+        totalAmount,
+        orderItems: storedCartItems,
+      };
+  
+      try {
+        // Save the order details in AsyncStorage
+        await AsyncStorage.setItem('orderHistory', JSON.stringify(order));
+  
+        // Clear the cart (optional)
+        await AsyncStorage.removeItem('cartItems');
+  
+        // Navigate to the OrderHistory screen and pass the order object
+  //    this.props.navigation.navigate('OrderHistoryScreen', { order });
+
+        // Inside the handlePayment method
+        this.props.navigation.navigate('SuccessOrderScreen', {
+          totalAmount: formattedTotalAmount,
+          paymentMethod: this.state.paymentMethod, // Pass the payment method
+        });
+
+      } catch (error) {
+        console.error('Error saving order details:', error);
+      }
+    } else {
+      alert('Please fill out all fields correctly.');
+    }
+  };
+>>>>>>> b3e5154bcac568e1ff2c2a63d28468b4fa38fa2c
 
   validateForm = () => {
     const { firstName, lastName, cardNumber, cvv } = this.state;
@@ -148,6 +206,17 @@ class PaymentScreen extends Component {
 
   render() {
     const subtotal = parseFloat(this.props.route.params.subtotal); // Convert subtotal to a floating-point number
+<<<<<<< HEAD
+=======
+    const deliveryFee = 5.0;
+    let promocodeAmount = 0; // Initialize promocodeAmount to 0
+    if (this.state.promocode === '123456') {
+      promocodeAmount = 5.0; // Apply $5.00 discount if promocode is valid
+    }
+    const totalAmount = subtotal + deliveryFee - promocodeAmount;
+    const formattedTotalAmount = totalAmount.toFixed(2);
+    
+>>>>>>> b3e5154bcac568e1ff2c2a63d28468b4fa38fa2c
 
     return (
       <ScrollView style={styles.container}>
@@ -234,19 +303,25 @@ class PaymentScreen extends Component {
           </View>
         </View>
 
-        <Text style={styles.label}>Voucher Code</Text>
+        <Text style={styles.label}>Promocode Code</Text>
         <TextInput
           style={styles.input}
           placeholder="XXXXXX"
-          onChangeText={(text) => this.setState({ voucher: text })}
+          onChangeText={(text) => this.setState({ promocode: text })}
         />
 
         <View style={styles.paymentContainer}>
           <Text style={styles.heading1}>Payment Details</Text>
           <Text>Subtotal: ${subtotal}</Text>
+<<<<<<< HEAD
           <Text>Delivery Fee: $5.00</Text>
           <Text>Voucher Amount: ${this.state.voucherAmount.toFixed(2)}</Text>
           <Text>Total: ${(subtotal + 5.0 - this.state.voucherAmount).toFixed(2)}</Text>
+=======
+          <Text>Delivery Fee: ${deliveryFee.toFixed(2)}</Text>
+          <Text>Discount: ${promocodeAmount.toFixed(2)}</Text>
+          <Text>Total: ${totalAmount.toFixed(2)}</Text>
+>>>>>>> b3e5154bcac568e1ff2c2a63d28468b4fa38fa2c
         </View>
 
         <Button title="Make Payment" onPress={() => this.handlePayment(subtotal)} />
@@ -271,7 +346,7 @@ const styles = StyleSheet.create({
   heading1: {
     fontSize: 18,
     marginBottom: 10,
-    marginTop: 20,
+    marginTop: 10,
     color: '#4A4A4A',
   },
   label: {
@@ -298,7 +373,8 @@ const styles = StyleSheet.create({
     marginLeft: 5,
   },
   paymentContainer: {
-    marginTop: 20,
+    marginTop: 10,
+    paddingTop: 1,
     padding: 10,
     borderWidth: 1,
     borderColor: 'lightgray',
@@ -307,12 +383,14 @@ const styles = StyleSheet.create({
     shadowColor: '#000000',
     shadowOffset: {
       width: 0,
-      height: 2,
+      height: 0, // Set both width and height to 0 for shadow on all sides
     },
     shadowOpacity: 0.2,
     shadowRadius: 4,
     elevation: 5,
+    marginBottom: 15,
   },
+  
   bottomSpace: {
     height: 40,
   },

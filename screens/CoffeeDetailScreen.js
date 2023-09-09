@@ -27,7 +27,7 @@ const CoffeeDetailScreen = ({ route, navigation }) => {
   const [whippedCream, setWhippedCream] = useState(false);
   const [sweetness, setSweetness] = useState('Default Sugar');
   const [quantity, setQuantity] = useState(1);
-  const [coffeeInfo, setCoffeeInfo] = useState('');
+  
 
   useEffect(() => {
     const db = SQLite.openDatabase({ name: 'coffeeDatabase' });
@@ -89,22 +89,9 @@ const CoffeeDetailScreen = ({ route, navigation }) => {
       iceLevel,
       whippedCream,
       sweetness,
+      customizations: `${iceLevel} | ${sweetness} | ${whippedCream ? 'Whipped Cream' : ''}`,
       price: parseFloat(price),
     };
-
-    const selectedOptions = [];
-    if (iceLevel !== 'Default Ice') {
-      selectedOptions.push(iceLevel);
-    }
-    if (sweetness !== 'Default Sugar') {
-      selectedOptions.push(sweetness);
-    }
-    if (whippedCream) {
-      selectedOptions.push('+ Whipped Cream');
-    }
-
-    const coffeeInfoText = selectedOptions.join(' | ');
-    setCoffeeInfo(coffeeInfoText);
 
     try {
       const existingCartItemsJSON = await AsyncStorage.getItem('cartItems');
@@ -113,8 +100,6 @@ const CoffeeDetailScreen = ({ route, navigation }) => {
       if (existingCartItemsJSON) {
         existingCartItems = JSON.parse(existingCartItemsJSON);
       }
-
-      coffeeItem.coffeeInfo = coffeeInfoText;
 
       existingCartItems.push(coffeeItem);
 
