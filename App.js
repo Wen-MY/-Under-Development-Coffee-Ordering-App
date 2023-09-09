@@ -8,6 +8,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { Avatar } from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import HomeScreen from './screens/HomeScreen';
+import AddBalanceScreen from './screens/AddBalanceScreen'
 import MenuScreen from './screens/MenuScreen';
 import CartScreen from './screens/CartScreen';
 import TermAndConditionsScreen from './screens/TermsAndConditions';
@@ -61,6 +62,14 @@ const handleSignOut = () => {
           console.error('Sign-out error:', error);
 
       });
+      try {
+        // Define the keys you want to remove
+        const keysToRemove = ['balance', 'email', 'id', 'password', 'username'];
+        // Use multiRemove to remove values for the specified keys
+        AsyncStorage.multiRemove(keysToRemove);
+      } catch (error) {
+        console.error('Error removing user data:', error);
+      }
 };
 
 const SettingStack = () => (
@@ -120,7 +129,7 @@ function AppBottomStack() {
       {/* Your Tab Screens */}
       <Tab.Screen
       name = 'Home'
-      component = {HomeScreen}
+      component = {AddBalanceScreen}
       options={{/*
         tabBarIcon: () => {
           return <FontAwesomeIcon icon="fa-sharp fa-regular fa-house-blank" size={20}/>

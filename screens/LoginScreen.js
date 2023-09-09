@@ -16,9 +16,36 @@ export default class Login extends Component {
         // Navigate to the Sign Up screen when the "Sign Up" button is pressed
         this.props.navigation.navigate('Sign Up');
     };
+    storeUserData = async (data) => {
+        try {
+          // Use multiSet to store data.user fields in AsyncStorage
+          const userFields = Object.entries(data.user);
+          const keyValuePairs = userFields.map(([key, value]) => [key, JSON.stringify(value)]);
+      
+          await AsyncStorage.multiSet(keyValuePairs);
+        } catch (error) {
+          console.error('Error storing user data:', error);
+        }
+    };
+    getUserData = async () => {
+        try {
+          // Define the keys you want to retrieve
+          const keysToRetrieve = ['balance', 'email', 'id', 'password', 'username'];
+      
+          // Use multiGet to retrieve values for the specified keys
+          const keyValuePairs = await AsyncStorage.multiGet(keysToRetrieve);
+      
+          // Log the retrieved values
+          keyValuePairs.forEach(([key, value]) => {
+            console.log(`${key}: ${JSON.parse(value)}`);
+          });
+        } catch (error) {
+          console.error('Error retrieving user data:', error);
+        }
+      };
     handleLogin = async () => {
         try {
-          const response = await fetch('http://192.168.0.155:5000/api/login', {
+          const response = await fetch('http://192.168.50.78:5000/api/login', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -33,11 +60,13 @@ export default class Login extends Component {
             const data = await response.json();
             // Authentication successful, handle the user data
             console.log(data.user);
+            this.storeUserData(data);
             this.props.navigation.navigate('Home');
           } else {
             const data = await response.json();
             // Authentication failed, show an error message
             console.error(data.message);
+            
           }
         } catch (error) {
           console.error('Error:', error);

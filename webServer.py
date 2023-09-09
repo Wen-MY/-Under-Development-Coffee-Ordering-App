@@ -1,7 +1,6 @@
 import sqlite3
 from flask import Flask, jsonify, request, abort
 from argparse import ArgumentParser
-from flask_cors import CORS
 
 DB = 'usersDB.sqlite'
 
@@ -182,4 +181,4 @@ if __name__ == '__main__':
     args = parser.parse_args()
     port = args.port
 
-    app.run(host='0.0.0.0', port=port)
+    app.run(host='192.168.50.78', port=port)
