@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, ScrollView ,Image } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, ScrollView ,Image, Alert } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+let SQLite = require('react-native-sqlite-storage');
 
 const VisaIcon = require('../assets/CardImage/visa_icon.png');
 const MasterCardIcon = require('../assets/CardImage/mastercard_icon.png');
@@ -13,6 +14,13 @@ const EbayIcon = require('../assets/CardImage/ebay_icon.png');
 class PaymentScreen extends Component {
   constructor(props) {
     super(props);
+    this.db = SQLite.openDatabase(
+        { name: 'coffeeDatabase' },
+        this.openCallback,
+        this.errorCallback,
+    )
+
+    const cartItems = this.props.route.params.cartItems;
 
     this.state = {
       firstName: '',
@@ -20,24 +28,26 @@ class PaymentScreen extends Component {
       cardNumber: '',
       cvv: '',
       paymentMethod: 'MasterCard', // Default payment method
-      voucher: '',
+      promocode: '',
       validUntilMonth: '01', // Default valid until month
       validUntilYear: '2023', // Default valid until year
       storedCartItems: [],
+      voucherAmount: 0,
+      orderInserted: false, // Track whether the order was successfully inserted
     };
   }
   
 
   handlePayment = async () => {
     if (this.validateForm()) {
-      const { voucher, storedCartItems } = this.state;
+      const { promocode, storedCartItems } = this.state;
       const subtotal = parseFloat(this.props.route.params.subtotal); // Convert subtotal to a floating-point number
       const deliveryFee = 5.0;
-      let voucherAmount = 0; // Initialize voucherAmount to 0
-      if (this.state.voucher === '123456') {
-        voucherAmount = 5.0; // Apply $5.00 discount if voucher is valid
+      let promocodeAmount = 0; // Initialize promocodeAmount to 0
+      if (this.state.promocode === '123456') {
+        promocodeAmount = 5.0; // Apply $5.00 discount if promocode is valid
       }
-      const totalAmount = subtotal + deliveryFee - voucherAmount;
+      const totalAmount = subtotal + deliveryFee - promocodeAmount;
       const formattedTotalAmount = totalAmount.toFixed(2);
       
       
@@ -48,12 +58,12 @@ class PaymentScreen extends Component {
         cardNumber: this.state.cardNumber,
         cvv: this.state.cvv,
         paymentMethod: this.state.paymentMethod,
-        voucher,
+        promocode,
         validUntilMonth: this.state.validUntilMonth,
         validUntilYear: this.state.validUntilYear,
         subtotal,
         deliveryFee,
-        voucherAmount,
+        promocodeAmount,
         totalAmount,
         orderItems: storedCartItems,
       };
@@ -66,7 +76,14 @@ class PaymentScreen extends Component {
         await AsyncStorage.removeItem('cartItems');
   
         // Navigate to the OrderHistory screen and pass the order object
-        this.props.navigation.navigate('OrderHistoryScreen', { order });
+  //    this.props.navigation.navigate('OrderHistoryScreen', { order });
+
+        // Inside the handlePayment method
+        this.props.navigation.navigate('SuccessOrderScreen', {
+          totalAmount: formattedTotalAmount,
+          paymentMethod: this.state.paymentMethod, // Pass the payment method
+        });
+
       } catch (error) {
         console.error('Error saving order details:', error);
       }
@@ -78,7 +95,7 @@ class PaymentScreen extends Component {
   validateForm = () => {
     const { firstName, lastName, cardNumber, cvv } = this.state;
     const cardNumberRegex = /^[0-9]{16}$/; // 16-digit number
-    const cvvRegex = /^[0-9]{4}$/; // 4-digit number
+    const cvvRegex = /^[0-9]{3,4}$/; // 3 or 4-digit number
 
     return (
       firstName &&
@@ -86,6 +103,91 @@ class PaymentScreen extends Component {
       cardNumberRegex.test(cardNumber) && // Validate card number
       cvvRegex.test(cvv) // Validate CVV
     );
+  };
+
+  handlePayment = async (subtotal) => {
+    // Calculate the total amount and voucherAmount
+    const deliveryFee = 5.0;
+    let voucherAmount = 0; // Initialize voucherAmount to 0
+    if (this.state.voucher === '123456') {
+      voucherAmount = 5.0; // Apply $5.00 discount if voucher is valid
+    }
+    const totalAmount = subtotal + deliveryFee - voucherAmount;
+  
+    if (this.validateForm()) {
+      try {
+        // Create an order object with relevant details
+        const order = {
+          firstName: this.state.firstName,
+          lastName: this.state.lastName,
+          cardNumber: this.state.cardNumber,
+          cvv: this.state.cvv,
+          paymentMethod: this.state.paymentMethod,
+          voucher: this.state.voucher,
+          validUntilMonth: this.state.validUntilMonth,
+          validUntilYear: this.state.validUntilYear,
+          subtotal,
+          deliveryFee,
+          voucherAmount,
+          totalAmount,
+          orderItems: this.state.storedCartItems,
+        };
+  
+        // Start a database transaction
+        this.db.transaction(async (tx) => {
+          // Insert order into the 'orders' table
+          tx.executeSql(
+            'INSERT INTO orders (total_amount) VALUES (?)',
+            [order.totalAmount],
+            async (tx, result) => {
+              const orderId = result.insertId;
+  
+              // Insert order items into the 'order_items' table
+              for (const item of order.orderItems) {
+                await new Promise((resolve, reject) => {
+                  tx.executeSql(
+                    'INSERT INTO order_items (order_id, item_id, quantity) VALUES (?, ?, ?)',
+                    [orderId, item.id, 1], // Assuming quantity is always 1
+                    (tx) => {
+                      resolve(); // Resolve the promise when insertion is successful
+                    },
+                    (tx, error) => {
+                      console.error('Error inserting order items:', error);
+                      reject(error); // Reject the promise if there's an error
+                    }
+                  );
+                });
+              }
+  
+              // Clear the cart (optional)
+              await AsyncStorage.removeItem('cartItems');
+  
+              // Show a success message using Alert
+              Alert.alert('Payment Successful', 'Your order has been placed successfully.', [
+                {
+                  text: 'OK',
+                  onPress: () => {
+                    // Navigate to the OrderHistoryScreen after payment success
+                    this.props.navigation.navigate('Order'); // Make sure the screen name matches your navigator configuration
+                  },
+                },
+              ]);
+            },
+            (tx, error) => {
+              console.error('Error inserting order:', error);
+              // Handle the error
+              Alert.alert('Payment Error', 'An error occurred while processing your payment.');
+            }
+          );
+        });
+      } catch (error) {
+        console.error('Error saving order details:', error);
+        // Show an error message using Alert
+        Alert.alert('Payment Error', 'An error occurred while processing your payment.');
+      }
+    } else {
+      alert('Please fill out all fields correctly.');
+    }
   };
 
   async componentDidMount() {
@@ -102,11 +204,11 @@ class PaymentScreen extends Component {
   render() {
     const subtotal = parseFloat(this.props.route.params.subtotal); // Convert subtotal to a floating-point number
     const deliveryFee = 5.0;
-    let voucherAmount = 0; // Initialize voucherAmount to 0
-    if (this.state.voucher === '123456') {
-      voucherAmount = 5.0; // Apply $5.00 discount if voucher is valid
+    let promocodeAmount = 0; // Initialize promocodeAmount to 0
+    if (this.state.promocode === '123456') {
+      promocodeAmount = 5.0; // Apply $5.00 discount if promocode is valid
     }
-    const totalAmount = subtotal + deliveryFee - voucherAmount;
+    const totalAmount = subtotal + deliveryFee - promocodeAmount;
     const formattedTotalAmount = totalAmount.toFixed(2);
     
 
@@ -115,7 +217,7 @@ class PaymentScreen extends Component {
         <Text style={styles.heading}>Order Confirmation</Text>
 
         <View style={styles.paymentMethodContainer}>
-          <Text style={styles.label}>Payment Method</Text>         
+          <Text style={styles.label}>Payment Method</Text>
           <Picker
             selectedValue={this.state.paymentMethod}
             onValueChange={(itemValue) => this.setState({ paymentMethod: itemValue })}
@@ -125,19 +227,20 @@ class PaymentScreen extends Component {
             <Picker.Item label="Visa" value="Visa" />
             <Picker.Item label="eBay" value="eBay" />
             <Picker.Item label="PayPal" value="PayPal" />
-            <Picker.Item label="Maestro" value="Maestro" />
+            <Picker.Item label="Maestro" value="Maestro" />          
             <Picker.Item label="Cirrus" value="Cirrus" />
           </Picker>
           
           <View style={styles.cardIconsRow}>
-          <Image source={MasterCardIcon} style={styles.cardIcon} />
-          <Image source={VisaIcon} style={styles.cardIcon} />
-          <Image source={EbayIcon} style={styles.cardIcon} />
-          <Image source={PaypalIcon} style={styles.cardIcon} />
-          <Image source={MaestroIcon} style={styles.cardIcon} />
-          <Image source={CirrusIcon} style={styles.cardIcon} />
+            <Image source={MasterCardIcon} style={styles.cardIcon} />
+            <Image source={VisaIcon} style={styles.cardIcon} />
+            <Image source={EbayIcon} style={styles.cardIcon} />
+            <Image source={PaypalIcon} style={styles.cardIcon} />
+            <Image source={MaestroIcon} style={styles.cardIcon} />
+            <Image source={CirrusIcon} style={styles.cardIcon} />
           </View>
         </View>
+        
         <Text style={styles.heading1}>Card Information</Text>
         <Text style={styles.label}>First Name</Text>
         <TextInput
@@ -176,17 +279,8 @@ class PaymentScreen extends Component {
               style={{ flex: 1 }}
             >
               <Picker.Item label="01 - January" value="01" />
-              <Picker.Item label="02 - Febuary" value="02" />
-              <Picker.Item label="03 - March" value="03" />
-              <Picker.Item label="04 - April" value="04" />
-              <Picker.Item label="05 - May" value="05" />
-              <Picker.Item label="06 - June" value="06" />
-              <Picker.Item label="07 - July" value="07" />
-              <Picker.Item label="08 - August" value="08" />
-              <Picker.Item label="09 - September" value="09" />
-              <Picker.Item label="10 - October" value="10" />
-              <Picker.Item label="11 - November" value="11" />
-              <Picker.Item label="12 - December" value="12" />
+              <Picker.Item label="02 - February" value="02" />
+              {/* ... (other months) ... */}
             </Picker>
           </View>
 
@@ -198,33 +292,27 @@ class PaymentScreen extends Component {
             >
               <Picker.Item label="2023" value="2023" />
               <Picker.Item label="2024" value="2024" />
-              <Picker.Item label="2025" value="2025" />
-              <Picker.Item label="2026" value="2026" />
-              <Picker.Item label="2027" value="2027" />
-              <Picker.Item label="2028" value="2028" />
-              <Picker.Item label="2029" value="2029" />
-              <Picker.Item label="2030" value="2030" />
+              {/* ... (other years) ... */}
             </Picker>
           </View>
         </View>
 
-        <Text style={styles.label}>Voucher Code</Text>
+        <Text style={styles.label}>Promocode Code</Text>
         <TextInput
           style={styles.input}
           placeholder="XXXXXX"
-          onChangeText={(text) => this.setState({ voucher: text })}
+          onChangeText={(text) => this.setState({ promocode: text })}
         />
 
         <View style={styles.paymentContainer}>
           <Text style={styles.heading1}>Payment Details</Text>
           <Text>Subtotal: ${subtotal}</Text>
           <Text>Delivery Fee: ${deliveryFee.toFixed(2)}</Text>
-          <Text>Voucher Amount: ${voucherAmount.toFixed(2)}</Text>
+          <Text>Discount: ${promocodeAmount.toFixed(2)}</Text>
           <Text>Total: ${totalAmount.toFixed(2)}</Text>
         </View>
 
-
-        <Button title="Make Payment" onPress={this.handlePayment} />
+        <Button title="Make Payment" onPress={() => this.handlePayment(subtotal)} />
         <View style={styles.bottomSpace} />
       </ScrollView>
     );
@@ -246,7 +334,7 @@ const styles = StyleSheet.create({
   heading1: {
     fontSize: 18,
     marginBottom: 10,
-    marginTop: 20,
+    marginTop: 10,
     color: '#4A4A4A',
   },
   label: {
@@ -273,7 +361,8 @@ const styles = StyleSheet.create({
     marginLeft: 5,
   },
   paymentContainer: {
-    marginTop: 20,
+    marginTop: 10,
+    paddingTop: 1,
     padding: 10,
     borderWidth: 1,
     borderColor: 'lightgray',
@@ -282,12 +371,14 @@ const styles = StyleSheet.create({
     shadowColor: '#000000',
     shadowOffset: {
       width: 0,
-      height: 2,
+      height: 0, // Set both width and height to 0 for shadow on all sides
     },
     shadowOpacity: 0.2,
     shadowRadius: 4,
     elevation: 5,
+    marginBottom: 15,
   },
+  
   bottomSpace: {
     height: 40,
   },
@@ -319,4 +410,3 @@ const styles = StyleSheet.create({
 
 export default PaymentScreen;
 
-   

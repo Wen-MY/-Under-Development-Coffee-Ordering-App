@@ -22,6 +22,8 @@ import OrderHistoryScreen from './screens/OrderHistoryScreen';
 import OrderDetailsScreen from './screens/OrderDetailsScreen';
 import PaymentScreen from './screens/PaymentScreen'; // Import your PaymentScreen component
 import DatabaseInitialization from './components/DatabaseInitialization'; 
+import SuccessOrderScreen from './screens/SuccessOrderScreen'; // Replace with the correct path to your SuccessOrderScreen component
+
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -72,12 +74,14 @@ const MenuStack = () => (
   <Stack.Navigator initialRouteName='MenuStackHome'>
     <Stack.Screen name="MenuStackHome" component={MenuScreen} options={{headerShown:false}}/>
     <Stack.Screen name="Coffee" component={CoffeeDetailScreen} />
+    
   </Stack.Navigator>
 );
 const CartStack = () => (
-  <Stack.Navigator initialRouteName='Your Cart'>
-    <Stack.Screen name="Your Cart" component={CartScreen}/>
-    <Stack.Screen name="PaymentScreen" component={PaymentScreen}/>
+  <Stack.Navigator initialRouteName='Shopping Cart'>
+    <Stack.Screen name="Shopping Cart" component={CartScreen}/>
+    <Stack.Screen name="PaymentScreen" component={PaymentScreen} />
+    <Stack.Screen name="SuccessOrderScreen" component={SuccessOrderScreen} />
   </Stack.Navigator>
 );
 
@@ -149,7 +153,7 @@ function AppBottomStack() {
       />
       <Tab.Screen
       name = 'Order'
-      component = {OrderHistoryScreen}
+      component = {SuccessOrderScreen}
       options={{/*
         tabBarIcon: () => {
           return <FontAwesomeIcon icon="fa-regular fa-user" size={20}/>

@@ -6,14 +6,15 @@ import {
   TouchableOpacity,
   StyleSheet,
   ScrollView,
+  Alert
 } from 'react-native';
 import { RadioButton, Checkbox } from 'react-native-paper';
 import SQLite from 'react-native-sqlite-storage';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import imageMapping from '../utils/imageMapping';
 
-const CoffeeDetailScreen = ({ route, navigation }) => {
-  const { itemId, cartItems, setCartItems } = route.params;
+const CoffeeDetailScreen = ({ route}) => {
+  const { itemId } = route.params;
 
   const [coffeeDetails, setCoffeeDetails] = useState({
     name: '',
@@ -26,7 +27,7 @@ const CoffeeDetailScreen = ({ route, navigation }) => {
   const [whippedCream, setWhippedCream] = useState(false);
   const [sweetness, setSweetness] = useState('Default Sugar');
   const [quantity, setQuantity] = useState(1);
-  const [coffeeInfo, setCoffeeInfo] = useState('');
+  
 
   useEffect(() => {
     const db = SQLite.openDatabase({ name: 'coffeeDatabase' });
@@ -51,15 +52,6 @@ const CoffeeDetailScreen = ({ route, navigation }) => {
     });
   }, [itemId]);
 
-  const clearCart = async () => {
-    try {
-      await AsyncStorage.removeItem('cartItems');
-      Alert.alert('Cart Cleared', 'Your cart has been cleared successfully.');
-    } catch (error) {
-      console.error('Error clearing cart:', error);
-    }
-  };
-
   const calculatePrice = () => {
     let price = parseFloat(coffeeDetails.basePrice);
 
@@ -79,7 +71,7 @@ const CoffeeDetailScreen = ({ route, navigation }) => {
       setQuantity(quantity - 1);
     }
   };
-
+  /*
   const addToCart = async () => {
     const price = calculatePrice();
 
@@ -88,22 +80,9 @@ const CoffeeDetailScreen = ({ route, navigation }) => {
       iceLevel,
       whippedCream,
       sweetness,
+      customizations: `${iceLevel} | ${sweetness} | ${whippedCream ? 'Whipped Cream' : ''}`,
       price: parseFloat(price),
     };
-
-    const selectedOptions = [];
-    if (iceLevel !== 'Default Ice') {
-      selectedOptions.push(iceLevel);
-    }
-    if (sweetness !== 'Default Sugar') {
-      selectedOptions.push(sweetness);
-    }
-    if (whippedCream) {
-      selectedOptions.push('+ Whipped Cream');
-    }
-
-    const coffeeInfoText = selectedOptions.join(' | ');
-    setCoffeeInfo(coffeeInfoText);
 
     try {
       const existingCartItemsJSON = await AsyncStorage.getItem('cartItems');
@@ -113,17 +92,48 @@ const CoffeeDetailScreen = ({ route, navigation }) => {
         existingCartItems = JSON.parse(existingCartItemsJSON);
       }
 
-      coffeeItem.coffeeInfo = coffeeInfoText;
-
       existingCartItems.push(coffeeItem);
 
       await AsyncStorage.setItem('cartItems', JSON.stringify(existingCartItems));
-      navigation.navigate('CartScreen');
+      navigation.navigate('Your Cart');
     } catch (error) {
       console.error('Error adding item to cart:', error);
     }
   };
-  
+  */
+  const addToCart = async() => {
+    //try{
+      //const current_user = await AsyncStorage.getItem('currentUser');
+      //if(current_user !== null){
+        const db = SQLite.openDatabase({ name: 'coffeeDatabase' });
+        const current_user = 1;
+        db.transaction((tx) => {
+          tx.executeSql(
+            'INSERT INTO cart(user_id,item_name,item_options,quantity,unit_price) VALUES (?,?,?,?,?)',
+            [
+              current_user
+              ,coffeeDetails.name
+              ,iceLevel.toString + whippedCream.toString + sweetness.toString
+              ,quantity
+              ,((calculatePrice)/quantity).parseFloat
+            ],
+            (tx, results) => {
+              console.log(coffeeDetails.name + "inserted in cart table successfully")
+            },
+            (error) => {
+              console.log('Error insert '+coffeeDetails.name+' into cart : ', error);
+            }
+          );
+        });
+      //}
+      //else{
+        //here to navigate user to logged in page if current login user is null
+      //}
+    //}
+    //catch(error){
+    //  console.log(error);
+    //}
+  };
   return (
     <View style={styles.container}>
       <ScrollView>
@@ -212,9 +222,6 @@ const CoffeeDetailScreen = ({ route, navigation }) => {
         <TouchableOpacity onPress={addToCart} style={styles.priceButton}>
           <Text style={styles.priceButtonLabel}>Add to Cart</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={clearCart} style={styles.clearCartButton}>
-          <Text style={styles.clearCartButtonText}>Clear Cart</Text>
-        </TouchableOpacity>
       </View>
     </View>
   );
@@ -301,7 +308,8 @@ const styles = StyleSheet.create({
   quantityButton: {
     backgroundColor: '#43A047',
     borderRadius: 20,
-    padding: 10, // Updated padding
+    paddingHorizontal: 10, // Updated padding
+    paddingBottom: 1,
     margin: 5, // Adjust the margin to your preference
   },
   quantityButtonText: {
