@@ -5,7 +5,7 @@ class DatabaseInitialization {
   _initializeDatabase() {
     // Delete the database for debugging purposes
     
-    SQLite.deleteDatabase(
+    /*SQLite.deleteDatabase(
       {
         name: 'coffeeDatabase',
         location: 'default',
@@ -16,7 +16,7 @@ class DatabaseInitialization {
       error => {
         console.log('Error deleting database:', error);
       }
-    );
+    );*/
     // Open the database
     this.db = SQLite.openDatabase(
       { name: 'coffeeDatabase', location: 'default' },
@@ -56,7 +56,7 @@ class DatabaseInitialization {
 
       // Create 'order_items' table if it does not exist
       tx.executeSql(
-        'CREATE TABLE IF NOT EXISTS order_items (id INTEGER PRIMARY KEY AUTOINCREMENT, order_id INTEGER, item_name VARCHAR(20), quantity INTEGER, FOREIGN KEY(order_id) REFERENCES orders(id))',
+        'CREATE TABLE IF NOT EXISTS order_items (id INTEGER PRIMARY KEY AUTOINCREMENT, order_id INTEGER, user_id INTEGER, item_name VARCHAR(20), quantity INTEGER, FOREIGN KEY(order_id) REFERENCES orders(id), FOREIGN KEY(user_id) REFERENCES users(id))',
         [],
         (sqlTxn, res) => {
           console.log('Order_items table ready');

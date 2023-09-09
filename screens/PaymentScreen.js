@@ -40,6 +40,7 @@ class PaymentScreen extends Component {
       voucherAmount = 5.0; // Apply $5.00 discount if voucher is valid
     }
     const totalAmount = subtotal + deliveryFee - voucherAmount;
+    const formattedTotalAmount = totalAmount.toFixed(2);
   
     if (this.validateForm()) {
       // Start a database transaction
@@ -72,10 +73,11 @@ class PaymentScreen extends Component {
                     }
                   );
                 }
-  
-                // Clear the cart (optional)
-                tx.executeSql('DELETE FROM cart', [], () => {
-                  // Cart items deleted successfully
+                // After successfully inserting all order items, navigate to the success screen.
+                console.log('Navigating to SuccessOrderScreen');
+                this.props.navigation.navigate('SuccessOrderScreen', {
+                  totalAmount: formattedTotalAmount,
+                  paymentMethod: this.state.paymentMethod,
                 });
               },
               (tx, error) => {
@@ -84,17 +86,6 @@ class PaymentScreen extends Component {
                 Alert.alert('Payment Error', 'An error occurred while processing your payment.');
               }
             );
-  
-            // Show a success message using Alert
-            Alert.alert('Payment Successful', 'Your order has been placed successfully.', [
-              {
-                text: 'OK',
-                onPress: () => {
-                  // Navigate to the OrderHistoryScreen after payment success
-                  this.props.navigation.navigate('OrderHistoryScreen'); // Make sure the screen name matches your navigator configuration
-                },
-              },
-            ]);
           },
           (tx, error) => {
             console.error('Error inserting order:', error);
@@ -129,9 +120,7 @@ class PaymentScreen extends Component {
       promocodeAmount = 5.0; // Apply $5.00 discount if promocode is valid
     }
     const totalAmount = subtotal + deliveryFee - promocodeAmount;
-    const formattedTotalAmount = totalAmount.toFixed(2);
     
-
     return (
       <ScrollView style={styles.container}>
         <Text style={styles.heading}>Order Confirmation</Text>

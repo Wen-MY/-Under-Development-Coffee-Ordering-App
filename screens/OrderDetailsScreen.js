@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
 
 class OrderDetailsScreen extends Component {
   render() {
@@ -7,7 +7,7 @@ class OrderDetailsScreen extends Component {
     const { selectedOrder } = route.params;
 
     return (
-      <View style={styles.container}>
+      <ScrollView style={styles.container}>
         <Text style={styles.heading}>Order Details</Text>
         <Text style={styles.orderText}>Order ID: {selectedOrder.id}</Text>
         <Text style={styles.orderText}>Order Date and Time: {selectedOrder.order_date}</Text>
@@ -20,9 +20,11 @@ class OrderDetailsScreen extends Component {
             <Text style={styles.itemText}>
               Subtotal: ${(item.base_price * item.quantity).toFixed(2)}
             </Text>
+            {/* Add a separator line between items */}
+            {itemIndex < selectedOrder.orderItems.length - 1 && <View style={styles.separator} />}
           </View>
         ))}
-      </View>
+      </ScrollView>
     );
   }
 }
@@ -49,10 +51,20 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   itemContainer: {
-    marginTop: 5,
+    marginTop: 10,
+    marginBottom: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: 'lightgray',
+    paddingBottom: 10,
   },
   itemText: {
     fontSize: 14,
+    marginBottom: 5,
+  },
+  separator: {
+    height: 1,
+    backgroundColor: 'lightgray',
+    marginVertical: 5,
   },
 });
 

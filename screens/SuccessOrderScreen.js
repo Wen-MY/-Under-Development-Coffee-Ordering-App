@@ -1,28 +1,37 @@
 import React, { Component } from 'react';
 import { View, Text, Button, StyleSheet, Image } from 'react-native';
 import successOrderImage from '../assets/otherImg/SuccessOrder.jpg';
+import SQLite from 'react-native-sqlite-storage';
 
 class SuccessOrderScreen extends Component {
   constructor(props) {
     super(props);
-    // Remove these lines from the constructor
-    // const { route } = route.params;
-    // const { totalAmount } = route.params;
-    // const { paymentMethod } = route.params;
-    // Example transaction details (you can replace this with actual data)
-    // const transactionNumber = 'TRX123456789';
-    // const amountPaid = totalAmount;
   }
 
-  navigateToMenuScreen = () => {
-    this.props.navigation.navigate('Menu'); // Replace 'Menu' with the actual name of your menu screen
+  componentDidMount() {
+    // Clear the cart after a successful order
+    const db = SQLite.openDatabase({ name: 'coffeeDatabase' });
+    db.transaction((tx) => {
+      tx.executeSql(
+        'DELETE FROM cart',
+        [],
+        (tx, results) => {
+          console.log('Cart cleared successfully');
+        },
+        (error) => {
+          console.log('Error clearing cart: ', error);
+        }
+      );
+    });
+  }
+
+  navigateToCartScreen = () => {
+    this.props.navigation.navigate('Shopping Cart'); // Replace 'Cart' with the actual name of your cart screen
   };
 
   render() {
-    // Receive both totalAmount and paymentMethod as parameters from navigation props
-    const { route } = this.props;
+    // Receive totalAmount and paymentMethod as parameters from navigation props
     const { formattedTotalAmount, paymentMethod } = this.props.route.params;
-    // Example transaction details (you can replace this with actual data)
     const transactionNumber = 'TRX123456789';
     const amountPaid = formattedTotalAmount;
 
@@ -39,7 +48,7 @@ class SuccessOrderScreen extends Component {
           <Text style={styles.transactionLabel}>Payment Method: {paymentMethod}</Text>
         </View>
 
-        <Button title="Continue Shopping" onPress={this.navigateToMenuScreen} style={styles.button} />
+        <Button title="Continue Shopping" onPress={this.navigateToCartScreen} style={styles.button} />
       </View>
     );
   }
@@ -61,14 +70,14 @@ const styles = StyleSheet.create({
     borderColor: 'lightgray',
     borderRadius: 10,
     marginBottom: 40,
-    shadowColor: '#000000', // Shadow color
+    shadowColor: '#000000',
     shadowOffset: {
       width: 0,
       height: 2,
     },
-    shadowOpacity: 0.2, // Shadow opacity
-    shadowRadius: 4, // Shadow radius
-    elevation: 5, // Android shadow elevation
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 5,
     backgroundColor: '#ffffff',
   },
   transactionLabel: {
@@ -76,17 +85,17 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   button: {
-    marginTop: 20, // Add margin to the button
+    marginTop: 20,
   },
   successOrderImage: {
     height: 250,
     width: 250,
   },
   imageFrame: {
-    borderWidth: 2, // Border width
-    borderColor: 'black', // Border color
-    padding: 5, // Padding around the image
-    borderRadius: 10, // Border radius for rounded corners
+    borderWidth: 2,
+    borderColor: 'black',
+    padding: 5,
+    borderRadius: 10,
   },
 });
 

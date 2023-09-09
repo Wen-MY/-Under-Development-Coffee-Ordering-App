@@ -88,24 +88,23 @@ class OrderHistoryScreen extends Component {
     return (
       <TouchableOpacity
         key={order.id}
-        onPress={() => this.navigateToOrderDetails(order)} // Navigate to OrderDetailsScreen
+        onPress={() => this.navigateToOrderDetails(order)}
         style={styles.orderContainer}
       >
         <Text style={styles.orderTitle}>Order ID: {order.id}</Text>
         <Text style={styles.orderItemText}>Order Date and Time: {order.order_date}</Text>
         <Text style={styles.orderTotalText}>Total Amount: ${order.total_amount.toFixed(2)}</Text>
+        {/* Add a separator line */}
+        <View style={styles.separator} />
       </TouchableOpacity>
     );
   }
 
-
-  render() {
+   render() {
     const { orderHistory, selectedOrder } = this.state;
-  
+
     return (
       <ScrollView style={styles.container}>
-        <Text style={styles.heading}>Order History</Text>
-  
         {orderHistory === null ? (
           <Text style={styles.loadingText}>Loading...</Text>
         ) : selectedOrder ? (
@@ -118,7 +117,7 @@ class OrderHistoryScreen extends Component {
       </ScrollView>
     );
   }
-}  
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -147,8 +146,12 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 4,
     elevation: 5,
-    justifyContent: 'center',
-    alignItems: 'center',
+  },
+  separator: {
+    height: 1,
+    backgroundColor: 'lightgray',
+    marginTop: 10,
+    marginBottom: 5,
   },
   orderTitle: {
     fontSize: 18,
@@ -161,25 +164,6 @@ const styles = StyleSheet.create({
   },
   orderTotalText: {
     fontSize: 16,
-    fontWeight: 'bold',
-    marginTop: 10,
-  },
-  orderSubtitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginTop: 10,
-  },
-  itemContainer: {
-    marginTop: 5,
-  },
-  itemName: {
-    fontSize: 14,
-  },
-  itemQuantity: {
-    fontSize: 14,
-  },
-  itemSubtotal: {
-    fontSize: 14,
     fontWeight: 'bold',
   },
   noOrdersText: {

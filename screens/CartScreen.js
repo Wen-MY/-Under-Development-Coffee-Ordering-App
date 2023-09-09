@@ -2,19 +2,21 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, Image, Button, StyleSheet, ScrollView } from 'react-native';
 import SQLite from 'react-native-sqlite-storage';
 import imageMapping from '../utils/imageMapping';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native'; // Import useFocusEffect
 
 const CartScreen = ({ navigation }) => {
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchCartItems = () => {
+  const fetchCartItems = async() => {
     const db = SQLite.openDatabase({ name: 'coffeeDatabase' });
+    const id = await AsyncStorage.getItem('id');
 
     db.transaction((tx) => {
       tx.executeSql(
         'SELECT * FROM cart WHERE user_id = ?',
-        [1], // Replace with the user's ID
+        [id], // Replace with the user's ID
         (tx, results) => {
           const items = [];
           for (let i = 0; i < results.rows.length; i++) {
