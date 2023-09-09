@@ -1,8 +1,48 @@
-import React, { Component } from 'react';
+import React, { Component, useState } from 'react';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default class Login extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            username: '',
+            password: '',
+            error: null,
+        };
+    }
+    handleSignUpPress = () => {
+        // Navigate to the Sign Up screen when the "Sign Up" button is pressed
+        this.props.navigation.navigate('Sign Up');
+    };
+    handleLogin = async () => {
+        try {
+          const response = await fetch('http://192.168.0.155:5000/api/login', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              username: this.state.username, // Access the state variables
+              password: this.state.password, // Access the state variables
+            }),
+          });
+      
+          if (response.status === 200) {
+            const data = await response.json();
+            // Authentication successful, handle the user data
+            console.log(data.user);
+            this.props.navigation.navigate('Home');
+          } else {
+            const data = await response.json();
+            // Authentication failed, show an error message
+            console.error(data.message);
+          }
+        } catch (error) {
+          console.error('Error:', error);
+        }
+      };
     render() {
         return (
             <View style={styles.container}>
@@ -12,8 +52,9 @@ export default class Login extends Component {
                     <Icon name={'mobile-phone'} size={20} color="gray" style={styles.icon} />
                     <TextInput
                         style={styles.input}
-                        placeholder="Enter your phone number"
-                        keyboardType="phone-pad"
+                        placeholder="Enter your username"
+                        onChangeText={(username) => this.setState({ username })}
+                        value={this.state.username}
                     />
                 </View>
                 <View style={styles.inputContainer}>
@@ -22,9 +63,13 @@ export default class Login extends Component {
                         style={styles.input}
                         placeholder="Enter your password"
                         secureTextEntry={true}
+                        onChangeText={(password) => this.setState({ password })}
+                        value={this.state.password}
                     />
                 </View>
-                <Button title="Continue" onPress={() => this.props.navigation.navigate('SignUp')} />
+                <Button title="Continue" onPress={this.handleLogin} />
+                <Button title="Sign Up" onPress={this.handleSignUpPress} />
+                {this.state.error && <Text style={styles.errorText}>{this.state.error}</Text>}
             </View>
         );
     }

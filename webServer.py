@@ -1,15 +1,14 @@
 import sqlite3
 from flask import Flask, jsonify, request, abort
 from argparse import ArgumentParser
-
+from flask_cors import CORS
 
 DB = 'usersDB.sqlite'
-
 
 def get_row_as_dict(row):
     row_dict = {
         'id': row[0],
-        'name': row[1],
+        'username': row[1],
         'email': row[2],
         'password': row[3],  
         'balance': row[4],   
@@ -17,6 +16,29 @@ def get_row_as_dict(row):
     return row_dict
 
 app = Flask(__name__)
+
+@app.route('/api/login', methods=['POST'])
+def login():
+    data = request.get_json()
+    username = data.get('username')
+    password = data.get('password')
+
+    if not username or not password:
+        return jsonify({'message': 'Username and password are required.'}), 400
+
+    db = sqlite3.connect(DB)
+    cursor = db.cursor()
+    cursor.execute('SELECT * FROM users WHERE username = ?', (username,))
+    user = cursor.fetchone()
+    db.close()
+
+    if user and user[3] == password:
+        # User authentication successful
+        user_dict = get_row_as_dict(user)
+        return jsonify({'message': 'Login successful', 'user': user_dict}), 200
+    else:
+        # Authentication failed
+        return jsonify({'message': 'Invalid username or password'}), 401
 
 
 @app.route('/api/users', methods=['GET'])
