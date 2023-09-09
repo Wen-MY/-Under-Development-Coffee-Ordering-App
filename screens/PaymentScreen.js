@@ -20,7 +20,7 @@ class PaymentScreen extends Component {
       cardNumber: '',
       cvv: '',
       paymentMethod: 'MasterCard', // Default payment method
-      voucher: '',
+      promocode: '',
       validUntilMonth: '01', // Default valid until month
       validUntilYear: '2023', // Default valid until year
       storedCartItems: [],
@@ -30,14 +30,14 @@ class PaymentScreen extends Component {
 
   handlePayment = async () => {
     if (this.validateForm()) {
-      const { voucher, storedCartItems } = this.state;
+      const { promocode, storedCartItems } = this.state;
       const subtotal = parseFloat(this.props.route.params.subtotal); // Convert subtotal to a floating-point number
       const deliveryFee = 5.0;
-      let voucherAmount = 0; // Initialize voucherAmount to 0
-      if (this.state.voucher === '123456') {
-        voucherAmount = 5.0; // Apply $5.00 discount if voucher is valid
+      let promocodeAmount = 0; // Initialize promocodeAmount to 0
+      if (this.state.promocode === '123456') {
+        promocodeAmount = 5.0; // Apply $5.00 discount if promocode is valid
       }
-      const totalAmount = subtotal + deliveryFee - voucherAmount;
+      const totalAmount = subtotal + deliveryFee - promocodeAmount;
       const formattedTotalAmount = totalAmount.toFixed(2);
       
       
@@ -48,12 +48,12 @@ class PaymentScreen extends Component {
         cardNumber: this.state.cardNumber,
         cvv: this.state.cvv,
         paymentMethod: this.state.paymentMethod,
-        voucher,
+        promocode,
         validUntilMonth: this.state.validUntilMonth,
         validUntilYear: this.state.validUntilYear,
         subtotal,
         deliveryFee,
-        voucherAmount,
+        promocodeAmount,
         totalAmount,
         orderItems: storedCartItems,
       };
@@ -109,11 +109,11 @@ class PaymentScreen extends Component {
   render() {
     const subtotal = parseFloat(this.props.route.params.subtotal); // Convert subtotal to a floating-point number
     const deliveryFee = 5.0;
-    let voucherAmount = 0; // Initialize voucherAmount to 0
-    if (this.state.voucher === '123456') {
-      voucherAmount = 5.0; // Apply $5.00 discount if voucher is valid
+    let promocodeAmount = 0; // Initialize promocodeAmount to 0
+    if (this.state.promocode === '123456') {
+      promocodeAmount = 5.0; // Apply $5.00 discount if promocode is valid
     }
-    const totalAmount = subtotal + deliveryFee - voucherAmount;
+    const totalAmount = subtotal + deliveryFee - promocodeAmount;
     const formattedTotalAmount = totalAmount.toFixed(2);
     
 
@@ -215,18 +215,18 @@ class PaymentScreen extends Component {
           </View>
         </View>
 
-        <Text style={styles.label}>Voucher Code</Text>
+        <Text style={styles.label}>Promocode Code</Text>
         <TextInput
           style={styles.input}
           placeholder="XXXXXX"
-          onChangeText={(text) => this.setState({ voucher: text })}
+          onChangeText={(text) => this.setState({ promocode: text })}
         />
 
         <View style={styles.paymentContainer}>
           <Text style={styles.heading1}>Payment Details</Text>
           <Text>Subtotal: ${subtotal}</Text>
           <Text>Delivery Fee: ${deliveryFee.toFixed(2)}</Text>
-          <Text>Voucher Amount: ${voucherAmount.toFixed(2)}</Text>
+          <Text>Discount: ${promocodeAmount.toFixed(2)}</Text>
           <Text>Total: ${totalAmount.toFixed(2)}</Text>
         </View>
 
@@ -253,7 +253,7 @@ const styles = StyleSheet.create({
   heading1: {
     fontSize: 18,
     marginBottom: 10,
-    marginTop: 20,
+    marginTop: 10,
     color: '#4A4A4A',
   },
   label: {
@@ -280,7 +280,8 @@ const styles = StyleSheet.create({
     marginLeft: 5,
   },
   paymentContainer: {
-    marginTop: 20,
+    marginTop: 10,
+    paddingTop: 1,
     padding: 10,
     borderWidth: 1,
     borderColor: 'lightgray',
@@ -289,12 +290,14 @@ const styles = StyleSheet.create({
     shadowColor: '#000000',
     shadowOffset: {
       width: 0,
-      height: 2,
+      height: 0, // Set both width and height to 0 for shadow on all sides
     },
     shadowOpacity: 0.2,
     shadowRadius: 4,
     elevation: 5,
+    marginBottom: 15,
   },
+  
   bottomSpace: {
     height: 40,
   },

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
-import { View, Text, Button, StyleSheet } from 'react-native';
-import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
+import { View, Text, Button, StyleSheet, Image} from 'react-native';
+import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome5';
+import successOrderImage from '../assets/otherImg/SuccessOrder.jpg';
 
 
 class SuccessOrderScreen extends Component {
@@ -18,7 +19,9 @@ class SuccessOrderScreen extends Component {
    
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <FontAwesomeIcon name="check-circle" size={50} color="green" />
+        <View style={styles.imageFrame}>
+          <Image source={successOrderImage} style={styles.successOrderImage} />
+        </View>
         <Text style={styles.successText}>Your order has been placed successfully!</Text>
 
         <View style={styles.transactionContainer}>
@@ -36,7 +39,7 @@ class SuccessOrderScreen extends Component {
 const styles = StyleSheet.create({
   successText: {
     fontFamily: 'Montserrat',
-    color: '#4A4A4A',
+    color: 'green',
     marginTop: 10,
     fontSize: 18,
   },
@@ -44,7 +47,7 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     alignItems: 'center',
     marginTop: 20,
-    padding: 10,
+    padding: 20,
     borderWidth: 1,
     borderColor: 'lightgray',
     borderRadius: 10,
@@ -66,6 +69,16 @@ const styles = StyleSheet.create({
   },
   button: {
     marginTop: 20, // Add margin to the button
+  },
+  successOrderImage:{
+    height:250,
+    width:250,
+  },
+  imageFrame: {
+    borderWidth: 2, // Border width
+    borderColor: 'black', // Border color
+    padding: 5, // Padding around the image
+    borderRadius: 10, // Border radius for rounded corners
   },
 });
 

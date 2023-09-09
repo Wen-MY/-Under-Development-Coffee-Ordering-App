@@ -3,6 +3,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { View, Text, Image, TouchableOpacity, Button, StyleSheet, ScrollView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import imageMapping from '../utils/imageMapping';
+import TrashIcon from 'react-native-vector-icons/Feather';
 
 const CartScreen = ({ navigation }) => {
   const [cartItems, setCartItems] = useState([]);
@@ -59,33 +60,29 @@ const CartScreen = ({ navigation }) => {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.heading}>Your Cart</Text>
+      <Text style={styles.heading}>My Cart</Text>
       {cartItems.map((item) => (
         <View key={item.id} style={styles.cartItemContainer}>
-          <Image
-            source={imageMapping[item.name]}
-            style={styles.cartItemImage}
-          />
-
+          <Image source={imageMapping[item.name]} style={styles.cartItemImage} />
+  
           <View style={styles.cartItemInfo}>
             <Text style={styles.itemName}>{item.name}</Text>
-            
+  
             {item.customizations && (
               <Text style={styles.customizations}> {item.customizations}</Text>
             )}
-            <Text style={styles.unitPrice}>Unit Price: ${item.price.toFixed(2)}</Text>
-            <View style={styles.actionRow}>
-              <TouchableOpacity
-                style={styles.removeButton}
-                onPress={() => removeItem(item.id)}
-              >
-                <Text style={styles.removeButtonText}>Remove</Text>
-              </TouchableOpacity>
-            </View>
+            <Text style={styles.unitPrice}>Price: ${item.price.toFixed(2)}</Text>
           </View>
+  
+          <TouchableOpacity
+            style={styles.removeButton}
+            onPress={() => removeItem(item.id)}
+          >
+            <Text style={styles.removeButtonText}>✘</Text>
+          </TouchableOpacity>
         </View>
       ))}
-      <Text style={styles.total}>Total for all items: ${calculateTotal()}</Text>
+      <Text style={styles.total}>Total Price: ${calculateTotal()}</Text>
       <Button
         title="Proceed to Payment"
         onPress={() => {
@@ -93,7 +90,7 @@ const CartScreen = ({ navigation }) => {
         }}
       />
     </ScrollView>
-  );
+  );  
 };
   
 
@@ -110,12 +107,21 @@ const styles = StyleSheet.create({
   },
   cartItemContainer: {
     flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'white',
+    alignItems: 'flex-start',
+    backgroundColor: 'white', // Background color
     padding: 15,
-    borderRadius: 8,
+    borderRadius: 15,
     marginTop: 10,
+    shadowColor: '#000000', // Shadow color
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.2, // Shadow opacity
+    shadowRadius: 4,     // Shadow radius
+    elevation: 5,        // Android shadow elevation
   },
+  
   cartItemImage: {
     width: 60,
     height: 90,
@@ -131,7 +137,7 @@ const styles = StyleSheet.create({
   unitPrice: {
     fontWeight: 'bold',
     fontSize: 14,
-    marginTop: 5,
+    marginTop: 10,
   },
   actionRow: {
     flexDirection: 'row',
@@ -157,19 +163,21 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
   },
   removeButton: {
-    width: 75,
-    height: 30,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#FF6F61',
-    paddingHorizontal: 5,
+    position: 'absolute',
+    top: 0, // Move the button to the top
+    right: 0, // Move the button to the right
+    paddingHorizontal: 10,
     paddingVertical: 5,
+    
     borderRadius: 4,
-    marginLeft: 5,
+    borderColor: '#FF6F61',
+    marginRight:2,
+    marginTop:2,
   },
   removeButtonText: {
-    color: 'white',
+    color: '#FF6F61',
     fontWeight: 'bold',
+    fontSize: 20,
   },
   totalPrice: {
     fontWeight: 'bold',
@@ -179,9 +187,15 @@ const styles = StyleSheet.create({
   total: {
     fontSize: 20,
     fontWeight: 'bold',
+    color: 'black',
     marginTop: 20,
     textAlign: 'center',
+    borderTopWidth: 2,    // Border on top
+    borderBottomWidth: 2, // Border on bottom
+    marginBottom:10,
+    padding:10,
   },
+  
 });
 
 export default CartScreen;
