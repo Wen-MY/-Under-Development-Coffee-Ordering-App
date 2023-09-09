@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   ScrollView,
+  Alert
 } from 'react-native';
 import { RadioButton, Checkbox } from 'react-native-paper';
 import SQLite from 'react-native-sqlite-storage';
@@ -118,7 +119,7 @@ const CoffeeDetailScreen = ({ route, navigation }) => {
       existingCartItems.push(coffeeItem);
 
       await AsyncStorage.setItem('cartItems', JSON.stringify(existingCartItems));
-      navigation.navigate('CartScreen');
+      navigation.navigate('Your Cart');
     } catch (error) {
       console.error('Error adding item to cart:', error);
     }

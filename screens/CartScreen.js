@@ -80,7 +80,7 @@ const CartScreen = ({ navigation, route }) => {
       <Button
       title="Proceed to Payment"
       onPress={() => {
-        navigation.navigate('PaymentScreen', { subtotal: calculateTotal() });
+        navigation.navigate('PaymentScreen', { subtotal: calculateTotal(), cartItems });
       }}
       />
     </ScrollView>

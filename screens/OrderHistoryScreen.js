@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { View, Text, ScrollView, StyleSheet } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import SQLite from 'react-native-sqlite-storage';
 
 class OrderHistoryScreen extends Component {
   constructor(props) {
@@ -9,19 +9,85 @@ class OrderHistoryScreen extends Component {
     this.state = {
       orderHistory: [],
     };
+
+    // Initialize the SQLite database in the constructor
+    this.db = SQLite.openDatabase(
+      { name: 'coffeeDatabase', location: 'default' },
+      this.openCallback,
+      this.errorCallback
+    );
   }
 
-  async componentDidMount() {
-    try {
-      // Retrieve the order history from AsyncStorage
-      const orderHistory = await AsyncStorage.getItem('orderHistory');
+  componentDidMount() {
+    // Fetch and set the order history when the component mounts
+    this.fetchOrderHistory();
+  }
 
-      if (orderHistory !== null) {
-        this.setState({ orderHistory: JSON.parse(orderHistory) });
-      }
-    } catch (error) {
-      console.error('Error retrieving order history:', error);
-    }
+  fetchOrderHistory() {
+    this.db.transaction((tx) => {
+      tx.executeSql(
+        'SELECT orders.id AS order_id, user_id, total_amount, order_date, ' +
+        'order_items.id AS item_id, name, description, base_price, type, quantity ' +
+        'FROM orders ' +
+        'INNER JOIN order_items ON orders.id = order_items.order_id ' +
+        'INNER JOIN items ON order_items.item_id = items.id ' +
+        'ORDER BY orders.order_date DESC',
+        [],
+        (tx, results) => {
+          console.log('Query results:', results);
+          const orderHistory = [];
+          const len = results.rows.length;
+          for (let i = 0; i < len; i++) {
+            const row = results.rows.item(i);
+            const orderId = row.order_id;
+            const order = orderHistory.find((o) => o.id === orderId);
+  
+            if (!order) {
+              // Create a new order entry in the history
+              const newOrder = {
+                id: orderId,
+                user_id: row.user_id,
+                total_amount: row.total_amount,
+                order_date: row.order_date,
+                orderItems: [
+                  {
+                    id: row.item_id,
+                    name: row.name,
+                    description: row.description,
+                    base_price: row.base_price,
+                    type: row.type,
+                    quantity: row.quantity,
+                  },
+                ],
+              };
+              orderHistory.push(newOrder);
+            } else {
+              // Add item to an existing order entry
+              order.orderItems.push({
+                id: row.item_id,
+                name: row.name,
+                description: row.description,
+                base_price: row.base_price,
+                type: row.type,
+                quantity: row.quantity,
+              });
+            }
+          }
+          this.setState({ orderHistory }); // Update the state here
+        },
+        (tx, error) => {
+          console.log('Error fetching order history:', error);
+        }
+      );
+    });
+  } 
+
+  openCallback() {
+    console.log('Database opened successfully');
+  }
+
+  errorCallback(err) {
+    console.log('Error in opening database: ' + err);
   }
 
   render() {
@@ -31,31 +97,32 @@ class OrderHistoryScreen extends Component {
       <ScrollView style={styles.container}>
         <Text style={styles.heading}>Order History</Text>
 
-        {orderHistory.map((order, index) => (
-          <View key={index} style={styles.orderContainer}>
-            <Text style={styles.orderTitle}>Order {index + 1}</Text>
-            <Text style={styles.orderItemText}>Order ID: {order.id}</Text>
-            <Text style={styles.orderItemText}>
-              Order Date and Time: {order.dateTime}
-            </Text>
-            <Text style={styles.orderItemText}>
-              Payment Method: {order.paymentMethod}
-            </Text>
-            <Text style={styles.orderTotalText}>
-              Total Amount: ${order.totalAmount.toFixed(2)}
-            </Text>
-            <Text style={styles.orderSubtitle}>Order Details:</Text>
-            {order.orderItems.map((item, itemIndex) => (
-              <View key={itemIndex} style={styles.itemContainer}>
-                <Text style={styles.itemName}>Item: {item.name}</Text>
-                <Text style={styles.itemQuantity}>Quantity: {item.quantity}</Text>
-                <Text style={styles.itemSubtotal}>
-                  Subtotal: ${(item.price * item.quantity).toFixed(2)}
-                </Text>
-              </View>
-            ))}
-          </View>
-        ))}
+        {orderHistory.length === 0 ? (
+          <Text style={styles.noOrdersText}>No orders available yet.</Text>
+        ) : (
+          orderHistory.map((order, index) => (
+            <View key={index} style={styles.orderContainer}>
+              <Text style={styles.orderTitle}>Order {index + 1}</Text>
+              <Text style={styles.orderItemText}>Order ID: {order.id}</Text>
+              <Text style={styles.orderItemText}>
+                Order Date and Time: {order.order_date} {/* Use 'order_date' property */}
+              </Text>
+              <Text style={styles.orderTotalText}>
+                Total Amount: ${order.total_amount.toFixed(2)} {/* Use 'total_amount' property */}
+              </Text>
+              <Text style={styles.orderSubtitle}>Order Details:</Text>
+              {order.orderItems.map((item, itemIndex) => (
+                <View key={itemIndex} style={styles.itemContainer}>
+                  <Text style={styles.itemName}>Item: {item.name}</Text>
+                  <Text style={styles.itemQuantity}>Quantity: {item.quantity}</Text>
+                  <Text style={styles.itemSubtotal}>
+                    Subtotal: ${(item.base_price * item.quantity).toFixed(2)} {/* Use 'base_price' */}
+                  </Text>
+                </View>
+              ))}
+            </View>
+          ))
+        )}
       </ScrollView>
     );
   }
@@ -120,6 +187,13 @@ const styles = StyleSheet.create({
   itemSubtotal: {
     fontSize: 14,
     fontWeight: 'bold',
+  },
+  noOrdersText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: 'gray',
+    textAlign: 'center',
+    marginTop: 20,
   },
 });
 
