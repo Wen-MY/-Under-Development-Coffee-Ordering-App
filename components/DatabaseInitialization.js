@@ -56,7 +56,7 @@ class DatabaseInitialization {
 
       // Create 'order_items' table if it does not exist
       tx.executeSql(
-        'CREATE TABLE IF NOT EXISTS order_items (id INTEGER PRIMARY KEY AUTOINCREMENT, order_id INTEGER, user_id INTEGER, item_name VARCHAR(20), quantity INTEGER, FOREIGN KEY(order_id) REFERENCES orders(id), FOREIGN KEY(user_id) REFERENCES users(id))',
+        'CREATE TABLE IF NOT EXISTS order_items (id INTEGER PRIMARY KEY AUTOINCREMENT, order_id INTEGER, item_name VARCHAR(20), quantity INTEGER, FOREIGN KEY(order_id) REFERENCES orders(id))',
         [],
         (sqlTxn, res) => {
           console.log('Order_items table ready');

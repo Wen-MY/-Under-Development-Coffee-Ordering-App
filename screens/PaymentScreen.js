@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, ScrollView ,Image, Alert } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 let SQLite = require('react-native-sqlite-storage');
 
 
@@ -55,8 +56,9 @@ class PaymentScreen extends Component {
   };
   
 
-  handlePayment = (subtotal) => {
+  handlePayment = async(subtotal) => {
       const deliveryFee = 5.0;
+      const id = await AsyncStorage.getItem('id');
       let promocodeAmount = 0; // Initialize promocodeAmount to 0
       if (this.state.promocode === '123456') {
         promocodeAmount = 5.0; // Apply $5.00 discount if promocode is valid
@@ -73,15 +75,15 @@ class PaymentScreen extends Component {
       this.db.transaction((tx) => {
         // Insert order into the 'orders' table
         tx.executeSql(
-          'INSERT INTO orders (total_amount) VALUES (?)',
-          [totalAmount],
+          'INSERT INTO orders (user_id ,total_amount) VALUES (?,?)',
+          [id,formattedTotalAmount],
           (tx, result) => {
+            console.log('Inserted Order into orders table');
             const orderId = result.insertId; // Get the inserted order ID
-
             // Fetch all items from the cart table
             tx.executeSql(
-              'SELECT * FROM cart',
-              [],
+              'SELECT * FROM cart WHERE user_id = ?',
+              [id],
               (tx, resultSet) => {
                 const rows = resultSet.rows;
                 for (let i = 0; i < rows.length; i++) {
