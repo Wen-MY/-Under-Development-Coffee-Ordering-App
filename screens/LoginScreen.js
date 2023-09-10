@@ -45,7 +45,7 @@ export default class Login extends Component {
       };
     handleLogin = async () => {
         try {
-          const response = await fetch('http://192.168.50.78:5000/api/login', {
+          const response = await fetch('http://192.168.1.4:5000/api/login', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',

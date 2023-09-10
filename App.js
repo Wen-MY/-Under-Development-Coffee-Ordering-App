@@ -90,9 +90,16 @@ const CartStack = () => (
   <Stack.Navigator initialRouteName='Shopping Cart'>
     <Stack.Screen name="Shopping Cart" component={CartScreen}/>
     <Stack.Screen name="PaymentScreen" component={PaymentScreen} />
-    <Stack.Screen name="SuccessOrderScreen" component={SuccessOrderScreen} />
+    <Stack.Screen name="SuccessOrderScreen" component={SuccessOrderScreen} options={{headerTitle:''}}/>
   </Stack.Navigator>
 );
+const OrderStack = () => (
+  <Stack.Navigator initialRouteName='OrderHistoryScreen'>
+    <Stack.Screen name="My Orders" component={OrderHistoryScreen}/>
+    <Stack.Screen name="OrderDetails" component={OrderDetailsScreen} />
+  </Stack.Navigator>
+);
+
 
 const LoginStack = () => {
   return (
@@ -162,7 +169,7 @@ function AppBottomStack() {
       />
       <Tab.Screen
       name = 'Order'
-      component = {SuccessOrderScreen}
+      component = {OrderStack}
       options={{/*
         tabBarIcon: () => {
           return <FontAwesomeIcon icon="fa-regular fa-user" size={20}/>
@@ -187,7 +194,7 @@ function AppDrawerStack() {
       drawerContent={CustomDrawerContent}
     >
       {/* Your Drawer Screens */}
-      <Drawer.Screen name ='Home Screen' component={AppBottomStack} options={{headerShown:false}}/>
+      <Drawer.Screen name ='Home Screen' component={AppBottomStack} options={{headerTitle: false}}/>
       <Drawer.Screen name="Profile" component={ProfileScreen} />
       <Drawer.Screen name="Settings" component={SettingStack} />
       <Drawer.Screen name="Sign Out" component={LoginStack} options={{ swipeEnabled: false, headerShown: false, drawerLabel: 'Sign Out',
@@ -203,7 +210,7 @@ export default function App() {
     // Check if the user is logged in using AsyncStorage
     AsyncStorage.getItem('userToken')
       .then((userToken) => {
-        if (userToken) {
+        if (!userToken) {
           // User is logged in
           setLoggedIn(true);
         } else {
@@ -222,14 +229,7 @@ export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator>
-        {loggedIn ? (
-          <>
-            <Stack.Screen name="AppDrawerStack" component={AppDrawerStack} options={{ headerShown: false }} />
-            <Stack.Screen name="OrderDetails" component={OrderDetailsScreen} />
-          </>
-        ) : (
-          <Stack.Screen name="LoginStack" component={LoginStack} options={{ headerShown: false }} />
-        )}
+        <Stack.Screen name="AppDrawerStack" component={AppDrawerStack} options={{ headerShown: false }} />
       </Stack.Navigator>
     </NavigationContainer>
   );

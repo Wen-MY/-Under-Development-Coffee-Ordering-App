@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, ScrollView, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 import SQLite from 'react-native-sqlite-storage';
 
 class OrderHistoryScreen extends Component {
@@ -8,6 +8,7 @@ class OrderHistoryScreen extends Component {
 
     this.state = {
       orderHistory: [],
+      selectedOrder: null, // Store the selected order when clicked
     };
 
     // Initialize the SQLite database in the constructor
@@ -23,64 +24,57 @@ class OrderHistoryScreen extends Component {
     this.fetchOrderHistory();
   }
 
+  navigateToOrderDetails(order) {
+    this.props.navigation.navigate('OrderDetails', { selectedOrder: order });
+  }
+
   fetchOrderHistory() {
     this.db.transaction((tx) => {
       tx.executeSql(
         'SELECT orders.id AS order_id, user_id, total_amount, order_date, ' +
-        'order_items.id AS item_id, name, description, base_price, type, quantity ' +
+        'order_items.id AS item_id, item_name, quantity ' +
         'FROM orders ' +
-        'INNER JOIN order_items ON orders.id = order_items.order_id ' +
-        'INNER JOIN items ON order_items.item_id = items.id ' +
+        'LEFT JOIN order_items ON orders.id = order_items.order_id ' +
         'ORDER BY orders.order_date DESC',
         [],
         (tx, results) => {
-          console.log('Query results:', results);
           const orderHistory = [];
           const len = results.rows.length;
           for (let i = 0; i < len; i++) {
             const row = results.rows.item(i);
             const orderId = row.order_id;
-            const order = orderHistory.find((o) => o.id === orderId);
+            let order = orderHistory.find((o) => o.id === orderId);
   
             if (!order) {
               // Create a new order entry in the history
-              const newOrder = {
+              order = {
                 id: orderId,
                 user_id: row.user_id,
                 total_amount: row.total_amount,
                 order_date: row.order_date,
-                orderItems: [
-                  {
-                    id: row.item_id,
-                    name: row.name,
-                    description: row.description,
-                    base_price: row.base_price,
-                    type: row.type,
-                    quantity: row.quantity,
-                  },
-                ],
+                orderItems: [],
               };
-              orderHistory.push(newOrder);
-            } else {
+              orderHistory.push(order);
+            }
+  
+            if (row.item_id) {
               // Add item to an existing order entry
               order.orderItems.push({
                 id: row.item_id,
-                name: row.name,
-                description: row.description,
-                base_price: row.base_price,
-                type: row.type,
+                name: row.item_name,
                 quantity: row.quantity,
               });
             }
           }
-          this.setState({ orderHistory }); // Update the state here
+          this.setState({ orderHistory });
         },
         (tx, error) => {
           console.log('Error fetching order history:', error);
         }
       );
     });
-  } 
+  }
+  
 
   openCallback() {
     console.log('Database opened successfully');
@@ -90,38 +84,35 @@ class OrderHistoryScreen extends Component {
     console.log('Error in opening database: ' + err);
   }
 
-  render() {
-    const { orderHistory } = this.state;
+  renderOrderSummary(order) {
+    return (
+      <TouchableOpacity
+        key={order.id}
+        onPress={() => this.navigateToOrderDetails(order)}
+        style={styles.orderContainer}
+      >
+        <Text style={styles.orderTitle}>Order ID: {order.id}</Text>
+        <Text style={styles.orderItemText}>Order Date and Time: {order.order_date}</Text>
+        <Text style={styles.orderTotalText}>Total Amount: ${order.total_amount.toFixed(2)}</Text>
+        {/* Add a separator line */}
+        <View style={styles.separator} />
+      </TouchableOpacity>
+    );
+  }
+
+   render() {
+    const { orderHistory, selectedOrder } = this.state;
 
     return (
       <ScrollView style={styles.container}>
-        <Text style={styles.heading}>Order History</Text>
-
-        {orderHistory.length === 0 ? (
+        {orderHistory === null ? (
+          <Text style={styles.loadingText}>Loading...</Text>
+        ) : selectedOrder ? (
+          this.renderOrderItems(selectedOrder)
+        ) : orderHistory.length === 0 ? (
           <Text style={styles.noOrdersText}>No orders available yet.</Text>
         ) : (
-          orderHistory.map((order, index) => (
-            <View key={index} style={styles.orderContainer}>
-              <Text style={styles.orderTitle}>Order {index + 1}</Text>
-              <Text style={styles.orderItemText}>Order ID: {order.id}</Text>
-              <Text style={styles.orderItemText}>
-                Order Date and Time: {order.order_date} {/* Use 'order_date' property */}
-              </Text>
-              <Text style={styles.orderTotalText}>
-                Total Amount: ${order.total_amount.toFixed(2)} {/* Use 'total_amount' property */}
-              </Text>
-              <Text style={styles.orderSubtitle}>Order Details:</Text>
-              {order.orderItems.map((item, itemIndex) => (
-                <View key={itemIndex} style={styles.itemContainer}>
-                  <Text style={styles.itemName}>Item: {item.name}</Text>
-                  <Text style={styles.itemQuantity}>Quantity: {item.quantity}</Text>
-                  <Text style={styles.itemSubtotal}>
-                    Subtotal: ${(item.base_price * item.quantity).toFixed(2)} {/* Use 'base_price' */}
-                  </Text>
-                </View>
-              ))}
-            </View>
-          ))
+          orderHistory.map((order) => this.renderOrderSummary(order))
         )}
       </ScrollView>
     );
@@ -156,6 +147,12 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 5,
   },
+  separator: {
+    height: 1,
+    backgroundColor: 'lightgray',
+    marginTop: 10,
+    marginBottom: 5,
+  },
   orderTitle: {
     fontSize: 18,
     fontWeight: 'bold',
@@ -167,25 +164,6 @@ const styles = StyleSheet.create({
   },
   orderTotalText: {
     fontSize: 16,
-    fontWeight: 'bold',
-    marginTop: 10,
-  },
-  orderSubtitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginTop: 10,
-  },
-  itemContainer: {
-    marginTop: 5,
-  },
-  itemName: {
-    fontSize: 14,
-  },
-  itemQuantity: {
-    fontSize: 14,
-  },
-  itemSubtotal: {
-    fontSize: 14,
     fontWeight: 'bold',
   },
   noOrdersText: {

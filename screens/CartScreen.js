@@ -1,53 +1,83 @@
 import React, { useState, useEffect } from 'react';
-import { useFocusEffect } from '@react-navigation/native';
-import { View, Text, Image, TouchableOpacity, Button, StyleSheet, ScrollView } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import {
+  View,
+  Text,
+  Image,
+  Button,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+} from 'react-native';
+import SQLite from 'react-native-sqlite-storage';
 import imageMapping from '../utils/imageMapping';
-import TrashIcon from 'react-native-vector-icons/Feather';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect } from '@react-navigation/native'; // Import useFocusEffect
 
 const CartScreen = ({ navigation }) => {
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const loadCartItems = async () => {
-    try {
-      const cartItemsJSON = await AsyncStorage.getItem('cartItems');
-      if (cartItemsJSON !== null) {
-        setCartItems(JSON.parse(cartItemsJSON));
-      }
-    } catch (error) {
-      console.error('Error loading cart items:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const fetchCartItems = async () => {
+    const db = SQLite.openDatabase({ name: 'coffeeDatabase' });
+    const id = await AsyncStorage.getItem('id');
 
-  useEffect(() => {
-    loadCartItems();
-  }, []);
+    db.transaction((tx) => {
+      tx.executeSql(
+        'SELECT * FROM cart WHERE user_id = ?',
+        [id], // Replace with the user's ID
+        (tx, results) => {
+          const items = [];
+          for (let i = 0; i < results.rows.length; i++) {
+            const item = results.rows.item(i);
+            items.push({
+              id: item.id,
+              name: item.item_name,
+              customizations: item.item_options, // This is the stored options
+              quantity: item.quantity,
+              price: item.unit_price,
+            });
+          }
+          setCartItems(items);
+          setLoading(false);
+        },
+        (error) => {
+          console.error('Error fetching cart items', error);
+          setLoading(false);
+        }
+      );
+    });
+  };
 
   useFocusEffect(
     React.useCallback(() => {
-      loadCartItems(); // Load cart items whenever the screen comes into focus
+      // Fetch cart items every time the screen comes into focus
+      fetchCartItems();
     }, [])
   );
 
   const removeItem = (itemId) => {
-    const newCartItems = [...cartItems];
-    const itemIndex = newCartItems.findIndex((item) => item.id === itemId);
-    if (itemIndex !== -1) {
-      newCartItems.splice(itemIndex, 1); // Remove the item at itemIndex
-      setCartItems(newCartItems);
-      saveCartItems(newCartItems);
-    }
-  };
+    console.log('Removing item with ID', itemId);
 
-  const saveCartItems = async (items) => {
-    try {
-      await AsyncStorage.setItem('cartItems', JSON.stringify(items));
-    } catch (error) {
-      console.error('Error saving cart items:', error);
-    }
+    const db = SQLite.openDatabase({ name: 'coffeeDatabase' });
+
+    db.transaction((tx) => {
+      tx.executeSql(
+        'DELETE FROM cart WHERE user_id = ? AND id = ?',
+        [1, itemId], // Replace with the user's ID
+        (tx, results) => {
+          if (results.rowsAffected > 0) {
+            console.log('Item removed successfully.');
+            const updatedCartItems = cartItems.filter((item) => item.id !== itemId);
+            setCartItems(updatedCartItems);
+          } else {
+            console.log('No item found with ID', itemId);
+          }
+        },
+        (error) => {
+          console.error(`Error removing item with ID ${itemId} from cart`, error);
+        }
+      );
+    });
   };
 
   const calculateTotal = () => {
@@ -58,22 +88,31 @@ const CartScreen = ({ navigation }) => {
     return subtotal.toFixed(2);
   };
 
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <Text>Loading...</Text>
+      </View>
+    );
+  }
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.heading}>My Cart</Text>
       {cartItems.map((item) => (
         <View key={item.id} style={styles.cartItemContainer}>
           <Image source={imageMapping[item.name]} style={styles.cartItemImage} />
-  
+
           <View style={styles.cartItemInfo}>
             <Text style={styles.itemName}>{item.name}</Text>
-  
-            {item.customizations && (
-              <Text style={styles.customizations}> {item.customizations}</Text>
-            )}
+            <View style={styles.selectedOptionsContainer}>
+              <Text style={styles.selectedOptionsText}>
+                {item.customizations} {/* Display stored customizations */}
+              </Text>
+            </View>
+            <Text style={styles.unitPrice}>Quantity: {item.quantity}</Text>
             <Text style={styles.unitPrice}>Price: ${item.price.toFixed(2)}</Text>
           </View>
-  
           <TouchableOpacity
             style={styles.removeButton}
             onPress={() => removeItem(item.id)}
@@ -90,15 +129,18 @@ const CartScreen = ({ navigation }) => {
         }}
       />
     </ScrollView>
-  );  
+  );
 };
-  
-
 
 const styles = StyleSheet.create({
   container: {
     backgroundColor: '#f4f4f4',
     padding: 20,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   heading: {
     fontSize: 24,
@@ -108,20 +150,19 @@ const styles = StyleSheet.create({
   cartItemContainer: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    backgroundColor: 'white', // Background color
+    backgroundColor: 'white',
     padding: 15,
     borderRadius: 15,
     marginTop: 10,
-    shadowColor: '#000000', // Shadow color
+    shadowColor: '#000000',
     shadowOffset: {
       width: 0,
       height: 2,
     },
-    shadowOpacity: 0.2, // Shadow opacity
-    shadowRadius: 4,     // Shadow radius
-    elevation: 5,        // Android shadow elevation
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 5,
   },
-  
   cartItemImage: {
     width: 60,
     height: 90,
@@ -139,50 +180,12 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginTop: 10,
   },
-  actionRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  selectedOptionsContainer: {
     marginTop: 5,
   },
-  smallButton: {
-    width: 30,
-    height: 30,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'lightgray',
-    borderRadius: 5,
-  },
-  buttonText: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  quantityText: {
-    fontSize: 16,
-  },
-  quantityMargin: {
-    marginHorizontal: 10,
-  },
-  removeButton: {
-    position: 'absolute',
-    top: 0, // Move the button to the top
-    right: 0, // Move the button to the right
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    
-    borderRadius: 4,
-    borderColor: '#FF6F61',
-    marginRight:2,
-    marginTop:2,
-  },
-  removeButtonText: {
-    color: '#FF6F61',
-    fontWeight: 'bold',
-    fontSize: 20,
-  },
-  totalPrice: {
-    fontWeight: 'bold',
-    fontSize: 16,
-    marginTop: 10,
+  selectedOptionsText: {
+    fontSize: 12, // You can adjust the font size
+    color: 'gray', // You can adjust the color
   },
   total: {
     fontSize: 20,
@@ -190,12 +193,27 @@ const styles = StyleSheet.create({
     color: 'black',
     marginTop: 20,
     textAlign: 'center',
-    borderTopWidth: 2,    // Border on top
-    borderBottomWidth: 2, // Border on bottom
-    marginBottom:10,
-    padding:10,
+    borderTopWidth: 2,
+    borderBottomWidth: 2,
+    marginBottom: 10,
+    padding: 10,
   },
-  
+  removeButton: {
+    position: 'absolute',
+    top: 0, // Move the button to the top
+    right: 0, // Move the button to the right
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 4,
+    borderColor: '#FF6F61',
+    marginRight: 2,
+    marginTop: 2,
+  },
+  removeButtonText: {
+    color: '#FF6F61',
+    fontWeight: 'bold',
+    fontSize: 20,
+  },
 });
 
 export default CartScreen;

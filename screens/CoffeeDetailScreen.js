@@ -12,9 +12,11 @@ import { RadioButton, Checkbox } from 'react-native-paper';
 import SQLite from 'react-native-sqlite-storage';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import imageMapping from '../utils/imageMapping';
+import { useNavigation } from '@react-navigation/native';
 
-const CoffeeDetailScreen = ({ route}) => {
+const CoffeeDetailScreen = ({route}) => {
   const { itemId } = route.params;
+  const navigation = useNavigation();
 
   const [coffeeDetails, setCoffeeDetails] = useState({
     name: '',
@@ -43,6 +45,7 @@ const CoffeeDetailScreen = ({ route}) => {
             basePrice: item.base_price,
             type: item.type,
             description: item.description,
+            customizations: item.item_options, // This is the stored options
           });
         },
         (error) => {
@@ -71,69 +74,50 @@ const CoffeeDetailScreen = ({ route}) => {
       setQuantity(quantity - 1);
     }
   };
-  /*
+  
   const addToCart = async () => {
-    const price = calculatePrice();
-
-    const coffeeItem = {
-      ...coffeeDetails,
-      iceLevel,
-      whippedCream,
-      sweetness,
-      customizations: `${iceLevel} | ${sweetness} | ${whippedCream ? 'Whipped Cream' : ''}`,
-      price: parseFloat(price),
-    };
-
     try {
-      const existingCartItemsJSON = await AsyncStorage.getItem('cartItems');
-      let existingCartItems = [];
-
-      if (existingCartItemsJSON) {
-        existingCartItems = JSON.parse(existingCartItemsJSON);
-      }
-
-      existingCartItems.push(coffeeItem);
-
-      await AsyncStorage.setItem('cartItems', JSON.stringify(existingCartItems));
-      navigation.navigate('Your Cart');
-    } catch (error) {
-      console.error('Error adding item to cart:', error);
-    }
-  };
-  */
-  const addToCart = async() => {
-    //try{
-      //const current_user = await AsyncStorage.getItem('currentUser');
-      //if(current_user !== null){
+      const current_user = await AsyncStorage.getItem('id');
+      if (current_user !== null) {
         const db = SQLite.openDatabase({ name: 'coffeeDatabase' });
-        const current_user = 1;
+        const itemOptions = `${iceLevel} | ${sweetness} | ${
+          whippedCream ? 'Whipped Cream' : ''
+        }`; // Construct the item options string
         db.transaction((tx) => {
           tx.executeSql(
             'INSERT INTO cart(user_id,item_name,item_options,quantity,unit_price) VALUES (?,?,?,?,?)',
             [
-              current_user
-              ,coffeeDetails.name
-              ,iceLevel.toString + whippedCream.toString + sweetness.toString
-              ,quantity
-              ,((calculatePrice)/quantity).parseFloat
+              current_user,
+              coffeeDetails.name,
+              itemOptions,
+              quantity,
+              calculatePrice(),
             ],
             (tx, results) => {
-              console.log(coffeeDetails.name + "inserted in cart table successfully")
+              Alert.alert('Success', `${coffeeDetails.name} added to cart successfully.`, [
+                {
+                  text: 'OK',
+                  onPress: () => {
+                    // Navigate back to the menu screen after acknowledging the alert
+                    navigation.goBack(); // You can use any navigation method here based on your navigation setup
+                  },
+                },
+              ]);
             },
             (error) => {
-              console.log('Error insert '+coffeeDetails.name+' into cart : ', error);
+              console.log('Error inserting ' + coffeeDetails.name + ' into cart : ', error);
             }
           );
         });
-      //}
-      //else{
-        //here to navigate user to logged in page if current login user is null
-      //}
-    //}
-    //catch(error){
-    //  console.log(error);
-    //}
+      } else {
+        // Navigate the user to the login page or perform any other action you want.
+        // You can use navigation props here.
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
+
   return (
     <View style={styles.container}>
       <ScrollView>
@@ -320,4 +304,3 @@ const styles = StyleSheet.create({
 });
 
 export default CoffeeDetailScreen;
-
