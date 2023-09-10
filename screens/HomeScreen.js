@@ -4,6 +4,7 @@ import Carousel from "react-native-reanimated-carousel";
 import {commonStyles} from "../style/CommonStyle"
 import { TouchableOpacity } from "react-native-gesture-handler";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import WeatherForecast from "../components/WeatherForecast";
 
 
 const imagePaths = [
@@ -26,9 +27,6 @@ export default class HomeScreen extends Component{
     }
     handleOrderNowPress = () => {
       this.props.navigation.navigate('Menu'); // Navigate to the 'Menu' tab
-  };
-    handleStorePress = () => {
-      this.props.navigation.navigate('SelectStoreScreen'); // Navigate to the 'Menu' tab
   };
   componentDidMount() {
     AsyncStorage.getItem('username')
@@ -77,12 +75,18 @@ export default class HomeScreen extends Component{
                         </View>
                     )}// will change to image if exist
                     />
+                    {/* Weather Box here */}
+                    
                     {/* Balance Box here */}
                     <View style={styles.boxContainer}>
-                        <Text style={styles.primaryTextBold}>Welcome, {this.state.username}</Text>
-                        <Text style={{marginTop: 10}}>Balance</Text>  
-                        <Text style={styles.primaryTextBold}>RM <Text style={{fontSize: 24}}>{this.state.balance}</Text></Text> 
-                        {/* will add responsive balance later */}
+                    <View style={{ flexDirection: 'row',alignItems: 'center', justifyContent: 'space-between'}}>
+                        <View>
+                          <Text style={styles.primaryTextBold}>Welcome, {this.state.username}</Text>
+                          <Text style={{marginTop: 10}}>Balance</Text>  
+                          <Text style={styles.primaryTextBold}>RM <Text style={{fontSize: 24}}>{this.state.balance}</Text></Text> 
+                        </View>
+                        <WeatherForecast style={{marginLeft: 10}}/>
+                      </View>
                     </View>
                     {/* Order Now Box here */}
                     <View style={styles.boxContainer}>

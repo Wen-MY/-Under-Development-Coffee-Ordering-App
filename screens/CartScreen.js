@@ -55,15 +55,15 @@ const CartScreen = ({ navigation }) => {
     }, [])
   );
 
-  const removeItem = (itemId) => {
+  const removeItem = async(itemId) => {
     console.log('Removing item with ID', itemId);
-
+    const id = await AsyncStorage.getItem('id');
     const db = SQLite.openDatabase({ name: 'coffeeDatabase' });
 
     db.transaction((tx) => {
       tx.executeSql(
         'DELETE FROM cart WHERE user_id = ? AND id = ?',
-        [1, itemId], // Replace with the user's ID
+        [id, itemId], // Replace with the user's ID
         (tx, results) => {
           if (results.rowsAffected > 0) {
             console.log('Item removed successfully.');
