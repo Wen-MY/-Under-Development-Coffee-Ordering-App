@@ -3,6 +3,9 @@ import { Text, View, StyleSheet, Dimensions, Button,Image } from "react-native";
 import Carousel from "react-native-reanimated-carousel";
 import {commonStyles} from "../style/CommonStyle"
 import { TouchableOpacity } from "react-native-gesture-handler";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+
 const imagePaths = [
   require('../assets/otherImg/CarouselAd/0.png'),
   require('../assets/otherImg/CarouselAd/1.png'),
@@ -24,6 +27,25 @@ export default class HomeScreen extends Component{
     handleOrderNowPress = () => {
       this.props.navigation.navigate('Menu'); // Navigate to the 'Menu' tab
   };
+    handleStorePress = () => {
+      this.props.navigation.navigate('SelectStoreScreen'); // Navigate to the 'Menu' tab
+  };
+  componentDidMount() {
+    AsyncStorage.getItem('username')
+      .then((username) => {
+        this.setState({ username }); // Update the state with the retrieved username
+      })
+      .catch((error) => {
+        console.error('Error retrieving username:', error);
+      });
+    AsyncStorage.getItem('balance')
+      .then((balance) => {
+        this.setState({ balance }); // Update the state with the retrieved username
+      })
+      .catch((error) => {
+        console.error('Error retrieving username:', error);
+      });
+  }
     render(){
       
         return(
@@ -64,9 +86,13 @@ export default class HomeScreen extends Component{
                     </View>
                     {/* Order Now Box here */}
                     <View style={styles.boxContainer}>
+
+                      <TouchableOpacity>
                       <Text style={{textAlign:'center'}}>Our Nearest Store At</Text>
                       <Text style={[styles.primaryTextBold,{textAlign:'center'}]}>NEStar Coffee -Bandar Sungai Long</Text>
-                      <View style={{marginTop: 30, marginHorizontal:70}}>
+                      </TouchableOpacity>
+
+                      <View style={{marginTop: 30, marginHorizontal:70}}> 
                       <TouchableOpacity onPress={this.handleOrderNowPress} style={commonStyles.primaryButton}>
                       <Text style={[commonStyles.itemCode,{fontSize: 16}]} >Order Now</Text>
                       </TouchableOpacity>

@@ -92,6 +92,11 @@ export default class MenuScreen extends Component {
     }
 
     render() {
+        const { searchPhrase, items } = this.state;
+        const filteredItems = searchPhrase === ""
+                    ? items
+                    : items.filter(item => item.name.includes(searchPhrase));
+        const sections = this.organizeDataIntoSections(filteredItems);
         return (
             <View style={commonStyles.container}>
                 <View>
@@ -104,9 +109,10 @@ export default class MenuScreen extends Component {
                 </View>
                 <SectionGrid
                     itemDimension={120}
-                    sections={this.organizeDataIntoSections(this.state.items)}
+                    sections={sections}
                     style={commonStyles.gridView}
                     renderItem={({ item }) => (
+                        
                         <TouchableOpacity onPress={() => this.handleItemDetail(item.id)}>
                             <View style={[commonStyles.itemContainer]}>
                                 <Image

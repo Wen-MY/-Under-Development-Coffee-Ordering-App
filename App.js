@@ -129,7 +129,7 @@ function AppBottomStack() {
       {/* Your Tab Screens */}
       <Tab.Screen
       name = 'Home'
-      component = {AddBalanceScreen}
+      component = {HomeScreen}
       options={{/*
         tabBarIcon: () => {
           return <FontAwesomeIcon icon="fa-sharp fa-regular fa-house-blank" size={20}/>
@@ -187,7 +187,7 @@ function AppDrawerStack() {
       drawerContent={CustomDrawerContent}
     >
       {/* Your Drawer Screens */}
-      <Drawer.Screen name ='Home' component={AppBottomStack} options={{headerTitle: false}}/>
+      <Drawer.Screen name ='Home Screen' component={AppBottomStack} options={{headerShown:false}}/>
       <Drawer.Screen name="Profile" component={ProfileScreen} />
       <Drawer.Screen name="Settings" component={SettingStack} />
       <Drawer.Screen name="Sign Out" component={LoginStack} options={{ swipeEnabled: false, headerShown: false, drawerLabel: 'Sign Out',
