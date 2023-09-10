@@ -9,10 +9,8 @@ class OrderHistoryScreen extends Component {
 
     this.state = {
       orderHistory: [],
-      selectedOrder: null, // Store the selected order when clicked
     };
 
-    // Initialize the SQLite database in the constructor
     this.db = SQLite.openDatabase(
       { name: 'coffeeDatabase', location: 'default' },
       this.openCallback,
@@ -21,44 +19,41 @@ class OrderHistoryScreen extends Component {
   }
 
   componentDidMount() {
-    // Fetch and set the order history when the component mounts
     this.fetchOrderHistory();
   }
 
   navigateToOrderDetails(order) {
-    this.props.navigation.navigate('OrderDetails', { selectedOrder: order });
+    this.props.navigation.navigate('OrderDetails', { order });
   }
 
-  fetchOrderHistory = async() => {
-    const id = await AsyncStorage.getItem('id');
-    this.db.transaction((tx) => {
-      tx.executeSql(
-        "SELECT id, user_id, total_amount, order_date FROM orders WHERE user_id = ? ORDER BY order_date",
-        [id],
-        (tx, results) => {
-          console.log('Retrieving Orders');
-          const orderHistory = [];
-          const len = results.rows.length;
-          for (let i = 0; i < len; i++) {
-            const row = results.rows.item(i);
-            // Create a new order entry in the history
-            orderHistory.push({
-              id: row.id,
-              user_id: row.user_id,
-              total_amount: row.total_amount,
-              order_date: row.order_date,
-            });
+  fetchOrderHistory = async () => {
+    try {
+      const id = await AsyncStorage.getItem('id');
+      this.db.transaction((tx) => {
+        tx.executeSql(
+          "SELECT id, order_date FROM orders WHERE user_id = ? ORDER BY order_date DESC",
+          [id],
+          (tx, results) => {
+            const orderHistory = [];
+            const len = results.rows.length;
+            for (let i = 0; i < len; i++) {
+              const row = results.rows.item(i);
+              orderHistory.push({
+                id: row.id,
+                order_date: row.order_date,
+              });
+            }
+            this.setState({ orderHistory });
+          },
+          (tx, error) => {
+            console.log('Error fetching order history:', error);
           }
-          this.setState({orderHistory : orderHistory});
-        }
-        ,
-        (tx, error) => {
-          console.log('Error fetching order history:', error);
-        }
-      );
-    });
+        );
+      });
+    } catch (error) {
+      console.log('Error fetching order history:', error);
+    }
   }
-  
 
   openCallback() {
     console.log('Database opened successfully');
@@ -77,27 +72,33 @@ class OrderHistoryScreen extends Component {
       >
         <Text style={styles.orderTitle}>Order ID: {order.id}</Text>
         <Text style={styles.orderItemText}>Order Date and Time: {order.order_date}</Text>
-        <Text style={styles.orderTotalText}>Total Amount: ${order.total_amount.toFixed(2)}</Text>
-        {/* Add a separator line */}
         <View style={styles.separator} />
       </TouchableOpacity>
     );
   }
 
-   render() {
-    const { orderHistory, selectedOrder } = this.state;
+  render() {
+    const { orderHistory } = this.state;
+
+    if (orderHistory === null) {
+      return (
+        <View style={styles.loadingContainer}>
+          <Text style={styles.loadingText}>Loading...</Text>
+        </View>
+      );
+    }
+
+    if (orderHistory.length === 0) {
+      return (
+        <View style={styles.noOrdersContainer}>
+          <Text style={styles.noOrdersText}>No orders available yet.</Text>
+        </View>
+      );
+    }
 
     return (
       <ScrollView style={styles.container}>
-        {orderHistory === null ? (
-          <Text style={styles.loadingText}>Loading...</Text>
-        ) : selectedOrder ? (
-          this.renderOrderItems(selectedOrder)
-        ) : orderHistory.length === 0 ? (
-          <Text style={styles.noOrdersText}>No orders available yet.</Text>
-        ) : (
-          orderHistory.map((order) => this.renderOrderSummary(order))
-        )}
+        {orderHistory.map(order => this.renderOrderSummary(order))}
       </ScrollView>
     );
   }
@@ -145,10 +146,6 @@ const styles = StyleSheet.create({
   orderItemText: {
     fontSize: 16,
     marginBottom: 5,
-  },
-  orderTotalText: {
-    fontSize: 16,
-    fontWeight: 'bold',
   },
   noOrdersText: {
     fontSize: 16,

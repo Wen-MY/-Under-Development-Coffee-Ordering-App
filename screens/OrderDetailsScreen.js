@@ -1,29 +1,79 @@
 import React, { Component } from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import SQLite from 'react-native-sqlite-storage';
 
 class OrderDetailsScreen extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      orderItems: [], // Store the order items
+    };
+
+    this.db = SQLite.openDatabase(
+      { name: 'coffeeDatabase', location: 'default' },
+      this.openCallback,
+      this.errorCallback
+    );
+  }
+
+  componentDidMount() {
+    // Fetch order items based on the order ID
+    const { route } = this.props;
+    const { order } = route.params;
+
+    this.fetchOrderItems(order);
+  }
+
+  fetchOrderItems(order) {
+    this.db.transaction((tx) => {
+      tx.executeSql(
+        'SELECT item_name, quantity FROM order_items WHERE order_id = ?',
+        [order.Id],
+        (tx, results) => {
+          const orderItems = [];
+          const len = results.rows.length;
+          for (let i = 0; i < len; i++) {
+            const row = results.rows.item(i);
+            orderItems.push({
+              name: row.item_name,
+              quantity: row.quantity,
+              //base_price: row.base_price,
+            });
+          }
+          this.setState({ orderItems });
+        },
+        (tx, error) => {
+          console.log('Error fetching order items:', error);
+        }
+      );
+    });
+  }
+
   render() {
     const { route } = this.props;
-    const { selectedOrder } = route.params;
+    const { order } = route.params; // Use 'order' that was passed from the previous screen
+    const { orderItems } = this.state;
 
     return (
       <ScrollView style={styles.container}>
         <Text style={styles.heading}>Order Details</Text>
-        <Text style={styles.orderText}>Order ID: {selectedOrder.id}</Text>
-        <Text style={styles.orderText}>Order Date and Time: {selectedOrder.order_date}</Text>
-        <Text style={styles.orderText}>Total Amount: ${selectedOrder.total_amount.toFixed(2)}</Text>
+        <Text style={styles.orderText}>Order ID: {order.id}</Text>
+        <Text style={styles.orderText}>Order Date and Time: {order.order_date}</Text>
+        <Text style={styles.orderText}>Total Amount: ${order.total_amount}</Text>
         <Text style={styles.orderSubtitle}>Order Items:</Text>
-        {selectedOrder.orderItems.map((item, itemIndex) => (
-          <View key={itemIndex} style={styles.itemContainer}>
-            <Text style={styles.itemText}>Item: {item.name}</Text>
-            <Text style={styles.itemText}>Quantity: {item.quantity}</Text>
-            <Text style={styles.itemText}>
-              Subtotal: ${(item.base_price * item.quantity).toFixed(2)}
-            </Text>
-            {/* Add a separator line between items */}
-            {itemIndex < selectedOrder.orderItems.length - 1 && <View style={styles.separator} />}
-          </View>
-        ))}
+        {orderItems.length === 0 ? (
+          <Text style={styles.noOrderItemsText}>No items in this order.</Text>
+        ) : (
+          orderItems.map((item, itemIndex) => (
+            <View key={itemIndex} style={styles.itemContainer}>
+              <Text style={styles.itemText}>Item: {item.name}</Text>
+              <Text style={styles.itemText}>Quantity: {item.quantity}</Text>
+              {/* Add a separator line between items */}
+              {itemIndex < orderItems.length - 1 && <View style={styles.separator} />}
+            </View>
+          ))
+        )}
       </ScrollView>
     );
   }
@@ -65,6 +115,12 @@ const styles = StyleSheet.create({
     height: 1,
     backgroundColor: 'lightgray',
     marginVertical: 5,
+  },
+  noOrderItemsText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: 'gray',
+    marginTop: 10,
   },
 });
 
