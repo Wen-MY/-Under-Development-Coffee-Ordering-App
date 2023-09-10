@@ -25,6 +25,7 @@ export default class HomeScreen extends Component{
             balance : "0.00"
         };
     }
+    
     handleOrderNowPress = () => {
       this.props.navigation.navigate('Menu'); // Navigate to the 'Menu' tab
   };
@@ -57,7 +58,6 @@ export default class HomeScreen extends Component{
       });
   }
     render(){
-      
         return(
             <View style={styles.container}>
                 {/* Carousel Slide Advertisement box here */}
@@ -102,13 +102,9 @@ export default class HomeScreen extends Component{
                     </View>
                     {/* Order Now Box here */}
                     <View style={styles.boxContainer}>
-
-                      <TouchableOpacity>
                       <Text style={{textAlign:'center'}}>Our Nearest Store At</Text>
                       <Text style={[styles.primaryTextBold,{textAlign:'center'}]}>NEStar Coffee -Bandar Sungai Long</Text>
-                      </TouchableOpacity>
-
-                      <View style={{marginTop: 30, marginHorizontal:70}}> 
+                      <View style={{marginTop: 30, marginHorizontal:70}}>
                       <TouchableOpacity onPress={this.handleOrderNowPress} style={commonStyles.primaryButton}>
                       <Text style={[commonStyles.itemCode,{fontSize: 16}]} >Order Now</Text>
                       </TouchableOpacity>
