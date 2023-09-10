@@ -48,7 +48,7 @@ handleQuickTopUp = (amount) => {
     const newBalance = (parseFloat(balance) + parseFloat(this.state.balanceToAdd)).toString();
     await AsyncStorage.setItem('balance', newBalance);
     try {
-      const response = await fetch('http://192.168.50.78:5000/api/addBalance', {
+      const response = await fetch('http://192.168.1.26:5000/api/addBalance', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

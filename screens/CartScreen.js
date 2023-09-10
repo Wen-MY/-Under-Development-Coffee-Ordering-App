@@ -7,11 +7,12 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
 import SQLite from 'react-native-sqlite-storage';
 import imageMapping from '../utils/imageMapping';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useFocusEffect } from '@react-navigation/native'; // Import useFocusEffect
+import { useFocusEffect } from '@react-navigation/native';
 
 const CartScreen = ({ navigation }) => {
   const [cartItems, setCartItems] = useState([]);
@@ -24,7 +25,7 @@ const CartScreen = ({ navigation }) => {
     db.transaction((tx) => {
       tx.executeSql(
         'SELECT * FROM cart WHERE user_id = ?',
-        [id], // Replace with the user's ID
+        [id],
         (tx, results) => {
           const items = [];
           for (let i = 0; i < results.rows.length; i++) {
@@ -32,7 +33,7 @@ const CartScreen = ({ navigation }) => {
             items.push({
               id: item.id,
               name: item.item_name,
-              customizations: item.item_options, // This is the stored options
+              customizations: item.item_options,
               quantity: item.quantity,
               price: item.unit_price,
             });
@@ -50,7 +51,6 @@ const CartScreen = ({ navigation }) => {
 
   useFocusEffect(
     React.useCallback(() => {
-      // Fetch cart items every time the screen comes into focus
       fetchCartItems();
     }, [])
   );
@@ -88,50 +88,60 @@ const CartScreen = ({ navigation }) => {
     return subtotal.toFixed(2);
   };
 
-  if (loading) {
-    return (
-      <View style={styles.loadingContainer}>
-        <Text>Loading...</Text>
-      </View>
-    );
-  }
+  const handleProceedToPayment = () => {
+    if (cartItems.length === 0) {
+      // Cart is empty, show an alert and navigate back to the menu screen
+      Alert.alert(
+        'Cart is Empty',
+        'Your cart is currently empty. Please add some orders to the cart.',
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+            },
+          },
+        ]
+      );
+    } else {
+      // Cart is not empty, proceed to the payment screen
+      navigation.navigate('PaymentScreen', { subtotal: calculateTotal() });
+    }
+  };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.heading}>My Cart</Text>
-      {cartItems.map((item) => (
-        <View key={item.id} style={styles.cartItemContainer}>
-          <Image source={imageMapping[item.name]} style={styles.cartItemImage} />
-
-          <View style={styles.cartItemInfo}>
-            <Text style={styles.itemName}>{item.name}</Text>
-            <View style={styles.selectedOptionsContainer}>
-              <Text style={styles.selectedOptionsText}>
-                {item.customizations} {/* Display stored customizations */}
-              </Text>
+      {cartItems.length === 0 ? (
+        <Text style={styles.emptyCartMessage}>Your cart is empty now.</Text>
+      ) : (
+        cartItems.map((item) => (
+          <View key={item.id} style={styles.cartItemContainer}>
+            <Image source={imageMapping[item.name]} style={styles.cartItemImage} />
+  
+            <View style={styles.cartItemInfo}>
+              <Text style={styles.itemName}>{item.name}</Text>
+              <View style={styles.selectedOptionsContainer}>
+                <Text style={styles.selectedOptionsText}>
+                  {item.customizations} {/* Display stored customizations */}
+                </Text>
+              </View>
+              <Text style={styles.unitPrice}>Quantity: {item.quantity}</Text>
+              <Text style={styles.unitPrice}>Price: ${item.price.toFixed(2)}</Text>
             </View>
-            <Text style={styles.unitPrice}>Quantity: {item.quantity}</Text>
-            <Text style={styles.unitPrice}>Price: ${item.price.toFixed(2)}</Text>
+            <TouchableOpacity
+              style={styles.removeButton}
+              onPress={() => removeItem(item.id)}
+            >
+              <Text style={styles.removeButtonText}>✘</Text>
+            </TouchableOpacity>
           </View>
-          <TouchableOpacity
-            style={styles.removeButton}
-            onPress={() => removeItem(item.id)}
-          >
-            <Text style={styles.removeButtonText}>✘</Text>
-          </TouchableOpacity>
-        </View>
-      ))}
+        ))
+      )}
       <Text style={styles.total}>Total Price: ${calculateTotal()}</Text>
-      <Button
-        title="Proceed to Payment"
-        onPress={() => {
-          navigation.navigate('PaymentScreen', { subtotal: calculateTotal() });
-        }}
-      />
+      <Button title="Proceed to Payment" onPress={handleProceedToPayment} />
     </ScrollView>
   );
-};
-
+}
 const styles = StyleSheet.create({
   container: {
     backgroundColor: '#f4f4f4',
