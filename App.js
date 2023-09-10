@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ImageBackground, StyleSheet, Image, ScrollView,NativeModules } from 'react-native';
+import { View, Text, ImageBackground, StyleSheet, Image, ScrollView,NativeModules,ActivityIndicator } from 'react-native';
 import 'react-native-gesture-handler';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList, DrawerItem, DrawerItem } from '@react-navigation/drawer';
+import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList, DrawerItem } from '@react-navigation/drawer';
 import { NavigationContainer } from '@react-navigation/native';
 import { Avatar } from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -12,6 +12,7 @@ import AddBalanceScreen from './screens/AddBalanceScreen'
 import MenuScreen from './screens/MenuScreen';
 import CartScreen from './screens/CartScreen';
 import TermAndConditionsScreen from './screens/TermsAndConditions';
+import AntDesign from "react-native-vector-icons/AntDesign";
 import CoffeeDetailScreen from './screens/CoffeeDetailScreen';
 import ProfileScreen from './screens/ProfileScreen';
 import SettingScreen from './screens/SettingScreen';
@@ -29,7 +30,7 @@ import SuccessOrderScreen from './screens/SuccessOrderScreen'; // Replace with t
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 const Drawer = createDrawerNavigator();
-const CustomDrawerContent = ({ navigation, ...props }) => {
+const CustomDrawerContent = ({...props }) => {
   const handleSignOut = async() => {
     try {
           // Define the keys you want to remove
@@ -58,7 +59,7 @@ const CustomDrawerContent = ({ navigation, ...props }) => {
         <Text style={styles.userName}>Name</Text>
         </ImageBackground>
       <DrawerItemList {...props} />
-      <DrawerItem label="Sign Out" onPress={handleSignOut} />
+      <DrawerItem label="Sign Out" onPress={handleSignOut}/>
     </DrawerContentScrollView>
   );
 };
@@ -81,19 +82,18 @@ const MenuStack = () => (
   <Stack.Navigator initialRouteName='MenuStackHome'>
     <Stack.Screen name="MenuStackHome" component={MenuScreen} options={{headerShown:false}}/>
     <Stack.Screen name="Coffee" component={CoffeeDetailScreen} options={{tabBarVisible: false}}/>
-    
   </Stack.Navigator>
 );
 const CartStack = () => (
   <Stack.Navigator initialRouteName='Shopping Cart'>
-    <Stack.Screen name="Shopping Cart" component={CartScreen}/>
+    <Stack.Screen name="Shopping Cart" component={CartScreen}  options={{headerShown:false}}/>
     <Stack.Screen name="PaymentScreen" component={PaymentScreen} />
     <Stack.Screen name="SuccessOrderScreen" component={SuccessOrderScreen} options={{headerTitle:''}}/>
   </Stack.Navigator>
 );
 const OrderStack = () => (
   <Stack.Navigator initialRouteName='OrderHistoryScreen'>
-    <Stack.Screen name="My Orders" component={OrderHistoryScreen}/>
+    <Stack.Screen name="My Orders" component={OrderHistoryScreen}  options={{headerShown:false}}/>
     <Stack.Screen name="OrderDetails" component={OrderDetailsScreen} />
   </Stack.Navigator>
 );
@@ -137,10 +137,9 @@ function AppBottomStack() {
       <Tab.Screen
       name = 'Home'
       component = {HomeStack}
-      options={{/*
-        tabBarIcon: () => {
-          return <FontAwesomeIcon icon="fa-sharp fa-regular fa-house-blank" size={20}/>
-        }*/
+      options={{tabBarIcon: ({color}) => (
+        <AntDesign name="home" size={20} color={color} />
+      ),
         headerShown:false,
         }
       }
@@ -148,10 +147,9 @@ function AppBottomStack() {
     <Tab.Screen
       name = 'Menu'
       component = {MenuStack}
-      options={{/*
-        tabBarIcon: () => {
-          return <FontAwesomeIcon icon="fa-regular fa-mug-hot" size={20}/>
-        }*/
+      options={{tabBarIcon: ({color}) => (
+        <AntDesign name="book" size={20} color={color} />
+      ),
         headerShown:false
         }
       }
@@ -159,10 +157,9 @@ function AppBottomStack() {
        <Tab.Screen
       name = 'Cart'
       component = {CartStack}
-      options={{/*
-        tabBarIcon: () => {
-          return <FontAwesomeIcon icon="fa-regular fa-cart-shopping" size={20}/>
-        }*/
+      options={{tabBarIcon: ({color}) => (
+        <AntDesign name="shoppingcart" size={20} color={color} />
+      ),
         headerShown:false
         }
       }
@@ -170,10 +167,9 @@ function AppBottomStack() {
       <Tab.Screen
       name = 'Order'
       component = {OrderStack}
-      options={{/*
-        tabBarIcon: () => {
-          return <FontAwesomeIcon icon="fa-regular fa-user" size={20}/>
-        }*/
+      options={{tabBarIcon: ({color}) => (
+        <AntDesign name="calculator" size={20} color={color} />
+      ),
         }
       }
       />
@@ -181,7 +177,7 @@ function AppBottomStack() {
   );
 }
 
-function AppDrawerStack({navigation,setLoggedIn}) {
+function AppDrawerStack({navigation}) {
   return (
     <Drawer.Navigator
       drawerStyle={{ width: '45%', backgroundColor: 'purple' }}
@@ -191,18 +187,24 @@ function AppDrawerStack({navigation,setLoggedIn}) {
         drawerActiveTintColor: 'darkslateblue',
         drawerActiveBackgroundColor: 'skyblue',
       }}
-      drawerContent={(props) => <CustomDrawerContent navigation={navigation} {...props}/>}
+      drawerContent={CustomDrawerContent}
     >
       {/* Your Drawer Screens */}
-      <Drawer.Screen name ='Home Screen' component={AppBottomStack} options={{headerShown: false}}/>
-      <Drawer.Screen name="Profile" component={ProfileScreen} />
-      <Drawer.Screen name="Settings" component={SettingStack} />
+      <Drawer.Screen name ='Home Screen' component={AppBottomStack} options={{drawerIcon: ({color}) => (
+              <AntDesign name="home" size={20} color={color} />
+            ), headerShown: false}}/>
+      <Drawer.Screen name="Profile" component={ProfileScreen} options={{drawerIcon: ({color}) => (
+              <AntDesign name="user" size={20} color={color} />
+            ),}}/>
+      <Drawer.Screen name="Settings" component={SettingStack} options={{drawerIcon: ({color}) => (
+              <AntDesign name="setting" size={20} color={color} />
+            ),}}/>
     </Drawer.Navigator>
   );
 }
 
 export default function App() {
-  const [loggedIn, setLoggedIn] = useState(false); // Initially not logged in
+  const [loggedIn, setLoggedIn] = useState(null); // Initially not logged in
 
   useEffect(() => {
     // Check if the user is logged in using AsyncStorage
@@ -222,7 +224,15 @@ export default function App() {
 
   const dbInit = new DatabaseInitialization();
   dbInit._initializeDatabase();
-
+  console.log("Logged in " + loggedIn);
+  if (loggedIn === null) {
+    // Render a loading indicator while waiting for AsyncStorage
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="purple" />
+      </View>
+    );
+  }
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName={loggedIn ? 'AppDrawerStack' : 'LoginStack'} >
@@ -247,5 +257,10 @@ const styles = StyleSheet.create({
   userName: {
     fontSize: 18,
     color: 'white',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
