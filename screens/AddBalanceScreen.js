@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default class AddBalanceScreen extends Component {
   constructor(props) {
@@ -40,10 +41,41 @@ handleQuickTopUp = (amount) => {
 
 
   // Function to handle fixed top-up button
-  handleFixedTopUp = () => {
-    // You can perform any logic here for the fixed top-up
-    // For now, let's just alert a message
-    alert('Performing fixed top-up...');
+  handleFixedTopUp = async () => {
+    const id = await AsyncStorage.getItem('id');
+    const balance = await AsyncStorage.getItem('balance');
+    const newBalance = (parseFloat(balance) + parseFloat(this.state.balanceToAdd)).toString();
+    await AsyncStorage.setItem('balance',newBalance);
+    try {
+      const response = await fetch('http://192.168.50.78:5000/api/addBalance', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          balance: newBalance,
+          id : id, 
+        }),
+      });
+  
+      if (response.status === 200) {
+        const data = await response.json();
+        // Authentication successful, handle the user data
+        console.log(data);
+        alert('Top Up Sucessfully');
+        
+      } else {
+        const data = await response.json();
+        // Authentication failed, show an error message
+        console.error(data.message);
+        alert('Top Up Failed');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Top Up Failed');
+    }
+    this.props.navigation.navigate('HomeStackHome');
+
   };
 
   render() {

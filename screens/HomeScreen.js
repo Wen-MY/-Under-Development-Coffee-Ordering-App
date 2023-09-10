@@ -28,6 +28,9 @@ export default class HomeScreen extends Component{
     handleOrderNowPress = () => {
       this.props.navigation.navigate('Menu'); // Navigate to the 'Menu' tab
   };
+  handleAddBalancePress = () =>{
+    this.props.navigation.navigate('AddBalance');
+  };
   componentDidMount() {
     AsyncStorage.getItem('username')
       .then((username) => {
@@ -36,6 +39,15 @@ export default class HomeScreen extends Component{
       .catch((error) => {
         console.error('Error retrieving username:', error);
       });
+    AsyncStorage.getItem('balance')
+      .then((balance) => {
+        this.setState({ balance }); // Update the state with the retrieved username
+      })
+      .catch((error) => {
+        console.error('Error retrieving username:', error);
+      });
+  }
+  componentDidUpdate(){
     AsyncStorage.getItem('balance')
       .then((balance) => {
         this.setState({ balance }); // Update the state with the retrieved username
@@ -75,15 +87,15 @@ export default class HomeScreen extends Component{
                         </View>
                     )}// will change to image if exist
                     />
-                    {/* Weather Box here */}
-                    
                     {/* Balance Box here */}
                     <View style={styles.boxContainer}>
                     <View style={{ flexDirection: 'row',alignItems: 'center', justifyContent: 'space-between'}}>
                         <View>
                           <Text style={styles.primaryTextBold}>Welcome, {this.state.username}</Text>
+                          <TouchableOpacity onPress={this.handleAddBalancePress}>
                           <Text style={{marginTop: 10}}>Balance</Text>  
                           <Text style={styles.primaryTextBold}>RM <Text style={{fontSize: 24}}>{this.state.balance}</Text></Text> 
+                          </TouchableOpacity>
                         </View>
                         <WeatherForecast style={{marginLeft: 10}}/>
                       </View>

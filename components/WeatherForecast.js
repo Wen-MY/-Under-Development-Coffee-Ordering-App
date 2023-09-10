@@ -16,7 +16,7 @@ const WeatherForecast = () => {
 
   useEffect(() => {
     // Define the API endpoint URL for JSON data
-    const apiUrl = 'http://www.7timer.info/bin/api.pl?lon=113.17&lat=23.09&product=civil&output=json';
+    const apiUrl = 'http://www.7timer.info/bin/api.pl?lon=95.459102&lat=19.947533&product=civil&output=json';
 
     // Fetch raw weather data from the API
     fetch(apiUrl)
