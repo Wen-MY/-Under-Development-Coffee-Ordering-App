@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default class AddBalanceScreen extends Component {
   constructor(props) {
@@ -40,10 +41,41 @@ handleQuickTopUp = (amount) => {
 
 
   // Function to handle fixed top-up button
-  handleFixedTopUp = () => {
+  handleFixedTopUp = async () => {
     // You can perform any logic here for the fixed top-up
-    // For now, let's just alert a message
-    alert('Performing fixed top-up...');
+    const id = await AsyncStorage.getItem('id');
+    const balance = await AsyncStorage.getItem('balance');
+    const newBalance = (parseFloat(balance) + parseFloat(this.state.balanceToAdd)).toString();
+    await AsyncStorage.setItem('balance', newBalance);
+    try {
+      const response = await fetch('http://192.168.50.78:5000/api/addBalance', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          balance: newBalance,
+          id : id, 
+        }),
+      });
+
+      if (response.status === 200) {
+        const data = await response.json();
+        // Authentication successful, handle the user data
+        console.log(data);
+        alert('Top Up Sucessfully');
+
+      } else {
+        const data = await response.json();
+        // Authentication failed, show an error message
+        console.error(data.message);
+        alert('Top Up Failed');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Top Up Failed');
+    }
+    this.props.navigation.navigate('HomeStackHome');
   };
 
   render() {
@@ -73,9 +105,9 @@ handleQuickTopUp = (amount) => {
     <View style={styles.ReloadContainer2}>
       <View style={styles.row}>
         {[
-          { label: '10', value: 10 },
-          { label: '20', value: 20 },
-          { label: '50', value: 50 },
+          { label: '10', value: "10" },
+          { label: '20', value: "20" },
+          { label: '50', value: "50" },
         ].map((item) => (
           <TouchableOpacity
             key={item.label}
@@ -87,8 +119,8 @@ handleQuickTopUp = (amount) => {
       </View>
       <View style={styles.row}>
         {[
-          { label: '100', value: 100 },
-          { label: '200', value: 200 },
+          { label: '100', value: "100" },
+          { label: '200', value: "200" },
           { label: 'Others', value: 'Others' },
         ].map((item) => (
           <TouchableOpacity
@@ -159,7 +191,7 @@ const styles = StyleSheet.create({
     marginLeft: 15,
     color:'white',
     fontWeight:'bold',
-    fontSize:'20',
+    fontSize: 20,
   },
   row: {
     flexDirection: 'row',
