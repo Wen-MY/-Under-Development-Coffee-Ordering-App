@@ -79,6 +79,13 @@ const SettingStack = () => (
     <Stack.Screen name="Change Password" component={ChangePassword} />
   </Stack.Navigator>
 );
+const HomeStack = () => (
+  <Stack.Navigator initialRouteName='HomeStackHome'>
+    <Stack.Screen name="HomeStackHome" component={HomeScreen} options={{headerShown:false}}/>
+    <Stack.Screen name="AddBalance" component={AddBalanceScreen} options={{headerTitle: 'Top Up Balance'}}/>
+    
+  </Stack.Navigator>
+);
 const MenuStack = () => (
   <Stack.Navigator initialRouteName='MenuStackHome'>
     <Stack.Screen name="MenuStackHome" component={MenuScreen} options={{headerShown:false}}/>
@@ -138,7 +145,7 @@ function AppBottomStack() {
       {/* Your Tab Screens */}
       <Tab.Screen
       name = 'Home'
-      component = {HomeScreen}
+      component = {HomeStack}
       options={{/*
         tabBarIcon: () => {
           return <FontAwesomeIcon icon="fa-sharp fa-regular fa-house-blank" size={20}/>
