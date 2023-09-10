@@ -22,12 +22,34 @@ export default class SignUp extends Component {
         }));
     };
 
+    validateEmail = (email) => {
+        // Regular expression for email validation
+        const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+      
+        if (!emailPattern.test(email)) {
+          Alert.alert('Error', 'Please enter a valid email address.');
+          return false;
+        }
+      
+        return true;
+      };
+
     handleSignUp = async () => {
         // Check if passwords match
         if (!this.state.username || !this.state.email || !this.state.password || !this.state.confirmPassword) {
             Alert.alert('Error', 'Please fill in all fields.');
             return;
         }
+        
+        if (this.state.username.length < 6 || this.state.username.length > 12) {
+            Alert.alert('Error', 'Username must be between 6 and 12 characters.');
+            return;
+          }
+          if (this.state.password.length < 8 || this.state.password.length > 16) {
+            Alert.alert('Error', 'Password must be between 8 and 16 characters.');
+            return;
+          }
+
         if (this.state.password !== this.state.confirmPassword) {
             Alert.alert('Error', 'Passwords do not match.');
             return;
@@ -38,6 +60,10 @@ export default class SignUp extends Component {
             Alert.alert('Error', 'You must agree to the terms and conditions.');
             return;
         }
+
+        if (!this.validateEmail(this.state.email)) {
+            return;
+          }
     
         // Create a user object
         const newUser = {
@@ -48,7 +74,7 @@ export default class SignUp extends Component {
     
         try {
             // Send a POST request to the server for registration
-            const response = await fetch('http://192.168.0.155:5000/api/users', {
+            const response = await fetch('http://127.0.0.1:5000/api/users', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

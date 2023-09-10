@@ -119,7 +119,7 @@ def update(user):
         abort(400)
 
     update_user = (
-        request.json['name'],
+        request.json['username'],
         request.json['email'],
         request.json['password'],
         request.json['balance'],
@@ -131,7 +131,49 @@ def update(user):
 
     cursor.execute('''
         UPDATE users SET
-            name=?,email=?,password=?,balance=?
+            username=?,email=?,password=?,balance=?
+        WHERE id=?
+    ''', update_user)
+
+    db.commit()
+
+    response = {
+        'id': user,
+        'affected': db.total_changes,
+    }
+
+    db.close()
+
+    return jsonify(response), 201
+
+@app.route('/api/users/update-username/<int:user>', methods=['PUT'])
+def update_username(user):
+    # Check if the request has JSON data
+    if not request.json:
+        abort(400)
+
+    # Check if the 'id' field is present in the JSON data and matches the URL parameter
+    if 'id' not in request.json or int(request.json['id']) != user:
+        abort(400)
+
+    # Check if the 'username' field is present in the JSON data
+    if 'username' not in request.json:
+        abort(400)
+
+    new_username = request.json['username']
+
+    # Update the username in the database
+    update_user = (
+        new_username,
+        str(user),
+    )
+
+    db = sqlite3.connect(DB)
+    cursor = db.cursor()
+
+    cursor.execute('''
+        UPDATE users SET
+            username=?
         WHERE id=?
     ''', update_user)
 
@@ -181,4 +223,4 @@ if __name__ == '__main__':
     args = parser.parse_args()
     port = args.port
 
-    app.run(host='0.0.0.0', port=port)
+    app.run(host='http://192.168.0.125:5000', port=port)

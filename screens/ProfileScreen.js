@@ -5,9 +5,7 @@ const ProfileScreen = () => {
   const user = {
     name: 'John Doe',
     email: 'johndoe@example.com',
-    phoneNumber: '123-456-7890',
-    birthDate: '1990-01-01',
-    additionalInfo: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+    balance: 'RM' + 100,
     profileImage: require('../assets/otherImg/user.png'), // Provide the actual image path
   };
 
@@ -29,9 +27,7 @@ const ProfileScreen = () => {
 
       <View style={styles.infoContainer}>
         <Text style={styles.infoText}>Email: {user.email}</Text>
-        <Text style={styles.infoText}>Phone: {user.phoneNumber}</Text>
-        <Text style={styles.infoText}>Birth Date: {user.birthDate}</Text>
-        <Text style={styles.additionalInfo}>{user.additionalInfo}</Text>
+        <Text style={styles.infoText}>Balance: {user.balance}</Text>
       </View>
 
       <TouchableOpacity style={styles.shareButton} onPress={handleShare}>
@@ -83,7 +79,7 @@ const styles = StyleSheet.create({
   },
   shareButton: {
     marginTop: 20,
-    backgroundColor: '#FFF',
+    backgroundColor: '#a9a9a9',
     paddingVertical: 12,
     borderRadius: 8,
     alignItems: 'center',

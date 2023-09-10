@@ -3,7 +3,7 @@ import { View, Text, ImageBackground, StyleSheet, Image, ScrollView } from 'reac
 import 'react-native-gesture-handler';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList } from '@react-navigation/drawer';
+import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList, DrawerItem } from '@react-navigation/drawer';
 import { NavigationContainer } from '@react-navigation/native';
 import { Avatar } from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -30,7 +30,7 @@ const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 const Drawer = createDrawerNavigator();
 
-const CustomDrawerContent = (props) => {
+const CustomDrawerContent = ({ loggedIn, setLoggedIn, ...props }) => {
   return (
     <DrawerContentScrollView {...props}>
       <ImageBackground 
@@ -38,19 +38,18 @@ const CustomDrawerContent = (props) => {
         style={{width: undefined, padding: 16, paddingTop: 48}}
       >
         <Avatar.Image
-          source={require('./assets/otherImg/user.png')} // Replace with your image source
+          source={require('./assets/otherImg/user.png')}
           size={70}
           style={styles.profileImage}
         />
-        <Text style={styles.userName}>hello</Text>
-        </ImageBackground>
+        <Text style={styles.userName}>User</Text>
+      </ImageBackground>
       <DrawerItemList {...props} />
     </DrawerContentScrollView>
   );
 };
 
 const handleSignOut = () => {
-
   AsyncStorage.removeItem('userToken')
       .then(() => {
           // Update the loggedIn state to false
@@ -181,7 +180,7 @@ function AppBottomStack() {
   );
 }
 
-function AppDrawerStack() {
+function AppDrawerStack({ setLoggedIn }) {
   return (
     <Drawer.Navigator
       drawerStyle={{ width: '45%', backgroundColor: 'purple' }}
@@ -191,14 +190,36 @@ function AppDrawerStack() {
         drawerActiveTintColor: 'darkslateblue',
         drawerActiveBackgroundColor: 'skyblue',
       }}
-      drawerContent={CustomDrawerContent}
+      drawerContent={(props) => (
+        <CustomDrawerContent {...props} setLoggedIn={setLoggedIn} />
+      )}
     >
       {/* Your Drawer Screens */}
-      <Drawer.Screen name ='Home Screen' component={AppBottomStack} options={{headerTitle: false}}/>
+      <Drawer.Screen name="Home" component={AppBottomStack} options={{ headerTitle: false }} />
       <Drawer.Screen name="Profile" component={ProfileScreen} />
       <Drawer.Screen name="Settings" component={SettingStack} />
-      <Drawer.Screen name="Sign Out" component={LoginStack} options={{ swipeEnabled: false, headerShown: false, drawerLabel: 'Sign Out',
-        onPress: handleSignOut,}}/>
+      {setLoggedIn ? (
+        <Drawer.Screen
+          name="Login"
+          component={LoginStack}
+          options={{
+            swipeEnabled: false,
+            headerShown: false,
+            drawerLabel: 'Login/Sign Up',
+          }}
+        />
+      ) : (
+        <Drawer.Screen
+          name="Sign Out"
+          component={LoginStack}
+          options={{
+            swipeEnabled: false,
+            headerShown: false,
+            drawerLabel: 'Sign Out',
+            onPress: () => handleSignOut(setLoggedIn),
+          }}
+      />
+      )}
     </Drawer.Navigator>
   );
 }
@@ -211,11 +232,11 @@ export default function App() {
     AsyncStorage.getItem('userToken')
       .then((userToken) => {
         if (!userToken) {
-          // User is logged in
-          setLoggedIn(true);
-        } else {
           // User is not logged in
           setLoggedIn(false);
+        } else {
+          // User is logged in
+          setLoggedIn(true);
         }
       })
       .catch((error) => {
@@ -229,7 +250,14 @@ export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator>
-        <Stack.Screen name="AppDrawerStack" component={AppDrawerStack} options={{ headerShown: false }} />
+        <Stack.Screen name="AppDrawerStack" options={{headerShown:false}}>
+          {(props) => (
+            <AppDrawerStack
+              {...props}
+              setLoggedIn={setLoggedIn} // Pass the loggedIn state to CustomDrawerContent
+            />
+          )}
+        </Stack.Screen>
       </Stack.Navigator>
     </NavigationContainer>
   );
