@@ -16,7 +16,7 @@ const ChangePasswordScreen = () => {
     } else {
       // Perform the password change action
       setErrorMessage('');
-      console.log('Password changed to:', newPassword);
+      Alert.alert('Password changed to:', newPassword);
     }
   };
 

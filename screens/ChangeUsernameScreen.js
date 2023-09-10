@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 
 const ChangeUsernameScreen = () => {
   const [newUsername, setNewUsername] = useState('');
@@ -12,7 +12,7 @@ const ChangeUsernameScreen = () => {
     } else {
       // Perform the username change action
       setErrorMessage('');
-      console.log('Username changed to:', newUsername);
+      Alert.alert('Username changed to:', newUsername);
     }
   };
 
