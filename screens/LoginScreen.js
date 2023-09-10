@@ -16,7 +16,7 @@ export default class Login extends Component {
         // Navigate to the Sign Up screen when the "Sign Up" button is pressed
         this.props.navigation.navigate('Sign Up');
     };
-    storeUserData = async (data) => {W
+    storeUserData = async (data) => {
         try {
           // Use multiSet to store data.user fields in AsyncStorage
           const userFields = Object.entries(data.user);
@@ -45,7 +45,7 @@ export default class Login extends Component {
       };
     handleLogin = async () => {
         try {
-          const response = await fetch('http://192.168.1.26:5000/api/login', {
+          const response = await fetch('http://192.168.1.4:5000/api/login', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -75,6 +75,7 @@ export default class Login extends Component {
           console.error('Error:', error);
         }
       };
+
     render() {
         return (
             <View style={styles.container}>

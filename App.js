@@ -25,6 +25,7 @@ import OrderDetailsScreen from './screens/OrderDetailsScreen';
 import PaymentScreen from './screens/PaymentScreen'; // Import your PaymentScreen component
 import DatabaseInitialization from './components/DatabaseInitialization'; 
 import SuccessOrderScreen from './screens/SuccessOrderScreen'; // Replace with the correct path to your SuccessOrderScreen component
+import { black } from 'react-native-paper/lib/typescript/styles/themes/v2/colors';
 
 
 const Stack = createStackNavigator();
@@ -93,8 +94,8 @@ const CartStack = () => (
 );
 const OrderStack = () => (
   <Stack.Navigator initialRouteName='OrderHistoryScreen'>
-    <Stack.Screen name="My Orders" component={OrderHistoryScreen}  options={{headerShown:false}}/>
-    <Stack.Screen name="OrderDetails" component={OrderDetailsScreen} />
+    <Stack.Screen name="My Orders" options={{ headerTitleStyle: styles.headerTitleStyle }} component={OrderHistoryScreen} />
+    <Stack.Screen name="OrderDetails" component={OrderDetailsScreen} options={{headerTitle:''}}/>
   </Stack.Navigator>
 );
 
@@ -170,6 +171,7 @@ function AppBottomStack() {
       options={{tabBarIcon: ({color}) => (
         <AntDesign name="calculator" size={20} color={color} />
       ),
+      headerShown:false
         }
       }
       />
@@ -262,5 +264,11 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  headerTitleStyle: {
+
+    fontSize: 24, // Set the desired font size
+    fontWeight: 'bold', // Set the desired font weight
+    color: '#19364d', // Set the desired text color
   },
 });

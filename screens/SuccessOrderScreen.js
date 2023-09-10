@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { View, Text, Button, StyleSheet, Image } from 'react-native';
 import successOrderImage from '../assets/otherImg/SuccessOrder.jpg';
 import SQLite from 'react-native-sqlite-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 class SuccessOrderScreen extends Component {
   constructor(props) {
@@ -9,12 +10,20 @@ class SuccessOrderScreen extends Component {
   }
 
   componentDidMount() {
+    this.initializeData();
+  }
+
+  initializeData = async () => {
+    const id = await AsyncStorage.getItem('id');
+    // Assuming you have the itemId somewhere in this component or passed through props
+    const itemId = this.props.itemId || null;
+
     // Clear the cart after a successful order
     const db = SQLite.openDatabase({ name: 'coffeeDatabase' });
     db.transaction((tx) => {
       tx.executeSql(
-        'DELETE FROM cart',
-        [],
+        'DELETE FROM cart WHERE user_id = ?',
+        [id],
         (tx, results) => {
           console.log('Cart cleared successfully');
         },
@@ -23,10 +32,10 @@ class SuccessOrderScreen extends Component {
         }
       );
     });
-  }
+  };
 
   navigateToMenuScreen = () => {
-    this.props.navigation.navigate('MenuStackHome'); // Replace 'Cart' with the actual name of your cart screen
+    this.props.navigation.navigate('Shopping Cart'); // Replace 'Cart' with the actual name of your cart screen
   };
 
   render() {
