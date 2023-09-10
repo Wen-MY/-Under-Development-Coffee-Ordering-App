@@ -12,6 +12,7 @@ import AddBalanceScreen from './screens/AddBalanceScreen'
 import MenuScreen from './screens/MenuScreen';
 import CartScreen from './screens/CartScreen';
 import TermAndConditionsScreen from './screens/TermsAndConditions';
+import AntDesign from "react-native-vector-icons/AntDesign";
 import CoffeeDetailScreen from './screens/CoffeeDetailScreen';
 import ProfileScreen from './screens/ProfileScreen';
 import SettingScreen from './screens/SettingScreen';
@@ -51,14 +52,14 @@ const CustomDrawerContent = ({...props }) => {
         style={{width: undefined, padding: 16, paddingTop: 48}}
       >
         <Avatar.Image
-          source={require('./assets/otherImg/user.png')} // Replace with your image source
+          source={require('./assets/otherImg/user.png')}
           size={70}
           style={styles.profileImage}
         />
         <Text style={styles.userName}>Name</Text>
         </ImageBackground>
       <DrawerItemList {...props} />
-      <DrawerItem label="Sign Out" onPress={handleSignOut} />
+      <DrawerItem label="Sign Out" onPress={handleSignOut}/>
     </DrawerContentScrollView>
   );
 };
@@ -81,7 +82,6 @@ const MenuStack = () => (
   <Stack.Navigator initialRouteName='MenuStackHome'>
     <Stack.Screen name="MenuStackHome" component={MenuScreen} options={{headerShown:false}}/>
     <Stack.Screen name="Coffee" component={CoffeeDetailScreen} options={{tabBarVisible: false}}/>
-    
   </Stack.Navigator>
 );
 const CartStack = () => (
@@ -137,10 +137,9 @@ function AppBottomStack() {
       <Tab.Screen
       name = 'Home'
       component = {HomeStack}
-      options={{/*
-        tabBarIcon: () => {
-          return <FontAwesomeIcon icon="fa-sharp fa-regular fa-house-blank" size={20}/>
-        }*/
+      options={{tabBarIcon: ({color}) => (
+        <AntDesign name="home" size={20} color={color} />
+      ),
         headerShown:false,
         }
       }
@@ -148,10 +147,9 @@ function AppBottomStack() {
     <Tab.Screen
       name = 'Menu'
       component = {MenuStack}
-      options={{/*
-        tabBarIcon: () => {
-          return <FontAwesomeIcon icon="fa-regular fa-mug-hot" size={20}/>
-        }*/
+      options={{tabBarIcon: ({color}) => (
+        <AntDesign name="book" size={20} color={color} />
+      ),
         headerShown:false
         }
       }
@@ -159,10 +157,9 @@ function AppBottomStack() {
        <Tab.Screen
       name = 'Cart'
       component = {CartStack}
-      options={{/*
-        tabBarIcon: () => {
-          return <FontAwesomeIcon icon="fa-regular fa-cart-shopping" size={20}/>
-        }*/
+      options={{tabBarIcon: ({color}) => (
+        <AntDesign name="shoppingcart" size={20} color={color} />
+      ),
         headerShown:false
         }
       }
@@ -170,10 +167,9 @@ function AppBottomStack() {
       <Tab.Screen
       name = 'Order'
       component = {OrderStack}
-      options={{/*
-        tabBarIcon: () => {
-          return <FontAwesomeIcon icon="fa-regular fa-user" size={20}/>
-        }*/
+      options={{tabBarIcon: ({color}) => (
+        <AntDesign name="calculator" size={20} color={color} />
+      ),
         }
       }
       />
@@ -194,9 +190,15 @@ function AppDrawerStack({navigation}) {
       drawerContent={CustomDrawerContent}
     >
       {/* Your Drawer Screens */}
-      <Drawer.Screen name ='Home Screen' component={AppBottomStack} options={{headerShown: false}}/>
-      <Drawer.Screen name="Profile" component={ProfileScreen} />
-      <Drawer.Screen name="Settings" component={SettingStack} />
+      <Drawer.Screen name ='Home Screen' component={AppBottomStack} options={{drawerIcon: ({color}) => (
+              <AntDesign name="home" size={20} color={color} />
+            ), headerShown: false}}/>
+      <Drawer.Screen name="Profile" component={ProfileScreen} options={{drawerIcon: ({color}) => (
+              <AntDesign name="user" size={20} color={color} />
+            ),}}/>
+      <Drawer.Screen name="Settings" component={SettingStack} options={{drawerIcon: ({color}) => (
+              <AntDesign name="setting" size={20} color={color} />
+            ),}}/>
     </Drawer.Navigator>
   );
 }
