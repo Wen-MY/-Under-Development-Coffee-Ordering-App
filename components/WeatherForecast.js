@@ -37,7 +37,7 @@ const WeatherForecast = () => {
       } else if (weatherDescription.includes('cloudy')) {
         return cloudyNight;
       } else if (weatherDescription.includes('rain')) {
-        return rainDay;
+        return rainNight;
       } else if (weatherDescription.includes('snow')) {
         return snowNight;
       } else {
