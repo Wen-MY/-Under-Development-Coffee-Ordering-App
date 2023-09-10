@@ -107,6 +107,14 @@ const CartScreen = ({ navigation }) => {
       navigation.navigate('PaymentScreen', { subtotal: calculateTotal() });
     }
   };
+  
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <Text>Loading...</Text>
+      </View>
+    );
+  }
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
