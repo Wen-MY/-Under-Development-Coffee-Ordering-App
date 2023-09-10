@@ -74,7 +74,7 @@ export default class SignUp extends Component {
     
         try {
             // Send a POST request to the server for registration
-            const response = await fetch('http://192.168.50.78:5000/api/users', {
+            const response = await fetch('http://192.168.1.26:5000/api/users', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

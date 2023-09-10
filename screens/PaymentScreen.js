@@ -56,27 +56,44 @@ class PaymentScreen extends Component {
   };
   
 
-  handlePayment = async(subtotal) => {
-      const deliveryFee = 5.0;
-      const id = await AsyncStorage.getItem('id');
-      let promocodeAmount = 0; // Initialize promocodeAmount to 0
-      if (this.state.promocode === '123456') {
-        promocodeAmount = 5.0; // Apply $5.00 discount if promocode is valid
+
+
+  handlePayment = async (subtotal) => {
+    const { firstName, lastName, cardNumber, cvv } = this.state;
+    const cardNumberRegex = /^[0-9]{16}$/; // 16-digit number
+    const cvvRegex = /^[0-9]{3,4}$/; // 3 or 4-digit number
+  
+    // Validate the input fields
+    if (
+      !firstName ||
+      !lastName ||
+      !cardNumberRegex.test(cardNumber) ||
+      !cvvRegex.test(cvv)
+    ) {
+      Alert.alert('Invalid Input', 'Please fill out all fields correctly.');
+      return; // Stop execution if any input is invalid
+    }
+  
+    const deliveryFee = 5.0;
+    const id = await AsyncStorage.getItem('id');
+    let promocodeAmount = 0; // Initialize promocodeAmount to 0
+    if (this.state.promocode === '123456') {
+      promocodeAmount = 5.0; // Apply $5.00 discount if promocode is valid
       this.setState({ promoCodeCorrect: true });
     } else {
       this.setState({ promoCodeCorrect: false });
     }
-
+  
     const totalAmount = subtotal + deliveryFee - promocodeAmount;
-      const formattedTotalAmount = totalAmount.toFixed(2); // Calculate formattedTotalAmount
-
+    const formattedTotalAmount = totalAmount.toFixed(2);
+  
     if (this.validateForm()) {
       // Start a database transaction
       this.db.transaction((tx) => {
         // Insert order into the 'orders' table
         tx.executeSql(
           'INSERT INTO orders (user_id ,total_amount) VALUES (?,?)',
-          [id,formattedTotalAmount],
+          [id, formattedTotalAmount],
           (tx, result) => {
             console.log('Inserted Order into orders table');
             const orderId = result.insertId; // Get the inserted order ID
@@ -88,7 +105,7 @@ class PaymentScreen extends Component {
                 const rows = resultSet.rows;
                 for (let i = 0; i < rows.length; i++) {
                   const item = rows.item(i);
-
+  
                   // Insert each item into the 'order_items' table
                   tx.executeSql(
                     'INSERT INTO order_items (order_id, item_name, quantity) VALUES (?, ?, ?)',
@@ -103,8 +120,8 @@ class PaymentScreen extends Component {
                 }
                 // After successfully inserting all order items, navigate to the success screen.
                 console.log('Navigating to SuccessOrderScreen');
-        this.props.navigation.navigate('SuccessOrderScreen', {
-          formattedTotalAmount: formattedTotalAmount, // Pass formattedTotalAmount here
+                this.props.navigation.navigate('SuccessOrderScreen', {
+                  formattedTotalAmount: formattedTotalAmount, // Pass formattedTotalAmount here
                   paymentMethod: this.state.paymentMethod,
                   promocodeAmount: promocodeAmount,
                 });
@@ -120,26 +137,26 @@ class PaymentScreen extends Component {
             console.error('Error inserting order:', error);
             // Handle the error
             Alert.alert('Payment Error', 'An error occurred while processing your payment.');
-      }
-);
+          }
+        );
       });
     } else {
       Alert.alert('Invalid Input', 'Please fill out all fields correctly.');
     }
   };
-  
-  validateForm = () => {
-    const { firstName, lastName, cardNumber, cvv } = this.state;
-    const cardNumberRegex = /^[0-9]{16}$/; // 16-digit number
-    const cvvRegex = /^[0-9]{3,4}$/; // 3 or 4-digit number
-
-    return (
-      firstName &&
-      lastName &&
-      cardNumberRegex.test(cardNumber) && // Validate card number
-      cvvRegex.test(cvv) // Validate CVV
-    );
-  };
+      
+      validateForm = () => {
+        const { firstName, lastName, cardNumber, cvv } = this.state;
+        const cardNumberRegex = /^[0-9]{16}$/; // 16-digit number
+        const cvvRegex = /^[0-9]{3,4}$/; // 3 or 4-digit number
+      
+        return (
+          firstName &&
+          lastName &&
+          cardNumberRegex.test(cardNumber) && // Validate card number
+          cvvRegex.test(cvv) // Validate CVV
+        );
+      };
 
   render() {
     const subtotal = parseFloat(this.props.route.params.subtotal); // Convert subtotal to a floating-point number
@@ -272,10 +289,6 @@ class PaymentScreen extends Component {
   title="Make Payment"
   onPress={() => {
     this.handlePayment(subtotal);
-    this.props.navigation.navigate('SuccessOrderScreen', {
-      formattedTotalAmount: this.state.formattedTotalAmount,
-      paymentMethod: this.state.paymentMethod,
-    });
   }}
 />
         <View style={styles.bottomSpace} />

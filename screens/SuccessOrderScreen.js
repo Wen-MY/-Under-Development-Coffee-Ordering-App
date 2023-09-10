@@ -25,8 +25,8 @@ class SuccessOrderScreen extends Component {
     });
   }
 
-  navigateToCartScreen = () => {
-    this.props.navigation.navigate('Shopping Cart'); // Replace 'Cart' with the actual name of your cart screen
+  navigateToMenuScreen = () => {
+    this.props.navigation.navigate('MenuStackHome'); // Replace 'Cart' with the actual name of your cart screen
   };
 
   render() {
@@ -48,7 +48,7 @@ class SuccessOrderScreen extends Component {
           <Text style={styles.transactionLabel}>Payment Method: {paymentMethod}</Text>
         </View>
 
-        <Button title="Continue Shopping" onPress={this.navigateToCartScreen} style={styles.button} />
+        <Button title="Continue Shopping" onPress={this.navigateToMenuScreen} style={styles.button} />
       </View>
     );
   }
