@@ -4,13 +4,13 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const ProfileScreen = () => {
   
-  const user = async()=> {
-    username = await AsyncStorage.getItem("username");
-    email = await AsyncStorage.getItem("email");
-    phoneNumber = '123-456-7890',
-    additionalInfo = "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-    profileImage = require('../assets/otherImg/user.png'), // Provide the actual image path
-  };
+  const user = {
+    //username = await AsyncStorage.getItem("username");
+   //email = await AsyncStorage.getItem("email");
+    phoneNumber : '123-456-7890',
+    additionalInfo : "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+    profileImage : require('../assets/otherImg/user.png'), // Provide the actual image path
+  }
 
   const handleShare = async () => {
     try {
