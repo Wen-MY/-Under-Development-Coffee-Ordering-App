@@ -75,14 +75,7 @@ export default class Login extends Component {
           console.error('Error:', error);
         }
       };
-      
-      if (loading) {
-        return (
-          <View style={styles.loadingContainer}>
-            <Text>Loading...</Text>
-          </View>
-        );
-      }
+
     render() {
         return (
             <View style={styles.container}>
