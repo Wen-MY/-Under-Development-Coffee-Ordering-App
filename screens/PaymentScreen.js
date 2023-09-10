@@ -3,6 +3,7 @@ import { View, Text, TextInput, Button, StyleSheet, ScrollView ,Image, Alert } f
 import { Picker } from '@react-native-picker/picker';
 let SQLite = require('react-native-sqlite-storage');
 
+
 const VisaIcon = require('../assets/CardImage/visa_icon.png');
 const MasterCardIcon = require('../assets/CardImage/mastercard_icon.png');
 const CirrusIcon = require('../assets/CardImage/cirrus_icon.png');
@@ -26,22 +27,45 @@ class PaymentScreen extends Component {
       cvv: '',
       paymentMethod: 'MasterCard', // Default payment method
       promocode: '',
+      promoCodeCorrect: false,
       validUntilMonth: '01', // Default valid until month
       validUntilYear: '2023', // Default valid until year
-      voucherAmount: 0,
+      promocodeAmount: 0,
+      formattedTotalAmount: 0,
+
     };
   }
   
 
+  handlePromoCodeChange = (text) => {
+    // Handle promo code change and update state
+    this.setState({ promocode: text }, () => {
+      // Check if the entered promo code is correct after setting state
+      console.log('Entered promo code:', this.state.promocode); // Add this line
+      if (this.state.promocode === '123456') {
+        this.setState({ promoCodeCorrect: true });
+        console.log('Promo code is correct.'); // Add this line
+      } else {
+        this.setState({ promoCodeCorrect: false });
+        console.log('Promo code is incorrect.'); // Add this line
+      }
+    });
+  };
+  
+
   handlePayment = (subtotal) => {
     const deliveryFee = 5.0;
-    let voucherAmount = 0; // Initialize voucherAmount to 0
+    let promocodeAmount = 0; // Initialize promocodeAmount to 0
     if (this.state.promocode === '123456') {
-      voucherAmount = 5.0; // Apply $5.00 discount if voucher is valid
+      promocodeAmount = 5.0; // Apply $5.00 discount if promocode is valid
+      this.setState({ promoCodeCorrect: true });
+    } else {
+      this.setState({ promoCodeCorrect: false });
     }
-    const totalAmount = subtotal + deliveryFee - voucherAmount;
-    const formattedTotalAmount = totalAmount.toFixed(2);
-  
+
+    const totalAmount = subtotal + deliveryFee - promocodeAmount;
+    const formattedTotalAmount = totalAmount.toFixed(2); // Calculate formattedTotalAmount
+
     if (this.validateForm()) {
       // Start a database transaction
       this.db.transaction((tx) => {
@@ -51,7 +75,7 @@ class PaymentScreen extends Component {
           [totalAmount],
           (tx, result) => {
             const orderId = result.insertId; // Get the inserted order ID
-  
+
             // Fetch all items from the cart table
             tx.executeSql(
               'SELECT * FROM cart',
@@ -60,7 +84,7 @@ class PaymentScreen extends Component {
                 const rows = resultSet.rows;
                 for (let i = 0; i < rows.length; i++) {
                   const item = rows.item(i);
-  
+
                   // Insert each item into the 'order_items' table
                   tx.executeSql(
                     'INSERT INTO order_items (order_id, item_name, quantity) VALUES (?, ?, ?)',
@@ -76,8 +100,9 @@ class PaymentScreen extends Component {
                 // After successfully inserting all order items, navigate to the success screen.
                 console.log('Navigating to SuccessOrderScreen');
                 this.props.navigation.navigate('SuccessOrderScreen', {
-                  totalAmount: formattedTotalAmount,
+                  formattedTotalAmount: formattedTotalAmount, // Pass formattedTotalAmount here
                   paymentMethod: this.state.paymentMethod,
+                  promocodeAmount: promocodeAmount,
                 });
               },
               (tx, error) => {
@@ -115,12 +140,10 @@ class PaymentScreen extends Component {
   render() {
     const subtotal = parseFloat(this.props.route.params.subtotal); // Convert subtotal to a floating-point number
     const deliveryFee = 5.0;
-    let promocodeAmount = 0; // Initialize promocodeAmount to 0
-    if (this.state.promocode === '123456') {
-      promocodeAmount = 5.0; // Apply $5.00 discount if promocode is valid
-    }
+    const promocodeAmount = this.state.promoCodeCorrect ? 5.0 : 0; // Apply $5.00 discount if promocode is valid
     const totalAmount = subtotal + deliveryFee - promocodeAmount;
-    
+    const formattedTotalAmount = totalAmount.toFixed(2);
+
     return (
       <ScrollView style={styles.container}>
         <Text style={styles.heading}>Order Confirmation</Text>
@@ -188,8 +211,17 @@ class PaymentScreen extends Component {
               style={{ flex: 1 }}
             >
               <Picker.Item label="01 - January" value="01" />
-              <Picker.Item label="02 - February" value="02" />
-              {/* ... (other months) ... */}
+              <Picker.Item label="02 - Febuary" value="02" />
+              <Picker.Item label="03 - March" value="03" />
+              <Picker.Item label="04 - April" value="04" />
+              <Picker.Item label="05 - May" value="05" />
+              <Picker.Item label="06 - June" value="06" />
+              <Picker.Item label="07 - July" value="07" />
+              <Picker.Item label="08 - August" value="08" />
+              <Picker.Item label="09 - September" value="09" />
+              <Picker.Item label="10 - October" value="10" />
+              <Picker.Item label="11 - November" value="11" />
+              <Picker.Item label="12 - December" value="12" />
             </Picker>
           </View>
 
@@ -201,17 +233,28 @@ class PaymentScreen extends Component {
             >
               <Picker.Item label="2023" value="2023" />
               <Picker.Item label="2024" value="2024" />
-              {/* ... (other years) ... */}
+              <Picker.Item label="2025" value="2025" />
+              <Picker.Item label="2026" value="2026" />
+              <Picker.Item label="2027" value="2027" />
+              <Picker.Item label="2028" value="2028" />
+              <Picker.Item label="2029" value="2029" />
+              <Picker.Item label="2030" value="2030" />
             </Picker>
           </View>
         </View>
 
-        <Text style={styles.label}>Promocode Code</Text>
+        <Text style={styles.label}>Promocode</Text>
+        <View style={styles.promoCodeContainer}>
         <TextInput
-          style={styles.input}
-          placeholder="XXXXXX"
-          onChangeText={(text) => this.setState({ promocode: text })}
+        style={styles.input}
+        placeholder="XXXXXX"
+        onChangeText={(text) => this.handlePromoCodeChange(text)} // Ensure this is correct
         />
+        {this.state.promoCodeCorrect && (
+            <Text style={styles.checkmarkIcon}>✔</Text>
+        )}
+        </View>
+        
 
         <View style={styles.paymentContainer}>
           <Text style={styles.heading1}>Payment Details</Text>
@@ -221,8 +264,18 @@ class PaymentScreen extends Component {
           <Text>Total: ${totalAmount.toFixed(2)}</Text>
         </View>
 
-        <Button title="Make Payment" onPress={() => this.handlePayment(subtotal)} />
-        <View style={styles.bottomSpace} />
+        <Button
+  title="Make Payment"
+  onPress={() => {
+    this.handlePayment(subtotal);
+    this.props.navigation.navigate('SuccessOrderScreen', {
+      formattedTotalAmount: this.state.formattedTotalAmount,
+      paymentMethod: this.state.paymentMethod,
+    });
+  }}
+/>
+<View style={styles.bottomSpace} />
+
       </ScrollView>
     );
   }
@@ -259,6 +312,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     padding: 5,
     borderRadius: 8,
+    flex:1,
   },
   pickerContainer: {
     flexDirection: 'row',
@@ -286,6 +340,7 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 5,
     marginBottom: 15,
+    
   },
   
   bottomSpace: {
@@ -314,6 +369,18 @@ const styles = StyleSheet.create({
     width: 40, // Adjust the width as needed
     height: 25, // Adjust the height as needed
     marginRight: 10, // Add some spacing between card icons
+  },
+  
+  promoCodeContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: 200, // Set a fixed width in pixels or adjust to your desired width
+  },
+  checkmarkIcon: {
+    marginLeft: 10,
+    marginBottom: 15,
+    color: 'green',
+    fontSize: 20,
   },
 });
 

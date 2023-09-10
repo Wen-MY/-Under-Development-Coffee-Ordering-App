@@ -210,7 +210,7 @@ export default function App() {
     // Check if the user is logged in using AsyncStorage
     AsyncStorage.getItem('userToken')
       .then((userToken) => {
-        if (userToken) {
+        if (!userToken) {
           // User is logged in
           setLoggedIn(true);
         } else {

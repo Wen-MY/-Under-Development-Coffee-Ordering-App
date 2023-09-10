@@ -45,6 +45,7 @@ const CoffeeDetailScreen = ({route}) => {
             basePrice: item.base_price,
             type: item.type,
             description: item.description,
+            customizations: item.item_options, // This is the stored options
           });
         },
         (error) => {
@@ -79,13 +80,16 @@ const CoffeeDetailScreen = ({route}) => {
       const current_user = await AsyncStorage.getItem('id');
       if (current_user !== null) {
         const db = SQLite.openDatabase({ name: 'coffeeDatabase' });
+        const itemOptions = `${iceLevel} | ${sweetness} | ${
+          whippedCream ? 'Whipped Cream' : ''
+        }`; // Construct the item options string
         db.transaction((tx) => {
           tx.executeSql(
             'INSERT INTO cart(user_id,item_name,item_options,quantity,unit_price) VALUES (?,?,?,?,?)',
             [
               current_user,
               coffeeDetails.name,
-              iceLevel.toString() + whippedCream.toString() + sweetness.toString(),
+              itemOptions,
               quantity,
               calculatePrice(),
             ],

@@ -1,5 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, Button, StyleSheet, ScrollView } from 'react-native';
+import {
+  View,
+  Text,
+  Image,
+  Button,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+} from 'react-native';
 import SQLite from 'react-native-sqlite-storage';
 import imageMapping from '../utils/imageMapping';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -9,7 +17,7 @@ const CartScreen = ({ navigation }) => {
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchCartItems = async() => {
+  const fetchCartItems = async () => {
     const db = SQLite.openDatabase({ name: 'coffeeDatabase' });
     const id = await AsyncStorage.getItem('id');
 
@@ -24,7 +32,7 @@ const CartScreen = ({ navigation }) => {
             items.push({
               id: item.id,
               name: item.item_name,
-              customizations: item.item_options,
+              customizations: item.item_options, // This is the stored options
               quantity: item.quantity,
               price: item.unit_price,
             });
@@ -48,6 +56,8 @@ const CartScreen = ({ navigation }) => {
   );
 
   const removeItem = (itemId) => {
+    console.log('Removing item with ID', itemId);
+
     const db = SQLite.openDatabase({ name: 'coffeeDatabase' });
 
     db.transaction((tx) => {
@@ -56,8 +66,11 @@ const CartScreen = ({ navigation }) => {
         [1, itemId], // Replace with the user's ID
         (tx, results) => {
           if (results.rowsAffected > 0) {
+            console.log('Item removed successfully.');
             const updatedCartItems = cartItems.filter((item) => item.id !== itemId);
             setCartItems(updatedCartItems);
+          } else {
+            console.log('No item found with ID', itemId);
           }
         },
         (error) => {
@@ -92,14 +105,20 @@ const CartScreen = ({ navigation }) => {
 
           <View style={styles.cartItemInfo}>
             <Text style={styles.itemName}>{item.name}</Text>
+            <View style={styles.selectedOptionsContainer}>
+              <Text style={styles.selectedOptionsText}>
+                {item.customizations} {/* Display stored customizations */}
+              </Text>
+            </View>
             <Text style={styles.unitPrice}>Quantity: {item.quantity}</Text>
             <Text style={styles.unitPrice}>Price: ${item.price.toFixed(2)}</Text>
           </View>
-
-          <Button
-            title="Remove"
+          <TouchableOpacity
+            style={styles.removeButton}
             onPress={() => removeItem(item.id)}
-          />
+          >
+            <Text style={styles.removeButtonText}>✘</Text>
+          </TouchableOpacity>
         </View>
       ))}
       <Text style={styles.total}>Total Price: ${calculateTotal()}</Text>
@@ -161,8 +180,12 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginTop: 10,
   },
-  customizations: {
-    fontSize: 14,
+  selectedOptionsContainer: {
+    marginTop: 5,
+  },
+  selectedOptionsText: {
+    fontSize: 12, // You can adjust the font size
+    color: 'gray', // You can adjust the color
   },
   total: {
     fontSize: 20,
@@ -174,6 +197,22 @@ const styles = StyleSheet.create({
     borderBottomWidth: 2,
     marginBottom: 10,
     padding: 10,
+  },
+  removeButton: {
+    position: 'absolute',
+    top: 0, // Move the button to the top
+    right: 0, // Move the button to the right
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 4,
+    borderColor: '#FF6F61',
+    marginRight: 2,
+    marginTop: 2,
+  },
+  removeButtonText: {
+    color: '#FF6F61',
+    fontWeight: 'bold',
+    fontSize: 20,
   },
 });
 
