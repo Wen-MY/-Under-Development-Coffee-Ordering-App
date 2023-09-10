@@ -66,9 +66,8 @@ class PaymentScreen extends Component {
     } else {
       this.setState({ promoCodeCorrect: false });
     }
-
+  
     const totalAmount = subtotal + deliveryFee - promocodeAmount;
-
     if (this.validateForm()) {
       this.db.transaction((tx) => {
         tx.executeSql(
