@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ImageBackground, StyleSheet, Image, ScrollView } from 'react-native';
+import { View, Text, ImageBackground, StyleSheet, Image, ScrollView,NativeModules } from 'react-native';
 import 'react-native-gesture-handler';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList, DrawerItem } from '@react-navigation/drawer';
+import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList, DrawerItem, DrawerItem } from '@react-navigation/drawer';
 import { NavigationContainer } from '@react-navigation/native';
 import { Avatar } from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -29,8 +29,21 @@ import SuccessOrderScreen from './screens/SuccessOrderScreen'; // Replace with t
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 const Drawer = createDrawerNavigator();
-
-const CustomDrawerContent = ({ loggedIn, setLoggedIn, ...props }) => {
+const CustomDrawerContent = ({ navigation, ...props }) => {
+  const handleSignOut = async() => {
+    try {
+          // Define the keys you want to remove
+          const keysToRemove = ['userToken','balance', 'email', 'id', 'password', 'username'];
+          // Use multiRemove to remove values for the specified keys
+          if(await AsyncStorage.multiRemove(keysToRemove)){
+            console.log('Sign-out Sucess');
+          }
+          NativeModules.DevSettings.reload();
+    }
+      catch (error) {
+        console.error('Error removing user data:', error);
+    }
+  };
   return (
     <DrawerContentScrollView {...props}>
       <ImageBackground 
@@ -42,33 +55,12 @@ const CustomDrawerContent = ({ loggedIn, setLoggedIn, ...props }) => {
           size={70}
           style={styles.profileImage}
         />
-        <Text style={styles.userName}>User</Text>
-      </ImageBackground>
+        <Text style={styles.userName}>Name</Text>
+        </ImageBackground>
       <DrawerItemList {...props} />
+      <DrawerItem label="Sign Out" onPress={handleSignOut} />
     </DrawerContentScrollView>
   );
-};
-
-const handleSignOut = () => {
-  AsyncStorage.removeItem('userToken')
-      .then(() => {
-          // Update the loggedIn state to false
-          setLoggedIn(false);
-
-          navigation.navigate('LoginStack');
-      })
-      .catch((error) => {
-          console.error('Sign-out error:', error);
-
-      });
-      try {
-        // Define the keys you want to remove
-        const keysToRemove = ['balance', 'email', 'id', 'password', 'username'];
-        // Use multiRemove to remove values for the specified keys
-        AsyncStorage.multiRemove(keysToRemove);
-      } catch (error) {
-        console.error('Error removing user data:', error);
-      }
 };
 
 const SettingStack = () => (
@@ -78,10 +70,17 @@ const SettingStack = () => (
     <Stack.Screen name="Change Password" component={ChangePassword} />
   </Stack.Navigator>
 );
+const HomeStack = () => (
+  <Stack.Navigator initialRouteName='HomeStackHome'>
+    <Stack.Screen name="HomeStackHome" component={HomeScreen} options={{headerShown:false}}/>
+    <Stack.Screen name="AddBalance" component={AddBalanceScreen} options={{headerTitle: 'Top Up Balance'}}/>
+    
+  </Stack.Navigator>
+);
 const MenuStack = () => (
   <Stack.Navigator initialRouteName='MenuStackHome'>
     <Stack.Screen name="MenuStackHome" component={MenuScreen} options={{headerShown:false}}/>
-    <Stack.Screen name="Coffee" component={CoffeeDetailScreen} />
+    <Stack.Screen name="Coffee" component={CoffeeDetailScreen} options={{tabBarVisible: false}}/>
     
   </Stack.Navigator>
 );
@@ -102,7 +101,7 @@ const OrderStack = () => (
 
 const LoginStack = () => {
   return (
-    <Stack.Navigator initialRouteName='LoginStackHome'>
+    <Stack.Navigator initialRouteName='Login' backBehavior='none'>
       <Stack.Screen
         name="Login"
         component={LoginScreen}
@@ -130,17 +129,19 @@ function AppBottomStack() {
           backgroundColor: 'lightgrey',
           borderRadius: 50,
         },
+        tabBarHideOnKeyboard: true,
+        
       }}
     >
       {/* Your Tab Screens */}
       <Tab.Screen
       name = 'Home'
-      component = {HomeScreen}
+      component = {HomeStack}
       options={{/*
         tabBarIcon: () => {
           return <FontAwesomeIcon icon="fa-sharp fa-regular fa-house-blank" size={20}/>
         }*/
-        headerShown:false
+        headerShown:false,
         }
       }
       />
@@ -180,7 +181,7 @@ function AppBottomStack() {
   );
 }
 
-function AppDrawerStack({ setLoggedIn }) {
+function AppDrawerStack({navigation,setLoggedIn}) {
   return (
     <Drawer.Navigator
       drawerStyle={{ width: '45%', backgroundColor: 'purple' }}
@@ -190,74 +191,43 @@ function AppDrawerStack({ setLoggedIn }) {
         drawerActiveTintColor: 'darkslateblue',
         drawerActiveBackgroundColor: 'skyblue',
       }}
-      drawerContent={(props) => (
-        <CustomDrawerContent {...props} setLoggedIn={setLoggedIn} />
-      )}
+      drawerContent={(props) => <CustomDrawerContent navigation={navigation} {...props}/>}
     >
       {/* Your Drawer Screens */}
-      <Drawer.Screen name="Home" component={AppBottomStack} options={{ headerTitle: false }} />
+      <Drawer.Screen name ='Home Screen' component={AppBottomStack} options={{headerShown: false}}/>
       <Drawer.Screen name="Profile" component={ProfileScreen} />
       <Drawer.Screen name="Settings" component={SettingStack} />
-      {setLoggedIn ? (
-        <Drawer.Screen
-          name="Login"
-          component={LoginStack}
-          options={{
-            swipeEnabled: false,
-            headerShown: false,
-            drawerLabel: 'Login/Sign Up',
-          }}
-        />
-      ) : (
-        <Drawer.Screen
-          name="Sign Out"
-          component={LoginStack}
-          options={{
-            swipeEnabled: false,
-            headerShown: false,
-            drawerLabel: 'Sign Out',
-            onPress: () => handleSignOut(setLoggedIn),
-          }}
-      />
-      )}
     </Drawer.Navigator>
   );
 }
 
 export default function App() {
   const [loggedIn, setLoggedIn] = useState(false); // Initially not logged in
-  
+
   useEffect(() => {
     // Check if the user is logged in using AsyncStorage
     AsyncStorage.getItem('userToken')
       .then((userToken) => {
-        if (!userToken) {
-          // User is not logged in
-          setLoggedIn(false);
-        } else {
+        if (userToken !== null) {
           // User is logged in
           setLoggedIn(true);
+        } else {
+          // User is not logged in
+          setLoggedIn(false);
         }
       })
       .catch((error) => {
         console.error('AsyncStorage error:', error);
-      });
-  }, []);
+      });},[]);
 
   const dbInit = new DatabaseInitialization();
   dbInit._initializeDatabase();
 
   return (
     <NavigationContainer>
-      <Stack.Navigator>
-        <Stack.Screen name="AppDrawerStack" options={{headerShown:false}}>
-          {(props) => (
-            <AppDrawerStack
-              {...props}
-              setLoggedIn={setLoggedIn} // Pass the loggedIn state to CustomDrawerContent
-            />
-          )}
-        </Stack.Screen>
+      <Stack.Navigator initialRouteName={loggedIn ? 'AppDrawerStack' : 'LoginStack'} >
+        <Stack.Screen name="AppDrawerStack" component={AppDrawerStack} options={{ headerShown: false }} />
+        <Stack.Screen name="LoginStack" component={LoginStack} options={{ headerShown: false}} />
       </Stack.Navigator>
     </NavigationContainer>
   );

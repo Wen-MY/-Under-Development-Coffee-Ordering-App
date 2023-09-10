@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 import SQLite from 'react-native-sqlite-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 class OrderHistoryScreen extends Component {
   constructor(props) {
@@ -28,46 +29,29 @@ class OrderHistoryScreen extends Component {
     this.props.navigation.navigate('OrderDetails', { selectedOrder: order });
   }
 
-  fetchOrderHistory() {
+  fetchOrderHistory = async() => {
+    const id = await AsyncStorage.getItem('id');
     this.db.transaction((tx) => {
       tx.executeSql(
-        'SELECT orders.id AS order_id, user_id, total_amount, order_date, ' +
-        'order_items.id AS item_id, item_name, quantity ' +
-        'FROM orders ' +
-        'LEFT JOIN order_items ON orders.id = order_items.order_id ' +
-        'ORDER BY orders.order_date DESC',
-        [],
+        "SELECT id, user_id, total_amount, order_date FROM orders WHERE user_id = ? ORDER BY order_date",
+        [id],
         (tx, results) => {
+          console.log('Retrieving Orders');
           const orderHistory = [];
           const len = results.rows.length;
           for (let i = 0; i < len; i++) {
             const row = results.rows.item(i);
-            const orderId = row.order_id;
-            let order = orderHistory.find((o) => o.id === orderId);
-  
-            if (!order) {
-              // Create a new order entry in the history
-              order = {
-                id: orderId,
-                user_id: row.user_id,
-                total_amount: row.total_amount,
-                order_date: row.order_date,
-                orderItems: [],
-              };
-              orderHistory.push(order);
-            }
-  
-            if (row.item_id) {
-              // Add item to an existing order entry
-              order.orderItems.push({
-                id: row.item_id,
-                name: row.item_name,
-                quantity: row.quantity,
-              });
-            }
+            // Create a new order entry in the history
+            orderHistory.push({
+              id: row.id,
+              user_id: row.user_id,
+              total_amount: row.total_amount,
+              order_date: row.order_date,
+            });
           }
-          this.setState({ orderHistory });
-        },
+          this.setState({orderHistory : orderHistory});
+        }
+        ,
         (tx, error) => {
           console.log('Error fetching order history:', error);
         }

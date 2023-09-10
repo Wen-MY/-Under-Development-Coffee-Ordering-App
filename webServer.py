@@ -188,18 +188,37 @@ def update_username(user):
 
     return jsonify(response), 201
 
+@app.route('/api/addBalance', methods=['POST'])
+def updateBalance():
+    data = request.get_json()
+    balance = data.get('balance')
+    id = data.get('id')
+    if not balance:
+        return jsonify({'message': 'Balance are required.'}), 400
+    db = sqlite3.connect(DB)
+    cursor = db.cursor()
+
+    cursor.execute('''
+        UPDATE users SET
+            balance=?
+        WHERE id=?
+    ''', (balance,id))
+    db.commit()
+
+    response = {
+        'affected': db.total_changes,
+    }
+
+    db.close()
+
+    return jsonify(response), 200
+
 
 @app.route('/api/users/<int:user>', methods=['DELETE'])
 def delete(user):
     if not request.json:
-        abort(400)
-
-    if 'id' not in request.json:
-        abort(400)
-
-    if int(request.json['id']) != user:
-        abort(400)
-
+        return jsonify({'error': 'Invalid JSON data'}), 400
+    new_balance = request.json['balance']
     db = sqlite3.connect(DB)
     cursor = db.cursor()
 

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, ScrollView ,Image, Alert } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 let SQLite = require('react-native-sqlite-storage');
 
 
@@ -19,6 +20,8 @@ class PaymentScreen extends Component {
         this.openCallback,
         this.errorCallback,
     )
+
+    const cartItems = this.props.route.params.cartItems;
 
     this.state = {
       firstName: '',
@@ -53,33 +56,34 @@ class PaymentScreen extends Component {
   };
   
 
-  handlePayment = (subtotal) => {
-    const deliveryFee = 5.0;
-    let promocodeAmount = 0; // Initialize promocodeAmount to 0
-    if (this.state.promocode === '123456') {
-      promocodeAmount = 5.0; // Apply $5.00 discount if promocode is valid
+  handlePayment = async(subtotal) => {
+      const deliveryFee = 5.0;
+      const id = await AsyncStorage.getItem('id');
+      let promocodeAmount = 0; // Initialize promocodeAmount to 0
+      if (this.state.promocode === '123456') {
+        promocodeAmount = 5.0; // Apply $5.00 discount if promocode is valid
       this.setState({ promoCodeCorrect: true });
     } else {
       this.setState({ promoCodeCorrect: false });
     }
 
     const totalAmount = subtotal + deliveryFee - promocodeAmount;
-    const formattedTotalAmount = totalAmount.toFixed(2); // Calculate formattedTotalAmount
+      const formattedTotalAmount = totalAmount.toFixed(2); // Calculate formattedTotalAmount
 
     if (this.validateForm()) {
       // Start a database transaction
       this.db.transaction((tx) => {
         // Insert order into the 'orders' table
         tx.executeSql(
-          'INSERT INTO orders (total_amount) VALUES (?)',
-          [totalAmount],
+          'INSERT INTO orders (user_id ,total_amount) VALUES (?,?)',
+          [id,formattedTotalAmount],
           (tx, result) => {
+            console.log('Inserted Order into orders table');
             const orderId = result.insertId; // Get the inserted order ID
-
             // Fetch all items from the cart table
             tx.executeSql(
-              'SELECT * FROM cart',
-              [],
+              'SELECT * FROM cart WHERE user_id = ?',
+              [id],
               (tx, resultSet) => {
                 const rows = resultSet.rows;
                 for (let i = 0; i < rows.length; i++) {
@@ -99,8 +103,8 @@ class PaymentScreen extends Component {
                 }
                 // After successfully inserting all order items, navigate to the success screen.
                 console.log('Navigating to SuccessOrderScreen');
-                this.props.navigation.navigate('SuccessOrderScreen', {
-                  formattedTotalAmount: formattedTotalAmount, // Pass formattedTotalAmount here
+        this.props.navigation.navigate('SuccessOrderScreen', {
+          formattedTotalAmount: formattedTotalAmount, // Pass formattedTotalAmount here
                   paymentMethod: this.state.paymentMethod,
                   promocodeAmount: promocodeAmount,
                 });
@@ -116,8 +120,8 @@ class PaymentScreen extends Component {
             console.error('Error inserting order:', error);
             // Handle the error
             Alert.alert('Payment Error', 'An error occurred while processing your payment.');
-          }
-        );
+      }
+);
       });
     } else {
       Alert.alert('Invalid Input', 'Please fill out all fields correctly.');
@@ -141,9 +145,9 @@ class PaymentScreen extends Component {
     const subtotal = parseFloat(this.props.route.params.subtotal); // Convert subtotal to a floating-point number
     const deliveryFee = 5.0;
     const promocodeAmount = this.state.promoCodeCorrect ? 5.0 : 0; // Apply $5.00 discount if promocode is valid
-    const totalAmount = subtotal + deliveryFee - promocodeAmount;
+        const totalAmount = subtotal + deliveryFee - promocodeAmount;
     const formattedTotalAmount = totalAmount.toFixed(2);
-
+    
     return (
       <ScrollView style={styles.container}>
         <Text style={styles.heading}>Order Confirmation</Text>
@@ -244,13 +248,13 @@ class PaymentScreen extends Component {
         </View>
 
         <Text style={styles.label}>Promocode</Text>
-        <View style={styles.promoCodeContainer}>
+<View style={styles.promoCodeContainer}>
         <TextInput
-        style={styles.input}
-        placeholder="XXXXXX"
-        onChangeText={(text) => this.handlePromoCodeChange(text)} // Ensure this is correct
+          style={styles.input}
+          placeholder="XXXXXX"
+          onChangeText={(text) => this.handlePromoCodeChange(text)} // Ensure this is correct
         />
-        {this.state.promoCodeCorrect && (
+{this.state.promoCodeCorrect && (
             <Text style={styles.checkmarkIcon}>✔</Text>
         )}
         </View>
@@ -274,7 +278,7 @@ class PaymentScreen extends Component {
     });
   }}
 />
-<View style={styles.bottomSpace} />
+        <View style={styles.bottomSpace} />
 
       </ScrollView>
     );
@@ -312,7 +316,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     padding: 5,
     borderRadius: 8,
-    flex:1,
+flex:1,
   },
   pickerContainer: {
     flexDirection: 'row',
@@ -340,7 +344,7 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 5,
     marginBottom: 15,
-    
+
   },
   
   bottomSpace: {
@@ -370,7 +374,7 @@ const styles = StyleSheet.create({
     height: 25, // Adjust the height as needed
     marginRight: 10, // Add some spacing between card icons
   },
-  
+
   promoCodeContainer: {
     flexDirection: 'row',
     alignItems: 'center',
