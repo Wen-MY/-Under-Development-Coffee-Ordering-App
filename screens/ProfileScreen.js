@@ -1,14 +1,15 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, Share } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const ProfileScreen = () => {
-  const user = {
-    name: 'John Doe',
-    email: 'johndoe@example.com',
-    phoneNumber: '123-456-7890',
-    birthDate: '1990-01-01',
-    additionalInfo: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-    profileImage: require('../assets/otherImg/user.png'), // Provide the actual image path
+  
+  const user = async()=> {
+    username = await AsyncStorage.getItem("username");
+    email = await AsyncStorage.getItem("email");
+    phoneNumber = '123-456-7890',
+    additionalInfo = "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+    profileImage = require('../assets/otherImg/user.png'), // Provide the actual image path
   };
 
   const handleShare = async () => {
@@ -30,7 +31,6 @@ const ProfileScreen = () => {
       <View style={styles.infoContainer}>
         <Text style={styles.infoText}>Email: {user.email}</Text>
         <Text style={styles.infoText}>Phone: {user.phoneNumber}</Text>
-        <Text style={styles.infoText}>Birth Date: {user.birthDate}</Text>
         <Text style={styles.additionalInfo}>{user.additionalInfo}</Text>
       </View>
 

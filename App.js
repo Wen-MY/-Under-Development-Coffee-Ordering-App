@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ImageBackground, StyleSheet, Image, ScrollView,NativeModules } from 'react-native';
+import { View, Text, ImageBackground, StyleSheet, Image, ScrollView,NativeModules,ActivityIndicator } from 'react-native';
 import 'react-native-gesture-handler';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -29,7 +29,7 @@ import SuccessOrderScreen from './screens/SuccessOrderScreen'; // Replace with t
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 const Drawer = createDrawerNavigator();
-const CustomDrawerContent = ({ navigation, ...props }) => {
+const CustomDrawerContent = ({...props }) => {
   const handleSignOut = async() => {
     try {
           // Define the keys you want to remove
@@ -86,14 +86,14 @@ const MenuStack = () => (
 );
 const CartStack = () => (
   <Stack.Navigator initialRouteName='Shopping Cart'>
-    <Stack.Screen name="Shopping Cart" component={CartScreen}/>
+    <Stack.Screen name="Shopping Cart" component={CartScreen}  options={{headerShown:false}}/>
     <Stack.Screen name="PaymentScreen" component={PaymentScreen} />
     <Stack.Screen name="SuccessOrderScreen" component={SuccessOrderScreen} options={{headerTitle:''}}/>
   </Stack.Navigator>
 );
 const OrderStack = () => (
   <Stack.Navigator initialRouteName='OrderHistoryScreen'>
-    <Stack.Screen name="My Orders" component={OrderHistoryScreen}/>
+    <Stack.Screen name="My Orders" component={OrderHistoryScreen}  options={{headerShown:false}}/>
     <Stack.Screen name="OrderDetails" component={OrderDetailsScreen} />
   </Stack.Navigator>
 );
@@ -181,7 +181,7 @@ function AppBottomStack() {
   );
 }
 
-function AppDrawerStack({navigation,setLoggedIn}) {
+function AppDrawerStack({navigation}) {
   return (
     <Drawer.Navigator
       drawerStyle={{ width: '45%', backgroundColor: 'purple' }}
@@ -191,7 +191,7 @@ function AppDrawerStack({navigation,setLoggedIn}) {
         drawerActiveTintColor: 'darkslateblue',
         drawerActiveBackgroundColor: 'skyblue',
       }}
-      drawerContent={(props) => <CustomDrawerContent navigation={navigation} {...props}/>}
+      drawerContent={CustomDrawerContent}
     >
       {/* Your Drawer Screens */}
       <Drawer.Screen name ='Home Screen' component={AppBottomStack} options={{headerShown: false}}/>
@@ -202,7 +202,7 @@ function AppDrawerStack({navigation,setLoggedIn}) {
 }
 
 export default function App() {
-  const [loggedIn, setLoggedIn] = useState(false); // Initially not logged in
+  const [loggedIn, setLoggedIn] = useState(null); // Initially not logged in
 
   useEffect(() => {
     // Check if the user is logged in using AsyncStorage
@@ -222,7 +222,15 @@ export default function App() {
 
   const dbInit = new DatabaseInitialization();
   dbInit._initializeDatabase();
-
+  console.log("Logged in " + loggedIn);
+  if (loggedIn === null) {
+    // Render a loading indicator while waiting for AsyncStorage
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="purple" />
+      </View>
+    );
+  }
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName={loggedIn ? 'AppDrawerStack' : 'LoginStack'} >
@@ -247,5 +255,10 @@ const styles = StyleSheet.create({
   userName: {
     fontSize: 18,
     color: 'white',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

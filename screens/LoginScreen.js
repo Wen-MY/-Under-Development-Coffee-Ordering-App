@@ -60,6 +60,9 @@ export default class Login extends Component {
             const data = await response.json();
             // Authentication successful, handle the user data
             console.log(data.user);
+            
+            if(AsyncStorage.setItem('userToken','logged'))
+              console.log("UserToken Set");
             this.storeUserData(data);
             this.props.navigation.navigate('Home');
           } else {
