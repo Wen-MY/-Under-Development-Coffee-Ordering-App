@@ -88,7 +88,7 @@ const MenuStack = () => (
 );
 const CartStack = () => (
   <Stack.Navigator initialRouteName='Shopping Cart'>
-    <Stack.Screen name="Shopping Cart" component={CartScreen}  options={{headerShown:false}}/>
+    <Stack.Screen name="Shopping Cart" component={CartScreen} options={{ headerShown: true, headerTitleStyle: styles.headerTitleStyle }} />
     <Stack.Screen name="PaymentScreen" component={PaymentScreen} />
     <Stack.Screen name="SuccessOrderScreen" component={SuccessOrderScreen} options={{headerShown:false}}/>
   </Stack.Navigator>

@@ -27,13 +27,13 @@ export default class MenuScreen extends Component {
         this._query();
     }
 
-    _query(){
+    _query() {
         this.db.transaction(tx =>
             tx.executeSql('SELECT id, name, base_price, type FROM items', [], (tx, results) => {
                 const itemsArray = [];
                 for (let i = 0; i < results.rows.length; i++) {
                     const item = results.rows.item(i);
-                    const { id, name, base_price: price, type} = item;
+                    const { id, name, base_price: price, type } = item;
                     itemsArray.push({ id, name, price, type });
                 }
                 this.setState({
@@ -94,11 +94,11 @@ export default class MenuScreen extends Component {
     render() {
         const { searchPhrase, items } = this.state;
         const filteredItems = searchPhrase === ""
-                    ? items
-                    : items.filter(item => item.name.includes(searchPhrase));
+            ? items
+            : items.filter(item => item.name.includes(searchPhrase));
         const sections = this.organizeDataIntoSections(filteredItems);
         return (
-            <View style={commonStyles.container}>
+            <View style={styles.container}>
                 <View>
                     <SearchBar
                         searchPhrase={this.state.searchPhrase}
@@ -112,20 +112,19 @@ export default class MenuScreen extends Component {
                     sections={sections}
                     style={commonStyles.gridView}
                     renderItem={({ item }) => (
-                        
                         <TouchableOpacity onPress={() => this.handleItemDetail(item.id)}>
-                            <View style={[commonStyles.itemContainer]}>
+                            <View style={styles.itemContainer}>
                                 <Image
                                     source={imageMapping[item.name]} // Update the path accordingly
-                                    style={{ width: 50, height: 100, alignSelf: 'center' }}
+                                    style={styles.itemImage}
                                 />
-                                <Text style={commonStyles.itemName}>{item.name}</Text>
-                                <Text style={commonStyles.itemName}>RM {item.price}</Text>
+                                <Text style={styles.itemName}>{item.name}</Text>
+                                <Text style={styles.itemPrice}>RM {item.price.toFixed(2)}</Text>
                             </View>
                         </TouchableOpacity>
                     )}
                     renderSectionHeader={({ section }) => (
-                        <Text style={commonStyles.sectionHeader}>{section.title}</Text>
+                        <Text style={styles.sectionHeader}>{section.title}</Text>
                     )}
                 />
             </View>
@@ -136,42 +135,36 @@ export default class MenuScreen extends Component {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        padding: 20,
+        backgroundColor: '#FFFFFF',
     },
-    text: {
-        fontSize: 25,
-        fontWeight: '500',
-        textAlign: 'center',
-    },
-    gridView: {
-        marginTop: 20,
-        flex: 1,
-    },
-    itemContainer:
-    {
-        justifyContent: 'flex-end',
-        borderRadius: 5,
+    itemContainer: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 10,
         padding: 10,
-        height: 150,
+        height: 200,
+        backgroundColor: '#0f4c81',
     },
-    itemName:
-    {
+    itemImage: {
+        width: 80,
+        height: 80,
+        marginBottom: 10,
+    },
+    itemName: {
         fontSize: 16,
         color: '#fff',
         fontWeight: '600',
     },
-    itemCode:
-    {
-        fontWeight: '600',
-        fontSize: 12,
+    itemPrice: {
+        fontSize: 14,
         color: '#fff',
     },
     sectionHeader: {
-        flex: 1,
-        fontSize: 15,
-        fontWeight: '600',
-        alignItems: 'center',
-        backgroundColor: '#0f4c81',
+        fontSize: 18,
+        fontWeight: 'bold',
+        backgroundColor: '#19364d',
         color: 'white',
         padding: 10,
     },
-})
+});

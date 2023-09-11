@@ -135,6 +135,7 @@ class PaymentScreen extends Component {
                 const rows = resultSet.rows;
                 for (let i = 0; i < rows.length; i++) {
                   const item = rows.item(i);
+  
                   tx.executeSql(
                     'INSERT INTO order_items (order_id, item_name, quantity, unit_price) VALUES (?, ?, ?, ?)',
                     [orderId, item.item_name, item.quantity, item.unit_price],
