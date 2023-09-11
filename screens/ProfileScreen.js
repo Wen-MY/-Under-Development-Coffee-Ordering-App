@@ -1,16 +1,36 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, Share } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const ProfileScreen = () => {
   
-  const user = {
-    //username = await AsyncStorage.getItem("username");
-   //email = await AsyncStorage.getItem("email");
-    phoneNumber : '123-456-7890',
-    additionalInfo : "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-    profileImage : require('../assets/otherImg/user.png'), // Provide the actual image path
-  }
+  const [user, setUser] = useState({
+    username: '',
+    email: '',
+    phoneNumber: '123-456-7890',
+    additionalInfo: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+    profileImage: require('../assets/otherImg/user.png'), // Provide the actual image path
+  });
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const username = await AsyncStorage.getItem('username');
+        const cleanedUsername = username ? username.replace(/"/g, '') : '';
+        const email = await AsyncStorage.getItem('email');
+        const cleanedEmail = email ? email.replace(/"/g, '') : '';
+        setUser((prevUser) => ({
+          ...prevUser,
+          username : cleanedUsername,
+          email : cleanedEmail, 
+        }));
+      } catch (error) {
+        console.error('Error fetching user data:', error.message);
+      }
+    }
+
+    fetchData();
+  }, []);
 
   const handleShare = async () => {
     try {
@@ -30,7 +50,7 @@ const ProfileScreen = () => {
 
       <View style={styles.infoContainer}>
         <Text style={styles.infoText}>Email: {user.email}</Text>
-        <Text style={styles.infoText}>Balance: {user.balance}</Text>
+        <Text style={styles.infoText}>Phone Number: {user.phoneNumber}</Text>
       </View>
 
       <TouchableOpacity style={styles.shareButton} onPress={handleShare}>
