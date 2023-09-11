@@ -111,7 +111,7 @@ const LoginStack = () => {
           headerShown: false,
         }}
       />
-      <Stack.Screen name ="Home" component={AppDrawerStack} options={{headerShown:false}}/>
+
       <Stack.Screen name="Sign Up" component={SignUpScreen} options={{headerTitle:false}}/>
     </Stack.Navigator>
   );
@@ -120,6 +120,7 @@ function AppBottomStack() {
   return (
     <Tab.Navigator 
       initialRouteName='Home'
+      backBehavior='initialRoute'
       screenOptions={({ route }) => ({
         tabBarActiveTintColor: 'white',
         tabBarActiveBackgroundColor: '#0f4c81',
@@ -136,7 +137,9 @@ function AppBottomStack() {
            ? 'none' : 'flex',
         },
         tabBarHideOnKeyboard: true,
+        gestureEnabled: false
       })}
+      
     >
       {/* Your Tab Screens */}
       <Tab.Screen
@@ -146,7 +149,7 @@ function AppBottomStack() {
         <AntDesign name="home" size={20} color={color} />
       ),
         headerShown:false,
-        
+        gestureEnabled: false
         }
       }
       />
@@ -158,6 +161,7 @@ function AppBottomStack() {
         <AntDesign name="book" size={20} color={color} />
       ),
         headerShown:false,
+        gestureEnabled: false
       }
       }
       />
@@ -168,6 +172,7 @@ function AppBottomStack() {
         <AntDesign name="shoppingcart" size={20} color={color} />
       ),
         headerShown:false,
+        gestureEnabled: false
         }
       }
       />
@@ -177,7 +182,9 @@ function AppBottomStack() {
       options={{tabBarIcon: ({color}) => (
         <AntDesign name="calculator" size={20} color={color} />
       ),
-      headerShown:false
+      headerShown:false,
+      gestureEnabled: false
+      
         }
       }
       />

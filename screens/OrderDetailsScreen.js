@@ -31,7 +31,7 @@ class OrderDetailsScreen extends Component {
   fetchOrderItems(order) {
     this.db.transaction((tx) => {
       tx.executeSql(
-        'SELECT item_name, quantity FROM order_items WHERE order_id = ?',
+        'SELECT item_name, quantity, unit_price FROM order_items WHERE order_id = ?',
         [order.id],
         (tx, results) => {
           const orderItems = [];
@@ -42,6 +42,7 @@ class OrderDetailsScreen extends Component {
             orderItems.push({
               name: row.item_name,
               quantity: row.quantity,
+              unit_price: row.unit_price
             });
           }
 
@@ -92,7 +93,7 @@ class OrderDetailsScreen extends Component {
               <Text style={styles.itemValueText}>{item.quantity}</Text>
             </View>
             <View style={styles.attributeContainer}>
-              <Text style={styles.itemAttributeText}>Price:</Text>
+              <Text style={styles.itemAttributeText}>Unit Price:</Text>
               <Text style={styles.itemValueText}>{item.unit_price}</Text>
             </View>
           </View>

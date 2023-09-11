@@ -1,6 +1,6 @@
 import React, { Component, useState } from 'react';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet,NativeModules } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default class Login extends Component {
@@ -45,7 +45,7 @@ export default class Login extends Component {
       };
     handleLogin = async () => {
         try {
-          const response = await fetch('http://192.168.1.4:5000/api/login', {
+          const response = await fetch('http://192.168.50.78:5000/api/login', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -64,7 +64,8 @@ export default class Login extends Component {
             if(AsyncStorage.setItem('userToken','logged'))
               console.log("UserToken Set");
             this.storeUserData(data);
-            this.props.navigation.navigate('Home');
+            //this.props.navigation.navigate('Home');
+            NativeModules.DevSettings.reload();
           } else {
             const data = await response.json();
             // Authentication failed, show an error message

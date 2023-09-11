@@ -120,8 +120,35 @@ class PaymentScreen extends Component {
       Alert.alert('Invalid Input', 'Please fill out all fields correctly.');
     } else {
       const newBalance = this.state.paymentMethod === 'Balance' ? (numericBalance - totalAmount).toString() : numericBalance.toString();
-      await AsyncStorage.setItem('balance', newBalance);
+      try {
+        const response = await fetch('http://192.168.50.78:5000/api/addBalance', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            balance: newBalance,
+            id : id, 
+          }),
+        });
   
+        if (response.status === 200) {
+          const data = await response.json();
+          // Authentication successful, handle the user data
+          await AsyncStorage.setItem('balance', newBalance);
+          console.log(data);
+          alert('Paid Sucessfully');
+  
+        } else {
+          const data = await response.json();
+          // Authentication failed, show an error message
+          console.error(data.message);
+          alert('Payment Failed, Server Connection Problem');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Payment Failed, Server Connection Problem');
+      }
       this.db.transaction((tx) => {
         tx.executeSql(
           'INSERT INTO orders (user_id, total_amount) VALUES (?, ?)',
@@ -321,18 +348,18 @@ class PaymentScreen extends Component {
                   }
                   style={{ flex: 1 }}
                 > 
-              <Picker.Item label="01 - January" value="01" />
-              <Picker.Item label="02 - February" value="02" />
-              <Picker.Item label="03 - March" value="03" />
-              <Picker.Item label="04 - April" value="04" />
-              <Picker.Item label="05 - May" value="05" />
-              <Picker.Item label="06 - June" value="06" />
-              <Picker.Item label="07 - July" value="07" />
-              <Picker.Item label="08 - August" value="08" />
-              <Picker.Item label="09 - September" value="09" />
-              <Picker.Item label="10 - October" value="10" />
-              <Picker.Item label="11 - November" value="11" />
-              <Picker.Item label="12 - December" value="12" />
+                  <Picker.Item label="01 - January" value="01" />
+                  <Picker.Item label="02 - February" value="02" />
+                  <Picker.Item label="03 - March" value="03" />
+                  <Picker.Item label="04 - April" value="04" />
+                  <Picker.Item label="05 - May" value="05" />
+                  <Picker.Item label="06 - June" value="06" />
+                  <Picker.Item label="07 - July" value="07" />
+                  <Picker.Item label="08 - August" value="08" />
+                  <Picker.Item label="09 - September" value="09" />
+                  <Picker.Item label="10 - October" value="10" />
+                  <Picker.Item label="11 - November" value="11" />
+                  <Picker.Item label="12 - December" value="12" />
                 </Picker>
               </View>
     
@@ -344,14 +371,14 @@ class PaymentScreen extends Component {
                   }
                   style={{ flex: 1 }}
                 >
-               <Picker.Item label="2023" value="2023" />
-              <Picker.Item label="2024" value="2024" />
-              <Picker.Item label="2025" value="2025" />
-              <Picker.Item label="2026" value="2026" />
-              <Picker.Item label="2027" value="2027" />
-              <Picker.Item label="2028" value="2028" />
-              <Picker.Item label="2029" value="2029" />
-              <Picker.Item label="2030" value="2030" />
+                    <Picker.Item label="2023" value="2023" />
+                    <Picker.Item label="2024" value="2024" />
+                    <Picker.Item label="2025" value="2025" />
+                    <Picker.Item label="2026" value="2026" />
+                    <Picker.Item label="2027" value="2027" />
+                    <Picker.Item label="2028" value="2028" />
+                    <Picker.Item label="2029" value="2029" />
+                    <Picker.Item label="2030" value="2030" />
                   {/* Add more years */}
                 </Picker>
               </View>
@@ -364,7 +391,8 @@ class PaymentScreen extends Component {
         {makePaymentSection}
       </ScrollView>
     );
-  }}
+}
+}
 const styles = StyleSheet.create({
   container: {
     flex: 1,
