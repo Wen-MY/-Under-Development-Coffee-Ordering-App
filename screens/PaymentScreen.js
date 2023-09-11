@@ -61,8 +61,11 @@ class PaymentScreen extends Component {
   handlePayment = async (subtotal) => {
     const deliveryFee = 5.0;
     const id = await AsyncStorage.getItem('id');
+    const balance = await AsyncStorage.getItem('balance');
+    const numericBalance = parseFloat(balance);
+  
     let promocodeAmount = 0;
-
+  
     if (this.state.promocode === '123456') {
       promocodeAmount = 5.0;
       this.setState({ promoCodeCorrect: true });
@@ -71,10 +74,18 @@ class PaymentScreen extends Component {
     }
   
     const totalAmount = subtotal + deliveryFee - promocodeAmount;
-    if (this.validateForm()) {
+  
+    if (this.state.paymentMethod === 'Balance' && numericBalance < totalAmount) {
+      Alert.alert('Insufficient Balance', 'Your balance is not enough.');
+    } else if (this.state.paymentMethod !== 'Balance' && !this.validateForm()) {
+      Alert.alert('Invalid Input', 'Please fill out all fields correctly.');
+    } else {
+      const newBalance = this.state.paymentMethod === 'Balance' ? (numericBalance - totalAmount).toString() : numericBalance.toString();
+      await AsyncStorage.setItem('balance', newBalance);
+  
       this.db.transaction((tx) => {
         tx.executeSql(
-          'INSERT INTO orders (user_id, total_amount) VALUES (?,?)',
+          'INSERT INTO orders (user_id, total_amount) VALUES (?, ?)',
           [id, totalAmount.toFixed(2)],
           (tx, result) => {
             const orderId = result.insertId;
@@ -122,10 +133,10 @@ class PaymentScreen extends Component {
           }
         );
       });
-    } else {
-      Alert.alert('Invalid Input', 'Please fill out all fields correctly.');
     }
   };
+  
+  
 
   validateForm = () => {
     const { firstName, lastName, cardNumber, cvv } = this.state;
@@ -210,6 +221,11 @@ class PaymentScreen extends Component {
           </View>
         </View>
 
+  // Conditionally render card information based on the selected payment method
+  let cardInformationSection = null;
+  if (this.state.paymentMethod !== 'Balance') {
+    cardInformationSection = (
+      <View>
         <Text style={styles.heading1}>Card Information</Text>
         <Text style={styles.label}>First Name</Text>
         <TextInput
@@ -242,7 +258,8 @@ class PaymentScreen extends Component {
         <Text style={styles.label}>Expiry Date</Text>
         <View style={styles.pickerContainer}>
           <View style={styles.pickerColumn}>
-            <Picker selectedValue={this.state.validUntilMonth}
+            <Picker
+              selectedValue={this.state.validUntilMonth}
               onValueChange={(itemValue) =>
                 this.setState({ validUntilMonth: itemValue })
               }
@@ -282,6 +299,9 @@ class PaymentScreen extends Component {
             </Picker>
           </View>
         </View>
+      </View>
+    )
+  }
 
         {promoCodeSection}
         {paymentDetailsSection}
@@ -293,10 +313,9 @@ class PaymentScreen extends Component {
           }}
         />
         <View style={styles.bottomSpace} />
-      </ScrollView>
-    );
-  }
-}
+    </ScrollView>
+  );
+}}
 
 const styles = StyleSheet.create({
   container: {
@@ -392,4 +411,3 @@ const styles = StyleSheet.create({
 });
 
 export default PaymentScreen;
-

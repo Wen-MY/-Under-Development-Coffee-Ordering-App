@@ -94,7 +94,8 @@ export default class HomeScreen extends Component{
                           <Text style={styles.primaryTextBold}>Welcome, {this.state.username}</Text>
                           <TouchableOpacity onPress={this.handleAddBalancePress}>
                           <Text style={{marginTop: 10}}>Balance</Text>  
-                          <Text style={styles.primaryTextBold}>RM <Text style={{fontSize: 24}}>{this.state.balance}</Text></Text> 
+                          <Text style={styles.primaryTextBold}>RM<Text style={{ fontSize: 24 }}>{parseFloat(this.state.balance).toFixed(2)}
+                          </Text></Text> 
                           </TouchableOpacity>
                         </View>
                         <WeatherForecast style={{marginLeft: 10}}/>
