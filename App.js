@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ImageBackground, StyleSheet, Image, ScrollView,NativeModules,ActivityIndicator } from 'react-native';
+import { View, Text, ImageBackground, StyleSheet,NativeModules,ActivityIndicator } from 'react-native';
 import 'react-native-gesture-handler';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList, DrawerItem } from '@react-navigation/drawer';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, getFocusedRouteNameFromRoute } from '@react-navigation/native';
 import { Avatar } from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import HomeScreen from './screens/HomeScreen';
@@ -66,23 +66,24 @@ const CustomDrawerContent = ({...props }) => {
 };
 
 const SettingStack = () => (
-  <Stack.Navigator initialRouteName='SettingsStackHome'>
-    <Stack.Screen name="SettingsStackHome" component={SettingScreen} options={{headerShown:false}}/>
+  <Stack.Navigator initialRouteName='SettingsStackHome' >
+    <Stack.Screen name="Settings " component={SettingScreen} options={{}}/>
     <Stack.Screen name="Change Username" component={ChangeUsername} />
     <Stack.Screen name="Change Password" component={ChangePassword} />
+    <Stack.Screen name="Terms and Conditions" component={TermAndConditionsScreen} />
   </Stack.Navigator>
 );
 const HomeStack = () => (
   <Stack.Navigator initialRouteName='HomeStackHome'>
     <Stack.Screen name="HomeStackHome" component={HomeScreen} options={{headerShown:false}}/>
     <Stack.Screen name="AddBalance" component={AddBalanceScreen} options={{headerTitle: 'Top Up Balance'}}/>
-    
+    <Stack.Screen name="PaymentScreen" component={PaymentScreen} />
   </Stack.Navigator>
 );
 const MenuStack = () => (
   <Stack.Navigator initialRouteName='MenuStackHome'>
     <Stack.Screen name="MenuStackHome" component={MenuScreen} options={{headerShown:false}}/>
-    <Stack.Screen name="Coffee" component={CoffeeDetailScreen} options={{tabBarVisible: false}}/>
+    <Stack.Screen name="Coffee" component={CoffeeDetailScreen} options={{}}/>
   </Stack.Navigator>
 );
 const CartStack = () => (
@@ -115,12 +116,11 @@ const LoginStack = () => {
     </Stack.Navigator>
   );
 }
-
 function AppBottomStack() {
   return (
     <Tab.Navigator 
       initialRouteName='Home'
-      screenOptions={{
+      screenOptions={({ route }) => ({
         tabBarActiveTintColor: 'white',
         tabBarActiveBackgroundColor: '#0f4c81',
         tabBarLabelStyle: {
@@ -128,11 +128,15 @@ function AppBottomStack() {
         },
         tabBarStyle: {
           backgroundColor: 'lightgrey',
-          borderRadius: 50,
+          height: 60,
+          display: 
+          getFocusedRouteNameFromRoute(route) === ('Coffee') ||
+          getFocusedRouteNameFromRoute(route) === ('PaymentScreen') ||
+          getFocusedRouteNameFromRoute(route) === ('SuccessOrderScreen') 
+           ? 'none' : 'flex',
         },
         tabBarHideOnKeyboard: true,
-        
-      }}
+      })}
     >
       {/* Your Tab Screens */}
       <Tab.Screen
@@ -142,17 +146,19 @@ function AppBottomStack() {
         <AntDesign name="home" size={20} color={color} />
       ),
         headerShown:false,
+        
         }
       }
       />
+      
     <Tab.Screen
       name = 'Menu'
       component = {MenuStack}
       options={{tabBarIcon: ({color}) => (
         <AntDesign name="book" size={20} color={color} />
       ),
-        headerShown:false
-        }
+        headerShown:false,
+      }
       }
       />
        <Tab.Screen
@@ -161,7 +167,7 @@ function AppBottomStack() {
       options={{tabBarIcon: ({color}) => (
         <AntDesign name="shoppingcart" size={20} color={color} />
       ),
-        headerShown:false
+        headerShown:false,
         }
       }
       />
@@ -179,7 +185,7 @@ function AppBottomStack() {
   );
 }
 
-function AppDrawerStack({navigation}) {
+function AppDrawerStack({}) {
   return (
     <Drawer.Navigator
       drawerStyle={{ width: '45%', backgroundColor: 'purple' }}
@@ -197,10 +203,10 @@ function AppDrawerStack({navigation}) {
             ), headerShown: false}}/>
       <Drawer.Screen name="Profile" component={ProfileScreen} options={{drawerIcon: ({color}) => (
               <AntDesign name="user" size={20} color={color} />
-            ),}}/>
+            )}}/>
       <Drawer.Screen name="Settings" component={SettingStack} options={{drawerIcon: ({color}) => (
               <AntDesign name="setting" size={20} color={color} />
-            ),}}/>
+            ),headerShown: false}}/>
     </Drawer.Navigator>
   );
 }

@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { CommonActions } from '@react-navigation/native';
 import { View, Text, Button, StyleSheet, Image } from 'react-native';
 import successOrderImage from '../assets/otherImg/SuccessOrder.jpg';
 import SQLite from 'react-native-sqlite-storage';
@@ -35,7 +36,12 @@ class SuccessOrderScreen extends Component {
   };
 
   navigateToMenuScreen = () => {
-    this.props.navigation.navigate('MenuStackHome'); // Replace 'Cart' with the actual name of your cart screen
+    const resetAction = CommonActions.reset({
+      index: 0, // Reset the stack to the initial screen (index 0)
+      routes: [{ name: 'Shopping Cart' }], // Replace 'HomeStackHome' with the actual name of your initial screen
+    });
+    this.props.navigation.dispatch(resetAction);
+    this.props.navigation.navigate('HomeStackHome');
   };
 
   render() {

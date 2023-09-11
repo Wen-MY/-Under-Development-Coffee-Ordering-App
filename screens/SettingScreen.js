@@ -13,7 +13,6 @@ const SettingScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Settings</Text>
 
       {/* Notifications */}
       <Text style={styles.sectionHeader}>Notification</Text>
@@ -37,8 +36,8 @@ const SettingScreen = () => {
 
       {/* Help */}
       <Text style={styles.sectionHeader}>Help</Text>
-      <TouchableOpacity style={styles.optionRow} onPress={() => {}}>
-        <Text style={styles.optionLabel}>Contact Us</Text>
+      <TouchableOpacity style={styles.optionRow} onPress={() => navigation.navigate('Terms and Conditions')}>
+        <Text style={styles.optionLabel}>Term and Conditions</Text>
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.optionRow} onPress={() => {}}>

@@ -35,7 +35,11 @@ export default class HomeScreen extends Component{
   componentDidMount() {
     AsyncStorage.getItem('username')
       .then((username) => {
-        this.setState({ username }); // Update the state with the retrieved username
+        if(username !== null)
+        {
+          const cleanedUsername = username ? username.replace(/"/g, '') : '';
+          this.setState({  username: cleanedUsername });
+        } // Update the state with the retrieved username
       })
       .catch((error) => {
         console.error('Error retrieving username:', error);

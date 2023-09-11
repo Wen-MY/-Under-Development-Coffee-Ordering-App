@@ -34,7 +34,7 @@ handleQuickTopUp = (amount) => {
       }
     });
   } else {
-    this.setState({ balanceToAdd: amount.toString() });
+    this.setState({ balanceToAdd: amount });
   }
 };
 
@@ -133,12 +133,19 @@ handleQuickTopUp = (amount) => {
         ))}
       </View>
   </View>
-    <TouchableOpacity
-      onPress={this.handleFixedTopUp}
-      style={styles.fixedTopUpButton}>
-      <Text style={styles.fixedTopUpButtonText}>+ Reload</Text>
-    </TouchableOpacity>
-</View>
+  <TouchableOpacity
+  onPress={() => {
+    this.props.navigation.navigate('PaymentScreen', {
+      selectedAmount: parseFloat(this.state.balanceToAdd),
+      fromAddBalanceScreen: true,
+    });
+  }}
+  style={styles.fixedTopUpButton}
+>
+  <Text style={styles.fixedTopUpButtonText}>+ Reload</Text>
+</TouchableOpacity>
+
+  </View>
     );
   }
 }

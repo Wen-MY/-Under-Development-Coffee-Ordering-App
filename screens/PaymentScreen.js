@@ -28,8 +28,8 @@ class PaymentScreen extends Component {
       this.openCallback,
       this.errorCallback
     );
-
-    const { cartItems } = this.props.route.params;
+    
+    const { selectedAmount, fromAddBalanceScreen } = this.props.route.params;
 
     this.state = {
       firstName: '',
@@ -42,6 +42,9 @@ class PaymentScreen extends Component {
       validUntilMonth: '01',
       validUntilYear: '2023',
       promocodeAmount: 0,
+      //selectedAmount: 1,
+      selectedAmount: selectedAmount || 0, // Set selectedAmount from the parameter or 0 if not provided
+      fromAddBalanceScreen: fromAddBalanceScreen || false, // Set fromAddBalanceScreen from the parameter or false if not provided
     };
   }
 
@@ -148,149 +151,145 @@ class PaymentScreen extends Component {
     );
   };
 
-render() {
-  const subtotal = parseFloat(this.props.route.params.subtotal);
-  const deliveryFee = 5.0;
-  const promocodeAmount = this.state.promoCodeCorrect ? 5.0 : 0;
-  const totalAmount = subtotal + deliveryFee - promocodeAmount;
-
-  // Conditionally render card information based on the selected payment method
-  let cardInformationSection = null;
-  if (this.state.paymentMethod !== 'Balance') {
-    cardInformationSection = (
-      <View>
-        <Text style={styles.heading1}>Card Information</Text>
-        <Text style={styles.label}>First Name</Text>
+  render() {
+    const subtotal = parseFloat(this.props.route.params.subtotal);
+    const deliveryFee = 5.0;
+    const promocodeAmount = this.state.promoCodeCorrect ? 5.0 : 0;
+    const totalAmount = subtotal + deliveryFee - promocodeAmount;
+  
+    // Conditionally render the promo code section
+  const promoCodeSection = this.state.fromAddBalanceScreen ? null : (
+    <>
+      <Text style={styles.label}>Promocode</Text>
+      <View style={styles.promoCodeContainer}>
         <TextInput
           style={styles.input}
-          onChangeText={(text) => this.setState({ firstName: text })}
+          placeholder="XXXXXX"
+          onChangeText={(text) => this.handlePromoCodeChange(text)}
         />
+        {this.state.promoCodeCorrect && (
+          <Text style={styles.checkmarkIcon}>✔</Text>
+        )}
+      </View>
+    </>
+    );
 
-        <Text style={styles.label}>Last Name</Text>
-        <TextInput
-          style={styles.input}
-          onChangeText={(text) => this.setState({ lastName: text })}
-        />
-
-        <Text style={styles.label}>Card Number</Text>
-        <TextInput
-          style={styles.input}
-          onChangeText={(text) => this.setState({ cardNumber: text })}
-          maxLength={16}
-          keyboardType="numeric"
-        />
-
-        <Text style={styles.label}>CVV</Text>
-        <TextInput
-          style={styles.input}
-          onChangeText={(text) => this.setState({ cvv: text })}
-          maxLength={4}
-          keyboardType="numeric"
-        />
-
-        <Text style={styles.label}>Expiry Date</Text>
-        <View style={styles.pickerContainer}>
-          <View style={styles.pickerColumn}>
-            <Picker
-              selectedValue={this.state.validUntilMonth}
-              onValueChange={(itemValue) =>
-                this.setState({ validUntilMonth: itemValue })
-              }
-              style={{ flex: 1 }}
-            >
-              <Picker.Item label="01 - January" value="01" />
-              <Picker.Item label="02 - February" value="02" />
-              <Picker.Item label="03 - March" value="03" />
-              <Picker.Item label="04 - April" value="04" />
-              <Picker.Item label="05 - May" value="05" />
-              <Picker.Item label="06 - June" value="06" />
-              <Picker.Item label="07 - July" value="07" />
-              <Picker.Item label="08 - August" value="08" />
-              <Picker.Item label="09 - September" value="09" />
-              <Picker.Item label="10 - October" value="10" />
-              <Picker.Item label="11 - November" value="11" />
-              <Picker.Item label="12 - December" value="12" />
-            </Picker>
-          </View>
-
-          <View style={styles.pickerColumn}>
-            <Picker
-              selectedValue={this.state.validUntilYear}
-              onValueChange={(itemValue) =>
-                this.setState({ validUntilYear: itemValue })
-              }
-              style={{ flex: 1 }}
-            >
-              <Picker.Item label="2023" value="2023" />
-              <Picker.Item label="2024" value="2024" />
-              <Picker.Item label="2025" value="2025" />
-              <Picker.Item label="2026" value="2026" />
-              <Picker.Item label="2027" value="2027" />
-              <Picker.Item label="2028" value="2028" />
-              <Picker.Item label="2029" value="2029" />
-              <Picker.Item label="2030" value="2030" />
-            </Picker>
-          </View>
-        </View>
+    // Conditionally render the payment details section
+    const paymentDetailsSection = this.state.fromAddBalanceScreen ? (
+      <View style={styles.paymentContainer}>
+        <Text style={styles.heading1}>Payment Details</Text>
+        <Text>Total: ${this.state.selectedAmount.toFixed(2)}</Text>
+      </View>
+    ) : (
+      <View style={styles.paymentContainer}>
+        <Text style={styles.heading1}>Payment Details</Text>
+        <Text>Subtotal: ${subtotal}</Text>
+        <Text>Delivery Fee: ${deliveryFee.toFixed(2)}</Text>
+        <Text>Discount: ${promocodeAmount.toFixed(2)}</Text>
+        <Text>Total: ${totalAmount.toFixed(2)}</Text>
       </View>
     );
-  }
 
-  return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.heading}>Order Confirmation</Text>
-
-      <View style={styles.paymentMethodContainer}>
-        <Text style={styles.label}>Payment Method</Text>
-        <Picker
-          selectedValue={this.state.paymentMethod}
-          onValueChange={(itemValue) =>
-            this.setState({ paymentMethod: itemValue })
-          }
-          style={styles.input}
-        >
-          <Picker.Item label="Balance" value="Balance" />
-          <Picker.Item label="MasterCard" value="MasterCard" />
-          <Picker.Item label="Visa" value="Visa" />
-          <Picker.Item label="eBay" value="eBay" />
-          <Picker.Item label="PayPal" value="PayPal" />
-          <Picker.Item label="Maestro" value="Maestro" />
-          <Picker.Item label="Cirrus" value="Cirrus" />
-        </Picker>
-
-        <View style={styles.cardIconsRow}>
-        <Image source={MasterCardIcon} style={styles.cardIcon} />
+    return (
+      <ScrollView style={styles.container}>
+        <Text style={styles.heading}>Order Confirmation</Text>
+    
+        <View style={styles.paymentMethodContainer}>
+          <Text style={styles.label}>Payment Method</Text>
+          <Picker
+            selectedValue={this.state.paymentMethod}
+            onValueChange={(itemValue) =>
+              this.setState({ paymentMethod: itemValue })
+            }
+            style={styles.input}
+          >
+            <Picker.Item label="MasterCard" value="MasterCard" />
+            <Picker.Item label="Visa" value="Visa" />
+            <Picker.Item label="eBay" value="eBay" />
+            <Picker.Item label="PayPal" value="PayPal" />
+            <Picker.Item label="Maestro" value="Maestro" />
+            <Picker.Item label="Cirrus" value="Cirrus" />
+          </Picker>
+    
+          <View style={styles.cardIconsRow}>
+            <Image source={MasterCardIcon} style={styles.cardIcon} />
             <Image source={VisaIcon} style={styles.cardIcon} />
             <Image source={EbayIcon} style={styles.cardIcon} />
             <Image source={PaypalIcon} style={styles.cardIcon} />
             <Image source={MaestroIcon} style={styles.cardIcon} />
             <Image source={CirrusIcon} style={styles.cardIcon} />
+          </View>
         </View>
-      </View>
-
-      {cardInformationSection}
-
-
-      <Text style={styles.label}>Promocode</Text>
-        <View style={styles.promoCodeContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder="XXXXXX"
-            onChangeText={(text) => this.handlePromoCodeChange(text)}
-          />
-          {this.state.promoCodeCorrect && (
-            <Text style={styles.checkmarkIcon}>✔</Text>
-          )}
-        </View>
-
-        <View style={styles.paymentContainer}>
-          <Text style={styles.heading1}>Payment Details</Text>
-          <Text>Subtotal: ${subtotal}</Text>
-          <Text>Delivery Fee: ${deliveryFee.toFixed(2)}</Text>
-          <Text>Discount: ${promocodeAmount.toFixed(2)}</Text>
-          <Text>Total: ${totalAmount.toFixed(2)}</Text>
-        </View>
-
+    
+        {/* Conditionally render card information based on the selected payment method */}
+        {this.state.paymentMethod !== 'Balance' && (
+          <View>
+            <Text style={styles.heading1}>Card Information</Text>
+            <Text style={styles.label}>First Name</Text>
+            <TextInput
+              style={styles.input}
+              onChangeText={(text) => this.setState({ firstName: text })}
+            />
+    
+            <Text style={styles.label}>Last Name</Text>
+            <TextInput
+              style={styles.input}
+              onChangeText={(text) => this.setState({ lastName: text })}
+            />
+    
+            <Text style={styles.label}>Card Number</Text>
+            <TextInput
+              style={styles.input}
+              onChangeText={(text) => this.setState({ cardNumber: text })}
+              maxLength={16}
+              keyboardType="numeric"
+            />
+    
+            <Text style={styles.label}>CVV</Text>
+            <TextInput
+              style={styles.input}
+              onChangeText={(text) => this.setState({ cvv: text })}
+              maxLength={4}
+              keyboardType="numeric"
+            />
+    
+            <Text style={styles.label}>Expiry Date</Text>
+            <View style={styles.pickerContainer}>
+              <View style={styles.pickerColumn}>
+                <Picker
+                  selectedValue={this.state.validUntilMonth}
+                  onValueChange={(itemValue) =>
+                    this.setState({ validUntilMonth: itemValue })
+                  }
+                  style={{ flex: 1 }}
+                >
+                  <Picker.Item label="01 - January" value="01" />
+                  <Picker.Item label="02 - February" value="02" />
+                  <Picker.Item label="03 - March" value="03" />
+                  {/* Add more months */}
+                </Picker>
+              </View>
+    
+              <View style={styles.pickerColumn}>
+                <Picker
+                  selectedValue={this.state.validUntilYear}
+                  onValueChange={(itemValue) =>
+                    this.setState({ validUntilYear: itemValue })
+                  }
+                  style={{ flex: 1 }}
+                >
+                  <Picker.Item label="2023" value="2023" />
+                  <Picker.Item label="2024" value="2024" />
+                  {/* Add more years */}
+                </Picker>
+              </View>
+            </View>
+          </View>
+        )}
+        
+        {promoCodeSection}
+        {paymentDetailsSection}
+    
         <Button
           title="Make Payment"
           onPress={() => {
@@ -298,10 +297,9 @@ render() {
           }}
         />
         <View style={styles.bottomSpace} />
-    </ScrollView>
-  );
-}}
-
+      </ScrollView>
+    );
+  }}
 const styles = StyleSheet.create({
   container: {
     flex: 1,
