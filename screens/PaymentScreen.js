@@ -28,8 +28,8 @@ class PaymentScreen extends Component {
       this.openCallback,
       this.errorCallback
     );
-
-    const { cartItems } = this.props.route.params;
+    
+    const { selectedAmount, fromAddBalanceScreen } = this.props.route.params;
 
     this.state = {
       firstName: '',
@@ -42,6 +42,9 @@ class PaymentScreen extends Component {
       validUntilMonth: '01',
       validUntilYear: '2023',
       promocodeAmount: 0,
+      //selectedAmount: 1,
+      selectedAmount: selectedAmount || 0, // Set selectedAmount from the parameter or 0 if not provided
+      fromAddBalanceScreen: fromAddBalanceScreen || false, // Set fromAddBalanceScreen from the parameter or false if not provided
     };
   }
 
@@ -142,6 +145,39 @@ class PaymentScreen extends Component {
     const deliveryFee = 5.0;
     const promocodeAmount = this.state.promoCodeCorrect ? 5.0 : 0;
     const totalAmount = subtotal + deliveryFee - promocodeAmount;
+  
+    // Conditionally render the promo code section
+  const promoCodeSection = this.state.fromAddBalanceScreen ? null : (
+    <>
+      <Text style={styles.label}>Promocode</Text>
+      <View style={styles.promoCodeContainer}>
+        <TextInput
+          style={styles.input}
+          placeholder="XXXXXX"
+          onChangeText={(text) => this.handlePromoCodeChange(text)}
+        />
+        {this.state.promoCodeCorrect && (
+          <Text style={styles.checkmarkIcon}>✔</Text>
+        )}
+      </View>
+    </>
+    );
+
+    // Conditionally render the payment details section
+    const paymentDetailsSection = this.state.fromAddBalanceScreen ? (
+      <View style={styles.paymentContainer}>
+        <Text style={styles.heading1}>Payment Details</Text>
+        <Text>Total: ${this.state.selectedAmount.toFixed(2)}</Text>
+      </View>
+    ) : (
+      <View style={styles.paymentContainer}>
+        <Text style={styles.heading1}>Payment Details</Text>
+        <Text>Subtotal: ${subtotal}</Text>
+        <Text>Delivery Fee: ${deliveryFee.toFixed(2)}</Text>
+        <Text>Discount: ${promocodeAmount.toFixed(2)}</Text>
+        <Text>Total: ${totalAmount.toFixed(2)}</Text>
+      </View>
+    );
 
     return (
       <ScrollView style={styles.container}>
@@ -206,7 +242,7 @@ class PaymentScreen extends Component {
         <Text style={styles.label}>Expiry Date</Text>
         <View style={styles.pickerContainer}>
           <View style={styles.pickerColumn}>
-            <Picker               selectedValue={this.state.validUntilMonth}
+            <Picker selectedValue={this.state.validUntilMonth}
               onValueChange={(itemValue) =>
                 this.setState({ validUntilMonth: itemValue })
               }
@@ -247,25 +283,8 @@ class PaymentScreen extends Component {
           </View>
         </View>
 
-        <Text style={styles.label}>Promocode</Text>
-        <View style={styles.promoCodeContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder="XXXXXX"
-            onChangeText={(text) => this.handlePromoCodeChange(text)}
-          />
-          {this.state.promoCodeCorrect && (
-            <Text style={styles.checkmarkIcon}>✔</Text>
-          )}
-        </View>
-
-        <View style={styles.paymentContainer}>
-          <Text style={styles.heading1}>Payment Details</Text>
-          <Text>Subtotal: ${subtotal}</Text>
-          <Text>Delivery Fee: ${deliveryFee.toFixed(2)}</Text>
-          <Text>Discount: ${promocodeAmount.toFixed(2)}</Text>
-          <Text>Total: ${totalAmount.toFixed(2)}</Text>
-        </View>
+        {promoCodeSection}
+        {paymentDetailsSection}
 
         <Button
           title="Make Payment"

@@ -34,7 +34,7 @@ handleQuickTopUp = (amount) => {
       }
     });
   } else {
-    this.setState({ balanceToAdd: amount.toString() });
+    this.setState({ balanceToAdd: amount });
   }
 };
 
@@ -48,7 +48,7 @@ handleQuickTopUp = (amount) => {
     const newBalance = (parseFloat(balance) + parseFloat(this.state.balanceToAdd)).toString();
     await AsyncStorage.setItem('balance', newBalance);
     try {
-      const response = await fetch('http://192.168.1.26:5000/api/addBalance', {
+      const response = await fetch('Running on http://192.168.1.4:5000/api/addBalance', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -132,12 +132,19 @@ handleQuickTopUp = (amount) => {
         ))}
       </View>
   </View>
-    <TouchableOpacity
-      onPress={this.handleFixedTopUp}
-      style={styles.fixedTopUpButton}>
-      <Text style={styles.fixedTopUpButtonText}>+ Reload</Text>
-    </TouchableOpacity>
-</View>
+  <TouchableOpacity
+  onPress={() => {
+    this.props.navigation.navigate('PaymentScreen', {
+      selectedAmount: this.state.balanceToAdd,
+      fromAddBalanceScreen: true,
+    });
+  }}
+  style={styles.fixedTopUpButton}
+>
+  <Text style={styles.fixedTopUpButtonText}>+ Reload</Text>
+</TouchableOpacity>
+
+  </View>
     );
   }
 }

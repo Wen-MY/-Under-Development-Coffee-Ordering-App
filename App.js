@@ -76,7 +76,7 @@ const HomeStack = () => (
   <Stack.Navigator initialRouteName='HomeStackHome'>
     <Stack.Screen name="HomeStackHome" component={HomeScreen} options={{headerShown:false}}/>
     <Stack.Screen name="AddBalance" component={AddBalanceScreen} options={{headerTitle: 'Top Up Balance'}}/>
-    
+    <Stack.Screen name="PaymentScreen" component={PaymentScreen} />
   </Stack.Navigator>
 );
 const MenuStack = () => (
