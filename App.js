@@ -81,13 +81,13 @@ const HomeStack = () => (
 );
 const MenuStack = () => (
   <Stack.Navigator initialRouteName='MenuStackHome'>
-    <Stack.Screen name="MenuStackHome" component={MenuScreen} options={{headerShown:false}}/>
+    <Stack.Screen name="MenuStackHome" component={MenuScreen} options={{headerTitle: 'Menu', headerTitleStyle: styles.headerTitleStyle}}/>
     <Stack.Screen name="Coffee" component={CoffeeDetailScreen} options={{tabBarVisible: false}}/>
   </Stack.Navigator>
 );
 const CartStack = () => (
   <Stack.Navigator initialRouteName='Shopping Cart'>
-    <Stack.Screen name="Shopping Cart" component={CartScreen}  options={{headerShown:false}}/>
+    <Stack.Screen name="Shopping Cart" component={CartScreen} options={{ headerShown: true, headerTitleStyle: styles.headerTitleStyle }} />
     <Stack.Screen name="PaymentScreen" component={PaymentScreen} />
     <Stack.Screen name="SuccessOrderScreen" component={SuccessOrderScreen} options={{headerTitle:''}}/>
   </Stack.Navigator>

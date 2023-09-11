@@ -207,7 +207,7 @@ const styles = StyleSheet.create({
   orderTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#4A4A4A',
+    color: '#2d5e86',
     marginBottom: 10,
   },
   orderDetail: {

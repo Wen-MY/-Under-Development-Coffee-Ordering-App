@@ -3,7 +3,7 @@ import {
   View,
   Text,
   TextInput,
-  Button,
+  TouchableOpacity,
   StyleSheet,
   ScrollView,
   Image,
@@ -12,6 +12,7 @@ import {
 import { Picker } from '@react-native-picker/picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import SQLite from 'react-native-sqlite-storage';
+import {commonStyles} from "../style/CommonStyle"
 
 const VisaIcon = require('../assets/CardImage/visa_icon.png');
 const MasterCardIcon = require('../assets/CardImage/mastercard_icon.png');
@@ -42,11 +43,49 @@ class PaymentScreen extends Component {
       validUntilMonth: '01',
       validUntilYear: '2023',
       promocodeAmount: 0,
-      //selectedAmount: 1,
+      unit_price: 0,
       selectedAmount: selectedAmount || 0, // Set selectedAmount from the parameter or 0 if not provided
       fromAddBalanceScreen: fromAddBalanceScreen || false, // Set fromAddBalanceScreen from the parameter or false if not provided
     };
   }
+
+  // Function to handle fixed top-up button
+  handleFixedTopUp = async () => {
+    // You can perform any logic here for the fixed top-up
+    const id = await AsyncStorage.getItem('id');
+    const balance = await AsyncStorage.getItem('balance');
+    const newBalance = (parseFloat(balance) + parseFloat(this.state.selectedAmount)).toString();
+    try {
+      const response = await fetch('http://192.168.1.4:5000/api/addBalance', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          balance: newBalance,
+          id : id, 
+        }),
+      });
+
+      if (response.status === 200) {
+        const data = await response.json();
+        // Authentication successful, handle the user data
+        await AsyncStorage.setItem('balance', newBalance);
+        console.log(data);
+        alert('Top Up Sucessfully');
+
+      } else {
+        const data = await response.json();
+        // Authentication failed, show an error message
+        console.error(data.message);
+        alert('Top Up Failed');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Top Up Failed');
+    }
+    this.props.navigation.navigate('HomeStackHome');
+  };
 
   handlePromoCodeChange = (text) => {
     this.setState({ promocode: text }, () => {
@@ -96,9 +135,10 @@ class PaymentScreen extends Component {
                 const rows = resultSet.rows;
                 for (let i = 0; i < rows.length; i++) {
                   const item = rows.item(i);
+  
                   tx.executeSql(
-                    'INSERT INTO order_items (order_id, item_name, quantity) VALUES (?, ?, ?)',
-                    [orderId, item.item_name, item.quantity],
+                    'INSERT INTO order_items (order_id, item_name, quantity, unit_price) VALUES (?, ?, ?, ?)',
+                    [orderId, item.item_name, item.quantity, item.unit_price],
                     null,
                     (tx, error) => {
                       console.error('Error inserting order items:', error);
@@ -134,10 +174,8 @@ class PaymentScreen extends Component {
         );
       });
     }
-  };
+  };  
   
-  
-
   validateForm = () => {
     const { firstName, lastName, cardNumber, cvv } = this.state;
     const cardNumberRegex = /^[0-9]{16}$/;
@@ -190,10 +228,30 @@ class PaymentScreen extends Component {
       </View>
     );
 
+    const makePaymentSection = this.state.fromAddBalanceScreen ? (
+      <TouchableOpacity
+        onPress={() => {
+          this.handleFixedTopUp(this.state.selectedAmount);
+        }}
+        style={[commonStyles.primaryButton, styles.bottomSpace]}
+      >
+        <Text style={[commonStyles.itemCode,{fontSize: 16}]} >Make Payment</Text>
+      </TouchableOpacity>
+    ) : (
+      <TouchableOpacity
+        onPress={() => {
+          this.handlePayment(subtotal);
+        }}
+        style={[commonStyles.primaryButton, styles.bottomSpace]}
+      >
+        <Text style={[commonStyles.itemCode,{fontSize: 16}]} >Make Payment</Text>
+      </TouchableOpacity>
+    );    
+
     return (
       <ScrollView style={styles.container}>
         <Text style={styles.heading}>Order Confirmation</Text>
-
+    
         <View style={styles.paymentMethodContainer}>
           <Text style={styles.label}>Payment Method</Text>
           <Picker
@@ -209,8 +267,9 @@ class PaymentScreen extends Component {
             <Picker.Item label="PayPal" value="PayPal" />
             <Picker.Item label="Maestro" value="Maestro" />
             <Picker.Item label="Cirrus" value="Cirrus" />
+            {!this.state.fromAddBalanceScreen && ( <Picker.Item label="Using Balance" value="Balance" />)}
           </Picker>
-
+    
           <View style={styles.cardIconsRow}>
             <Image source={MasterCardIcon} style={styles.cardIcon} />
             <Image source={VisaIcon} style={styles.cardIcon} />
@@ -220,103 +279,78 @@ class PaymentScreen extends Component {
             <Image source={CirrusIcon} style={styles.cardIcon} />
           </View>
         </View>
-
-  // Conditionally render card information based on the selected payment method
-  let cardInformationSection = null;
-  if (this.state.paymentMethod !== 'Balance') {
-    cardInformationSection = (
-      <View>
-        <Text style={styles.heading1}>Card Information</Text>
-        <Text style={styles.label}>First Name</Text>
-        <TextInput
-          style={styles.input}
-          onChangeText={(text) => this.setState({ firstName: text })}
-        />
-
-        <Text style={styles.label}>Last Name</Text>
-        <TextInput
-          style={styles.input}
-          onChangeText={(text) => this.setState({ lastName: text })}
-        />
-
-        <Text style={styles.label}>Card Number</Text>
-        <TextInput
-          style={styles.input}
-          onChangeText={(text) => this.setState({ cardNumber: text })}
-          maxLength={16}
-          keyboardType="numeric"
-        />
-
-        <Text style={styles.label}>CVV</Text>
-        <TextInput
-          style={styles.input}
-          onChangeText={(text) => this.setState({ cvv: text })}
-          maxLength={4}
-          keyboardType="numeric"
-        />
-
-        <Text style={styles.label}>Expiry Date</Text>
-        <View style={styles.pickerContainer}>
-          <View style={styles.pickerColumn}>
-            <Picker
-              selectedValue={this.state.validUntilMonth}
-              onValueChange={(itemValue) =>
-                this.setState({ validUntilMonth: itemValue })
-              }
-              style={{ flex: 1 }}
-            >
-              <Picker.Item label="01 - January" value="01" />
-              <Picker.Item label="02 - February" value="02" />
-              <Picker.Item label="03 - March" value="03" />
-              <Picker.Item label="04 - April" value="04" />
-              <Picker.Item label="05 - May" value="05" />
-              <Picker.Item label="06 - June" value="06" />
-              <Picker.Item label="07 - July" value="07" />
-              <Picker.Item label="08 - August" value="08" />
-              <Picker.Item label="09 - September" value="09" />
-              <Picker.Item label="10 - October" value="10" />
-              <Picker.Item label="11 - November" value="11" />
-              <Picker.Item label="12 - December" value="12" />
-            </Picker>
+    
+        {this.state.paymentMethod !== 'Balance' && (
+          <View>
+            <Text style={styles.heading1}>Card Information</Text>
+            <Text style={styles.label}>First Name</Text>
+            <TextInput
+              style={styles.input}
+              onChangeText={(text) => this.setState({ firstName: text })}
+            />
+    
+            <Text style={styles.label}>Last Name</Text>
+            <TextInput
+              style={styles.input}
+              onChangeText={(text) => this.setState({ lastName: text })}
+            />
+    
+            <Text style={styles.label}>Card Number</Text>
+            <TextInput
+              style={styles.input}
+              onChangeText={(text) => this.setState({ cardNumber: text })}
+              maxLength={16}
+              keyboardType="numeric"
+            />
+    
+            <Text style={styles.label}>CVV</Text>
+            <TextInput
+              style={styles.input}
+              onChangeText={(text) => this.setState({ cvv: text })}
+              maxLength={4}
+              keyboardType="numeric"
+            />
+    
+            <Text style={styles.label}>Expiry Date</Text>
+            <View style={styles.pickerContainer}>
+              <View style={styles.pickerColumn}>
+                <Picker
+                  selectedValue={this.state.validUntilMonth}
+                  onValueChange={(itemValue) =>
+                    this.setState({ validUntilMonth: itemValue })
+                  }
+                  style={{ flex: 1 }}
+                >
+                  <Picker.Item label="01 - January" value="01" />
+                  <Picker.Item label="02 - February" value="02" />
+                  <Picker.Item label="03 - March" value="03" />
+                  {/* Add more months */}
+                </Picker>
+              </View>
+    
+              <View style={styles.pickerColumn}>
+                <Picker
+                  selectedValue={this.state.validUntilYear}
+                  onValueChange={(itemValue) =>
+                    this.setState({ validUntilYear: itemValue })
+                  }
+                  style={{ flex: 1 }}
+                >
+                  <Picker.Item label="2023" value="2023" />
+                  <Picker.Item label="2024" value="2024" />
+                  {/* Add more years */}
+                </Picker>
+              </View>
+            </View>
           </View>
-
-          <View style={styles.pickerColumn}>
-            <Picker
-              selectedValue={this.state.validUntilYear}
-              onValueChange={(itemValue) =>
-                this.setState({ validUntilYear: itemValue })
-              }
-              style={{ flex: 1 }}
-            >
-              <Picker.Item label="2023" value="2023" />
-              <Picker.Item label="2024" value="2024" />
-              <Picker.Item label="2025" value="2025" />
-              <Picker.Item label="2026" value="2026" />
-              <Picker.Item label="2027" value="2027" />
-              <Picker.Item label="2028" value="2028" />
-              <Picker.Item label="2029" value="2029" />
-              <Picker.Item label="2030" value="2030" />
-            </Picker>
-          </View>
-        </View>
-      </View>
-    )
-  }
-
+        )}
+        
         {promoCodeSection}
         {paymentDetailsSection}
-
-        <Button
-          title="Make Payment"
-          onPress={() => {
-            this.handlePayment(subtotal);
-          }}
-        />
-        <View style={styles.bottomSpace} />
-    </ScrollView>
-  );
-}}
-
+        {makePaymentSection}
+      </ScrollView>
+    );
+  }}
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -378,7 +412,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   bottomSpace: {
-    height: 40,
+    marginBottom: 40,
   },
   paymentMethodContainer: {
     marginBottom: 20,

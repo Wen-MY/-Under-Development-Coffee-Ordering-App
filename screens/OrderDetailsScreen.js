@@ -91,6 +91,10 @@ class OrderDetailsScreen extends Component {
               <Text style={styles.itemAttributeText}>Quantity:</Text>
               <Text style={styles.itemValueText}>{item.quantity}</Text>
             </View>
+            <View style={styles.attributeContainer}>
+              <Text style={styles.itemAttributeText}>Price:</Text>
+              <Text style={styles.itemValueText}>{item.unit_price}</Text>
+            </View>
           </View>
           ))
         )}

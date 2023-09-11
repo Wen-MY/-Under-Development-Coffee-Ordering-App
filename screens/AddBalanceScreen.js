@@ -38,46 +38,6 @@ handleQuickTopUp = (amount) => {
   }
 };
 
-
-
-  // Function to handle fixed top-up button
-  handleFixedTopUp = async () => {
-    // You can perform any logic here for the fixed top-up
-    const id = await AsyncStorage.getItem('id');
-    const balance = await AsyncStorage.getItem('balance');
-    const newBalance = (parseFloat(balance) + parseFloat(this.state.balanceToAdd)).toString();
-    await AsyncStorage.setItem('balance', newBalance);
-    try {
-      const response = await fetch('Running on http://192.168.1.4:5000/api/addBalance', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          balance: newBalance,
-          id : id, 
-        }),
-      });
-
-      if (response.status === 200) {
-        const data = await response.json();
-        // Authentication successful, handle the user data
-        console.log(data);
-        alert('Top Up Sucessfully');
-
-      } else {
-        const data = await response.json();
-        // Authentication failed, show an error message
-        console.error(data.message);
-        alert('Top Up Failed');
-      }
-    } catch (error) {
-      console.error('Error:', error);
-      alert('Top Up Failed');
-    }
-    this.props.navigation.navigate('HomeStackHome');
-  };
-
   render() {
     return (
 <View style={styles.container}>
@@ -135,7 +95,7 @@ handleQuickTopUp = (amount) => {
   <TouchableOpacity
   onPress={() => {
     this.props.navigation.navigate('PaymentScreen', {
-      selectedAmount: this.state.balanceToAdd,
+      selectedAmount: parseFloat(this.state.balanceToAdd),
       fromAddBalanceScreen: true,
     });
   }}
