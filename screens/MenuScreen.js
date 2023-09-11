@@ -138,18 +138,27 @@ const styles = StyleSheet.create({
         padding: 20,
         backgroundColor: '#FFFFFF',
     },
+    text: {
+        fontSize: 25,
+        fontWeight: '500',
+        textAlign: 'center',
+    },
+    gridView: {
+        marginTop: 20,
+        flex: 1,
+    },
     itemContainer: {
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 10,
         padding: 10,
-        height: 200,
+        height: 150,
         backgroundColor: '#0f4c81',
     },
     itemImage: {
-        width: 80,
-        height: 80,
-        marginBottom: 10,
+        width: 50,
+        height: 100,
+        alignSelf: 'center'
     },
     itemName: {
         fontSize: 16,

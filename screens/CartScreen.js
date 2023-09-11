@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { TouchableOpacity, View, Text, Image, Button, StyleSheet, ScrollView } from 'react-native';
+import { TouchableOpacity, View, Text, Image, Button, StyleSheet, ScrollView, Alert } from 'react-native';
 import SQLite from 'react-native-sqlite-storage';
 import imageMapping from '../utils/imageMapping';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -68,18 +68,63 @@ const CartScreen = ({ navigation }) => {
   const calculateTotal = () => {
     return cartItems.reduce((acc, item) => acc + item.price, 0).toFixed(2);
   };
-
+  const handleProceedToPayment = () => {
+    if (cartItems.length === 0) {
+      // Cart is empty, show an alert and navigate back to the menu screen
+      Alert.alert(
+        'Cart is Empty',
+        'Your cart is currently empty. Please add some orders to the cart.',
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+            },
+          },
+        ]
+      );
+    } else {
+      // Cart is not empty, proceed to the payment screen
+      navigation.navigate('PaymentScreen', { subtotal: calculateTotal() });
+    }
+  };
   if (loading) {
-    return <Loading />;
+    return (
+      <View style={styles.loadingContainer}>
+        <Text>Loading...</Text>
+      </View>
+    );
   }
 
   return (
-    <ScrollView style={styles.container}>
-      {cartItems.map((item) => (
-        <CartItem key={item.id} item={item} onRemove={removeItem} />
-      ))}
-      <TotalPrice amount={calculateTotal()} />
-      <ProceedButton navigation={navigation} total={calculateTotal()} />
+    <ScrollView contentContainerStyle={styles.container}>
+    {cartItems.length === 0 ? (
+      <Text style={styles.emptyCartMessage}>Your cart is empty now.</Text>
+    ) : (
+      cartItems.map((item) => (
+        <View key={item.id} style={styles.cartItemContainer}>
+          <Image source={imageMapping[item.name]} style={styles.cartItemImage} />
+
+          <View style={styles.cartItemInfo}>
+            <Text style={styles.itemName}>{item.name}</Text>
+            <View style={styles.selectedOptionsContainer}>
+              <Text style={styles.selectedOptionsText}>
+                {item.customizations} {/* Display stored customizations */}
+              </Text>
+            </View>
+            <Text style={styles.unitPrice}>Quantity: {item.quantity}</Text>
+            <Text style={styles.unitPrice}>Price: ${item.price.toFixed(2)}</Text>
+          </View>
+          <TouchableOpacity
+            style={styles.removeButton}
+            onPress={() => removeItem(item.id)}
+          >
+            <Text style={styles.removeButtonText}>✘</Text>
+          </TouchableOpacity>
+        </View>
+      ))
+    )}
+    <Text style={styles.total}>Total Price: ${calculateTotal()}</Text>
+    <Button title="Proceed to Payment" onPress={handleProceedToPayment} />
     </ScrollView>
   );
 };
