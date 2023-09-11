@@ -56,7 +56,7 @@ class PaymentScreen extends Component {
     const balance = await AsyncStorage.getItem('balance');
     const newBalance = (parseFloat(balance) + parseFloat(this.state.selectedAmount)).toString();
     try {
-      const response = await fetch('http://192.168.1.4:5000/api/addBalance', {
+      const response = await fetch('http://192.168.50.78:5000/api/addBalance', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
