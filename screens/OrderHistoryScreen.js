@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component , useEffect} from 'react';
 import { RefreshControl, View, Text, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 import SQLite from 'react-native-sqlite-storage';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -22,7 +22,6 @@ class OrderHistoryScreen extends Component {
       this.errorCallback
     );
   }
-
   componentDidMount() {
     this.fetchId();
   }
@@ -40,11 +39,12 @@ class OrderHistoryScreen extends Component {
   fetchId = async () => {
     try {
       const id = await AsyncStorage.getItem('id');
-      this.setState({ id });
       if (id) {
-        this.fetchOrderHistory(id);  // Fetch orders after getting the id
+        this.fetchOrderHistory(id); 
+         // Fetch orders after getting the id
+         this.setState({ id });
       } else {
-        this.setState({ isLoading: false });
+        this.setState({ isLoading: true });
       }
     } catch (error) {
       console.log('Error fetching id:', error);
@@ -116,8 +116,7 @@ class OrderHistoryScreen extends Component {
 }
 
   render() {
-    const { orderHistory, isLoading } = this.state;
-
+    const { orderHistory, isLoading} = this.state;
     if (isLoading) {
       return (
         <View style={styles.loadingContainer}>
