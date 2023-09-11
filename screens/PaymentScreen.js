@@ -58,8 +58,11 @@ class PaymentScreen extends Component {
   handlePayment = async (subtotal) => {
     const deliveryFee = 5.0;
     const id = await AsyncStorage.getItem('id');
+    const balance = await AsyncStorage.getItem('balance');
+    const numericBalance = parseFloat(balance);
+  
     let promocodeAmount = 0;
-
+  
     if (this.state.promocode === '123456') {
       promocodeAmount = 5.0;
       this.setState({ promoCodeCorrect: true });
@@ -68,10 +71,18 @@ class PaymentScreen extends Component {
     }
   
     const totalAmount = subtotal + deliveryFee - promocodeAmount;
-    if (this.validateForm()) {
+  
+    if (this.state.paymentMethod === 'Balance' && numericBalance < totalAmount) {
+      Alert.alert('Insufficient Balance', 'Your balance is not enough.');
+    } else if (this.state.paymentMethod !== 'Balance' && !this.validateForm()) {
+      Alert.alert('Invalid Input', 'Please fill out all fields correctly.');
+    } else {
+      const newBalance = this.state.paymentMethod === 'Balance' ? (numericBalance - totalAmount).toString() : numericBalance.toString();
+      await AsyncStorage.setItem('balance', newBalance);
+  
       this.db.transaction((tx) => {
         tx.executeSql(
-          'INSERT INTO orders (user_id, total_amount) VALUES (?,?)',
+          'INSERT INTO orders (user_id, total_amount) VALUES (?, ?)',
           [id, totalAmount.toFixed(2)],
           (tx, result) => {
             const orderId = result.insertId;
@@ -119,10 +130,10 @@ class PaymentScreen extends Component {
           }
         );
       });
-    } else {
-      Alert.alert('Invalid Input', 'Please fill out all fields correctly.');
     }
   };
+  
+  
 
   validateForm = () => {
     const { firstName, lastName, cardNumber, cvv } = this.state;
@@ -137,43 +148,17 @@ class PaymentScreen extends Component {
     );
   };
 
-  render() {
-    const subtotal = parseFloat(this.props.route.params.subtotal);
-    const deliveryFee = 5.0;
-    const promocodeAmount = this.state.promoCodeCorrect ? 5.0 : 0;
-    const totalAmount = subtotal + deliveryFee - promocodeAmount;
+render() {
+  const subtotal = parseFloat(this.props.route.params.subtotal);
+  const deliveryFee = 5.0;
+  const promocodeAmount = this.state.promoCodeCorrect ? 5.0 : 0;
+  const totalAmount = subtotal + deliveryFee - promocodeAmount;
 
-    return (
-      <ScrollView style={styles.container}>
-        <Text style={styles.heading}>Order Confirmation</Text>
-
-        <View style={styles.paymentMethodContainer}>
-          <Text style={styles.label}>Payment Method</Text>
-          <Picker
-            selectedValue={this.state.paymentMethod}
-            onValueChange={(itemValue) =>
-              this.setState({ paymentMethod: itemValue })
-            }
-            style={styles.input}
-          >
-            <Picker.Item label="MasterCard" value="MasterCard" />
-            <Picker.Item label="Visa" value="Visa" />
-            <Picker.Item label="eBay" value="eBay" />
-            <Picker.Item label="PayPal" value="PayPal" />
-            <Picker.Item label="Maestro" value="Maestro" />
-            <Picker.Item label="Cirrus" value="Cirrus" />
-          </Picker>
-
-          <View style={styles.cardIconsRow}>
-            <Image source={MasterCardIcon} style={styles.cardIcon} />
-            <Image source={VisaIcon} style={styles.cardIcon} />
-            <Image source={EbayIcon} style={styles.cardIcon} />
-            <Image source={PaypalIcon} style={styles.cardIcon} />
-            <Image source={MaestroIcon} style={styles.cardIcon} />
-            <Image source={CirrusIcon} style={styles.cardIcon} />
-          </View>
-        </View>
-
+  // Conditionally render card information based on the selected payment method
+  let cardInformationSection = null;
+  if (this.state.paymentMethod !== 'Balance') {
+    cardInformationSection = (
+      <View>
         <Text style={styles.heading1}>Card Information</Text>
         <Text style={styles.label}>First Name</Text>
         <TextInput
@@ -206,7 +191,8 @@ class PaymentScreen extends Component {
         <Text style={styles.label}>Expiry Date</Text>
         <View style={styles.pickerContainer}>
           <View style={styles.pickerColumn}>
-            <Picker               selectedValue={this.state.validUntilMonth}
+            <Picker
+              selectedValue={this.state.validUntilMonth}
               onValueChange={(itemValue) =>
                 this.setState({ validUntilMonth: itemValue })
               }
@@ -246,8 +232,46 @@ class PaymentScreen extends Component {
             </Picker>
           </View>
         </View>
+      </View>
+    );
+  }
 
-        <Text style={styles.label}>Promocode</Text>
+  return (
+    <ScrollView style={styles.container}>
+      <Text style={styles.heading}>Order Confirmation</Text>
+
+      <View style={styles.paymentMethodContainer}>
+        <Text style={styles.label}>Payment Method</Text>
+        <Picker
+          selectedValue={this.state.paymentMethod}
+          onValueChange={(itemValue) =>
+            this.setState({ paymentMethod: itemValue })
+          }
+          style={styles.input}
+        >
+          <Picker.Item label="Balance" value="Balance" />
+          <Picker.Item label="MasterCard" value="MasterCard" />
+          <Picker.Item label="Visa" value="Visa" />
+          <Picker.Item label="eBay" value="eBay" />
+          <Picker.Item label="PayPal" value="PayPal" />
+          <Picker.Item label="Maestro" value="Maestro" />
+          <Picker.Item label="Cirrus" value="Cirrus" />
+        </Picker>
+
+        <View style={styles.cardIconsRow}>
+        <Image source={MasterCardIcon} style={styles.cardIcon} />
+            <Image source={VisaIcon} style={styles.cardIcon} />
+            <Image source={EbayIcon} style={styles.cardIcon} />
+            <Image source={PaypalIcon} style={styles.cardIcon} />
+            <Image source={MaestroIcon} style={styles.cardIcon} />
+            <Image source={CirrusIcon} style={styles.cardIcon} />
+        </View>
+      </View>
+
+      {cardInformationSection}
+
+
+      <Text style={styles.label}>Promocode</Text>
         <View style={styles.promoCodeContainer}>
           <TextInput
             style={styles.input}
@@ -274,10 +298,9 @@ class PaymentScreen extends Component {
           }}
         />
         <View style={styles.bottomSpace} />
-      </ScrollView>
-    );
-  }
-}
+    </ScrollView>
+  );
+}}
 
 const styles = StyleSheet.create({
   container: {
@@ -373,4 +396,3 @@ const styles = StyleSheet.create({
 });
 
 export default PaymentScreen;
-

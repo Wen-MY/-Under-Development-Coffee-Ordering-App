@@ -35,7 +35,7 @@ class SuccessOrderScreen extends Component {
   };
 
   navigateToMenuScreen = () => {
-    this.props.navigation.navigate('Shopping Cart'); // Replace 'Cart' with the actual name of your cart screen
+    this.props.navigation.navigate('MenuStackHome'); // Replace 'Cart' with the actual name of your cart screen
   };
 
   render() {
