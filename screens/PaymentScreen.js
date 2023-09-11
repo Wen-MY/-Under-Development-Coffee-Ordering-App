@@ -3,7 +3,7 @@ import {
   View,
   Text,
   TextInput,
-  Button,
+  TouchableOpacity,
   StyleSheet,
   ScrollView,
   Image,
@@ -12,6 +12,7 @@ import {
 import { Picker } from '@react-native-picker/picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import SQLite from 'react-native-sqlite-storage';
+import {commonStyles} from "../style/CommonStyle"
 
 const VisaIcon = require('../assets/CardImage/visa_icon.png');
 const MasterCardIcon = require('../assets/CardImage/mastercard_icon.png');
@@ -42,11 +43,49 @@ class PaymentScreen extends Component {
       validUntilMonth: '01',
       validUntilYear: '2023',
       promocodeAmount: 0,
-      //selectedAmount: 1,
+      unit_price: 0,
       selectedAmount: selectedAmount || 0, // Set selectedAmount from the parameter or 0 if not provided
       fromAddBalanceScreen: fromAddBalanceScreen || false, // Set fromAddBalanceScreen from the parameter or false if not provided
     };
   }
+
+  // Function to handle fixed top-up button
+  handleFixedTopUp = async () => {
+    // You can perform any logic here for the fixed top-up
+    const id = await AsyncStorage.getItem('id');
+    const balance = await AsyncStorage.getItem('balance');
+    const newBalance = (parseFloat(balance) + parseFloat(this.state.selectedAmount)).toString();
+    try {
+      const response = await fetch('http://192.168.50.78:5000/api/addBalance', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          balance: newBalance,
+          id : id, 
+        }),
+      });
+
+      if (response.status === 200) {
+        const data = await response.json();
+        // Authentication successful, handle the user data
+        await AsyncStorage.setItem('balance', newBalance);
+        console.log(data);
+        alert('Top Up Sucessfully');
+
+      } else {
+        const data = await response.json();
+        // Authentication failed, show an error message
+        console.error(data.message);
+        alert('Top Up Failed');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Top Up Failed');
+    }
+    this.props.navigation.navigate('HomeStackHome');
+  };
 
   handlePromoCodeChange = (text) => {
     this.setState({ promocode: text }, () => {
@@ -97,8 +136,8 @@ class PaymentScreen extends Component {
                 for (let i = 0; i < rows.length; i++) {
                   const item = rows.item(i);
                   tx.executeSql(
-                    'INSERT INTO order_items (order_id, item_name, quantity) VALUES (?, ?, ?)',
-                    [orderId, item.item_name, item.quantity],
+                    'INSERT INTO order_items (order_id, item_name, quantity, unit_price) VALUES (?, ?, ?, ?)',
+                    [orderId, item.item_name, item.quantity, item.unit_price],
                     null,
                     (tx, error) => {
                       console.error('Error inserting order items:', error);
@@ -134,10 +173,8 @@ class PaymentScreen extends Component {
         );
       });
     }
-  };
+  };  
   
-  
-
   validateForm = () => {
     const { firstName, lastName, cardNumber, cvv } = this.state;
     const cardNumberRegex = /^[0-9]{16}$/;
@@ -190,6 +227,26 @@ class PaymentScreen extends Component {
       </View>
     );
 
+    const makePaymentSection = this.state.fromAddBalanceScreen ? (
+      <TouchableOpacity
+        onPress={() => {
+          this.handleFixedTopUp(this.state.selectedAmount);
+        }}
+        style={[commonStyles.primaryButton, styles.bottomSpace]}
+      >
+        <Text style={[commonStyles.itemCode,{fontSize: 16}]} >Make Payment</Text>
+      </TouchableOpacity>
+    ) : (
+      <TouchableOpacity
+        onPress={() => {
+          this.handlePayment(subtotal);
+        }}
+        style={[commonStyles.primaryButton, styles.bottomSpace]}
+      >
+        <Text style={[commonStyles.itemCode,{fontSize: 16}]} >Make Payment</Text>
+      </TouchableOpacity>
+    );    
+
     return (
       <ScrollView style={styles.container}>
         <Text style={styles.heading}>Order Confirmation</Text>
@@ -209,6 +266,7 @@ class PaymentScreen extends Component {
             <Picker.Item label="PayPal" value="PayPal" />
             <Picker.Item label="Maestro" value="Maestro" />
             <Picker.Item label="Cirrus" value="Cirrus" />
+            {!this.state.fromAddBalanceScreen && ( <Picker.Item label="Using Balance" value="Balance" />)}
           </Picker>
     
           <View style={styles.cardIconsRow}>
@@ -221,7 +279,6 @@ class PaymentScreen extends Component {
           </View>
         </View>
     
-        {/* Conditionally render card information based on the selected payment method */}
         {this.state.paymentMethod !== 'Balance' && (
           <View>
             <Text style={styles.heading1}>Card Information</Text>
@@ -289,14 +346,7 @@ class PaymentScreen extends Component {
         
         {promoCodeSection}
         {paymentDetailsSection}
-    
-        <Button
-          title="Make Payment"
-          onPress={() => {
-            this.handlePayment(subtotal);
-          }}
-        />
-        <View style={styles.bottomSpace} />
+        {makePaymentSection}
       </ScrollView>
     );
   }}
@@ -361,7 +411,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   bottomSpace: {
-    height: 40,
+    marginBottom: 40,
   },
   paymentMethodContainer: {
     marginBottom: 20,
