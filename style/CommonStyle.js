@@ -88,7 +88,7 @@ export const commonStyles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   primaryButton:{
-    backgroundColor: '#43a047',
+    backgroundColor: '#192d4d',
     padding: 10,
     borderRadius: 10,
     justifyContent: 'center',

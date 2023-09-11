@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import CheckBox from '@react-native-community/checkbox';
-import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity, Linking, Alert } from 'react-native';
+import { Image, View, Text, TextInput, Button, StyleSheet, TouchableOpacity, Linking, Alert } from 'react-native';
 
 export default class SignUp extends Component {
     state = {
@@ -100,12 +100,21 @@ export default class SignUp extends Component {
     render() {
         return (
             <View style={styles.container}>
-                <Text style={styles.title}>Sign Up Screen</Text>
+                <Text style={styles.title}>Sign Up</Text>
+                <View style={styles.logoContainer}>
+                    <Image source={require('../pictures/logo.png')} style={styles.logo} />
+                </View>
                 <TextInput
                     style={styles.input}
                     placeholder="Username"
                     value={this.state.username}
                     onChangeText={(text) => this.setState({ username: text })}
+                />
+                <TextInput
+                    style={styles.input}
+                    placeholder="Email Address"
+                    value={this.state.email}
+                    onChangeText={(text) => this.setState({ email: text })}
                 />
                 <TextInput
                     style={styles.input}
@@ -121,23 +130,19 @@ export default class SignUp extends Component {
                     value={this.state.confirmPassword}
                     onChangeText={(text) => this.setState({ confirmPassword: text })}
                 />
-                <TextInput
-                    style={styles.input}
-                    placeholder="Email Address"
-                    value={this.state.email}
-                    onChangeText={(text) => this.setState({ email: text })}
-                />
-                <View style={styles.termsContainer}>
+                 <View style={styles.termsContainer}>
                     <CheckBox
                         value={this.state.agreedToTerms}
                         onValueChange={this.toggleTermsAgreement}
                     />
-                    <Text style={styles.terms}>I agree to the</Text>
+                    <Text>I agree to the</Text>
                     <TouchableOpacity onPress={this.handleTermsPress}>
                         <Text style={styles.terms}>Terms and Conditions</Text>
                     </TouchableOpacity>
                 </View>
-                <Button title="Sign Up" onPress={this.handleSignUp} />
+                <TouchableOpacity style={styles.loginButton} onPress={this.handleSignUp}>
+                    <Text style={styles.loginButtonText}>Sign Up</Text>
+                </TouchableOpacity>
             </View>
         );
     }
@@ -148,31 +153,55 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#fff',
+        backgroundColor: '#b3e2e5',
         padding: 20,
     },
     title: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        marginBottom: 20,
+        fontSize: 28,
+        color: '#19494d',
+        fontFamily: 'Montserrat-Regular',
+        marginBottom: 5,
     },
-    termsContainer: {
-        flexDirection: 'row',
+    logoContainer: {
         alignItems: 'center',
-        marginTop: 20,
+        marginBottom: 5,
     },
-    terms: {
-        fontSize: 14,
-        color: '#888',
-        marginLeft: 5,
+    logo: {
+        width: 200,
+        height: 200,
+        resizeMode: 'contain',
+        marginBottom: 10,
     },
     input: {
-        width: '100%',
+        width: '100%', // Set input width to 100%
         height: 40,
         borderWidth: 1,
         borderColor: '#ccc',
         borderRadius: 5,
-        marginBottom: 10,
+        marginBottom: 15,
         paddingLeft: 10,
+        backgroundColor: 'white',
+    },
+    termsContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    terms: {
+        fontSize: 14,
+        color: 'blue',
+        marginLeft: 5,
+    },
+    loginButton: {
+        backgroundColor: '#2d7f86',
+        borderRadius: 5,
+        paddingVertical: 10,
+        paddingHorizontal: 30,
+        marginTop: 15,
+    },
+    loginButtonText: {
+        color: 'white',
+        fontSize: 13,
+        fontWeight: 'bold',
+        textAlign: 'center',
     },
 });

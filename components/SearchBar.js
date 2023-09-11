@@ -33,7 +33,7 @@ const SearchBar = ({clicked, searchPhrase, setSearchPhrase, setClicked}) => {
         <View style={{padding :10, marginLeft: 10}}>
           <Button
             title="X"
-            color= "#43A047"
+            color= "#4091bf"
             onPress={() => {
               Keyboard.dismiss();
               setClicked(false);
@@ -54,10 +54,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     flexDirection: "row",
     width: "100%",
-
   },
   searchBar__unclicked: {
-    padding: 10,
+    padding: 1,
     flexDirection: "row",
     width: "95%",
     backgroundColor: "#d9dbda",
@@ -65,7 +64,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   searchBar__clicked: {
-    padding: 10,
+    padding: 1,
     flexDirection: "row",
     width: "80%",
     backgroundColor: "#d9dbda",
@@ -74,7 +73,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-evenly",
   },
   input: {
-    fontSize: 20,
+    fontSize: 18,
     marginLeft: 10,
     width: "90%",
   },

@@ -121,14 +121,16 @@ const CoffeeDetailScreen = ({route}) => {
   return (
     <View style={styles.container}>
       <ScrollView>
-        <Text style={styles.name}>{coffeeDetails.name}</Text>
+        <Text style={styles.title}>{coffeeDetails.name}</Text>
 
+        <View style={styles.whiteContainer}>
         <Image
           source={imageMapping[coffeeDetails.name]}
           style={styles.coffeeImage}
         />
 
         <Text style={styles.description}>{coffeeDetails.description}</Text>
+      </View>
 
         <View style={styles.section}>
           <Text style={styles.sectionHeader}>Ice Level</Text>
@@ -188,119 +190,149 @@ const CoffeeDetailScreen = ({route}) => {
             <Text>Add Whipped Cream</Text>
           </View>
         </View>
-      </ScrollView>
+        </ScrollView>
 
-      <View style={styles.priceContainer}>
-        <View style={styles.priceSection}>
-          <Text style={styles.priceButtonLabel}>Price: RM {calculatePrice()}</Text>
-          <View style={styles.quantityContainer}>
-            <TouchableOpacity onPress={decreaseQuantity} style={styles.quantityButton}>
-              <Text style={styles.quantityButtonText}>-</Text>
-            </TouchableOpacity>
-            <Text style={styles.quantityText}>{quantity}</Text>
-            <TouchableOpacity onPress={increaseQuantity} style={styles.quantityButton}>
-              <Text style={styles.quantityButtonText}>+</Text>
-            </TouchableOpacity>
+        <View style={styles.footerContainer}>
+          <View style={styles.priceSection}>
+          <Text style={[styles.valueText, styles.priceDisplay]}>Price: RM {calculatePrice()}</Text>
+            <View style={styles.quantityContainer}>
+              <TouchableOpacity onPress={decreaseQuantity} style={styles.quantityButton}>
+                <Text style={styles.quantityButtonText}>-</Text>
+              </TouchableOpacity>
+              <Text style={styles.valueText}>{quantity}</Text>
+              <TouchableOpacity onPress={increaseQuantity} style={styles.quantityButton}>
+                <Text style={styles.quantityButtonText}>+</Text>
+              </TouchableOpacity>
+            </View>
           </View>
+          <TouchableOpacity onPress={addToCart} style={styles.addToCartButton}>
+            <Text style={styles.addToCartButtonText}>Add to Cart</Text>
+          </TouchableOpacity>
         </View>
-        <TouchableOpacity onPress={addToCart} style={styles.priceButton}>
-          <Text style={styles.priceButtonLabel}>Add to Cart</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
-  );
-};
+        </View>
+        );
+      };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f8f8f8',
-    paddingHorizontal: 16,
-    paddingTop: 20,
-  },
-  name: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 10,
-    textAlign: 'center',
-  },
-  coffeeImage: {
-    width: 200,
-    height: 350,
-    marginBottom: 20,
-    alignSelf: 'center',
-  },
-  description: {
-    fontSize: 16,
-    marginHorizontal: 20,
-    marginBottom: 20,
-    textAlign: 'center',
-  },
-  section: {
-    marginBottom: 20,
-  },
-  sectionHeader: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  optionRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  priceButton: {
-    padding: 10,
-    alignItems: 'center',
-    backgroundColor: '#43A047',
-    borderRadius: 8,
-  },
-  priceButtonLabel: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: 'white',
-    marginTop: 5,
-    marginBottom: 5,
-  },
-  priceButtonPrice: {
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  priceSection: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  priceContainer: {
-    backgroundColor: 'lightgrey',
-    padding: 8, // Updated padding
-    borderRadius: 8,
-    marginBottom: 16,
-  },
-  quantityContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginLeft: 20, // Adjust the margin to your preference
-    marginRight: 20, // Adjust the margin to your preference
-  },
-  quantityText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginRight: 10,
-    marginLeft: 10,
-  },
-  quantityButton: {
-    backgroundColor: '#43A047',
-    borderRadius: 20,
-    paddingHorizontal: 10, // Updated padding
-    paddingBottom: 1,
-    margin: 5, // Adjust the margin to your preference
-  },
-  quantityButtonText: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: 'white',
-  },
-});
+      const styles = StyleSheet.create({
+        container: {
+          flex: 1,
+          backgroundColor: '#b3e2e5',
+          paddingHorizontal: 20,
+          paddingTop: 20,
+        },
+        footerContainer: {
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          backgroundColor: '#f3f7f7',
+          padding: 16,
+          borderRadius: 8,
+          marginBottom: 16,
+        },
+        addToCartButton: {
+          backgroundColor: '#4085bf',
+          borderRadius: 8,
+          padding: 8, // Reduced padding to make the button smaller
+          paddingHorizontal: 12, // Adjusted padding for a more compact button
+        },
+        addToCartButtonText: {
+          fontSize: 14,  // Reduced font size for a more compact button
+          fontWeight: 'bold',
+          color: 'white',
+          textAlign: 'center',
+        },
+        priceSection: {
+          flexDirection: 'row',
+          alignItems: 'center',
+        },
+        quantityContainer: {
+          flexDirection: 'row',
+          alignItems: 'center',
+          marginLeft: 10,  // Adjusted margin for spacing
+          marginRight: 10,
+        },
+        quantityButton: {
+          backgroundColor: '#4085bf',
+          borderRadius: 15, // Smaller, rounded button
+          paddingHorizontal: 8, // Reduced padding for a smaller button
+          paddingBottom: 1,
+          margin: 5,
+        },
+        quantityButtonText: {
+          fontSize: 15,  // Slightly reduced font size
+          fontWeight: 'bold',
+          color: 'white',
+        },
+        title: {
+          fontSize: 28,
+          color: '#19494d',
+          fontFamily: 'Montserrat-Regular',
+          marginBottom: 15,
+          textAlign: 'center',
+        },
+        subtitle: {
+          fontSize: 16,
+          fontFamily: 'Montserrat-Regular',
+          color: '#888',
+          marginBottom: 20,
+          textAlign: 'center',
+        },
+        valueText: {
+          fontSize: 16,
+          fontFamily: 'Montserrat-Regular',
+          color: '#888',
+          marginBottom: 1,
+          textAlign: 'center',
+        },
+        coffeeImage: {
+          width: 200,
+          height: 350,
+          marginBottom: 20,
+          alignSelf: 'center',
+          backgroundColor: 'white',
+        },
+        description: {
+          fontSize: 16,
+          marginHorizontal: 20,
+          marginBottom: 20,
+          textAlign: 'center',
+        },
+        section: {
+          marginBottom: 25,
+        },
+        sectionHeader: {
+          fontSize: 20,
+          fontWeight: 'bold',
+          marginBottom: 10,
+          color: '#19354d',
+        },
+        optionRow: {
+          flexDirection: 'row',
+          alignItems: 'center',
+        },
+        priceButton: {
+          padding: 10,
+          alignItems: 'center',
+          backgroundColor: '#43A047',
+          borderRadius: 8,
+        },
+        quantityText: {
+          fontSize: 13,
+          fontWeight: 'bold',
+          marginRight: 10,
+          marginLeft: 10,
+        },
+        whiteContainer: {
+          backgroundColor: 'white',
+          borderRadius: 15,
+          padding: 20,
+          marginVertical: 15,
+          alignItems: 'center',
+        },
+        priceDisplay: {
+          marginTop: 5,
+          marginRight: 10,
+        },
+      });      
 
 export default CoffeeDetailScreen;

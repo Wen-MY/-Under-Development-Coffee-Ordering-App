@@ -112,7 +112,7 @@ const LoginStack = () => {
         }}
       />
       <Stack.Screen name ="Home" component={AppDrawerStack} options={{headerShown:false}}/>
-      <Stack.Screen name="Sign Up" component={SignUpScreen} options={{headerTitle:false}}/>
+      <Stack.Screen name="Sign Up" component={SignUpScreen} options={{headerTitle:''}}/>
     </Stack.Navigator>
   );
 }
@@ -124,11 +124,14 @@ function AppBottomStack() {
         tabBarActiveTintColor: 'white',
         tabBarActiveBackgroundColor: '#0f4c81',
         tabBarLabelStyle: {
-          fontSize: 22,
+          fontSize: 20,
+        },
+        tabBarIconStyle: {
+          marginBottom: -10, // Adjust the negative margin to reduce space
         },
         tabBarStyle: {
           backgroundColor: 'lightgrey',
-          height: 60,
+          height: 55,
           display: 
           getFocusedRouteNameFromRoute(route) === ('Coffee') ||
           getFocusedRouteNameFromRoute(route) === ('PaymentScreen') ||

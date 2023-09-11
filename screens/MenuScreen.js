@@ -153,7 +153,8 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         padding: 10,
         height: 150,
-        backgroundColor: '#0f4c81',
+        borderColor: '#2d5e86', // Add border color
+        borderWidth: 2, // Set border width
     },
     itemImage: {
         width: 50,
@@ -162,12 +163,12 @@ const styles = StyleSheet.create({
     },
     itemName: {
         fontSize: 16,
-        color: '#fff',
+        color: '#2d5e86',
         fontWeight: '600',
     },
     itemPrice: {
         fontSize: 14,
-        color: '#fff',
+        color: '#f47373',
     },
     sectionHeader: {
         fontSize: 18,
@@ -175,5 +176,6 @@ const styles = StyleSheet.create({
         backgroundColor: '#19364d',
         color: 'white',
         padding: 10,
+        borderRadius: 15,
     },
 });

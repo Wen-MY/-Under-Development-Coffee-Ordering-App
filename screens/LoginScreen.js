@@ -1,6 +1,6 @@
-import React, { Component, useState } from 'react';
+import React, { Component } from 'react';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
+import { TouchableOpacity, View, Text, TextInput, Button, StyleSheet, Image } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default class Login extends Component {
@@ -76,72 +76,110 @@ export default class Login extends Component {
         }
       };
 
-    render() {
+      render() {
         return (
-            <View style={styles.container}>
-                <Text style={styles.title}>Welcome to our App</Text>
-                <Text style={styles.subtitle}>Login or Sign Up to get started</Text>
-                <View style={styles.inputContainer}>
-                    <Icon name={'mobile-phone'} size={20} color="gray" style={styles.icon} />
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Enter your username"
-                        onChangeText={(username) => this.setState({ username })}
-                        value={this.state.username}
-                    />
+            <>
+                <View style={styles.container}>
+                    <Text style={styles.title}>Welcome to our App</Text>
+                      <View style={styles.logoPlaceholder}>
+                    <Image source={require('../pictures/logo.png')} style={styles.logo} />
+                    </View>
+                    <Text style={styles.subtitle}>Login or Sign Up to get started</Text>
+                    <View style={styles.inputContainer}>
+                        <Icon name={'mobile-phone'} size={20} color="gray" style={styles.icon} />
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Enter your username"
+                            onChangeText={(username) => this.setState({ username })}
+                            value={this.state.username}
+                        />
+                    </View>
+                    <View style={styles.inputContainer}>
+                        <Icon name={'lock'} size={20} color="gray" style={styles.icon} />
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Enter your password"
+                            secureTextEntry={true}
+                            onChangeText={(password) => this.setState({ password })}
+                            value={this.state.password}
+                        />
+                    </View>
+                    <TouchableOpacity style={styles.loginButton} onPress={this.handleLogin}>
+                        <Text style={styles.loginButtonText}>Login</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.loginButton} onPress={this.handleSignUpPress}>
+                        <Text style={styles.loginButtonText}>Sign Up</Text>
+                    </TouchableOpacity>
                 </View>
-                <View style={styles.inputContainer}>
-                    <Icon name={'lock'} size={20} color="gray" style={styles.icon} />
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Enter your password"
-                        secureTextEntry={true}
-                        onChangeText={(password) => this.setState({ password })}
-                        value={this.state.password}
-                    />
-                </View>
-                <Button title="Continue" onPress={this.handleLogin} />
-                <Button title="Sign Up" onPress={this.handleSignUpPress} />
-                {this.state.error && <Text style={styles.errorText}>{this.state.error}</Text>}
-            </View>
+            </>
         );
     }
 }
 
+// Updated styles
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#fff',
-        padding: 20,
-    },
-    inputContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        borderWidth: 1,
-        borderColor: '#ccc',
-        borderRadius: 5,
-        marginBottom: 10,
-        paddingLeft: 10,
-    },
-    title: {
-        fontSize: 28,
-        fontWeight: 'bold',
-        marginTop: 20, // Adjust the margin as needed
-        marginBottom: 200,
-    },
-    subtitle: {
-        fontSize: 16,
-        color: '#888',
-        marginBottom: 10,
-    },
-    icon: {
-        marginRight: 10,
-    },
-    input: {
-        flex: 1,
-        height: 40,
-        borderWidth: 0,
-    },
+  container: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: '#b3e2e5', // Set your desired background color here
+      padding: 20,
+  },
+  title: {
+      fontSize: 28,
+      color: '#19494d',
+      fontFamily: 'Montserrat-Regular',
+      marginBottom: 5,
+  },
+  subtitle: {
+      fontSize: 16,
+      fontFamily: 'Montserrat-Regular',
+      color: '#888',
+      marginBottom: 10,
+  },
+  logoContainer: {
+      alignItems: 'center',
+      marginBottom: 30, // Adjust the margin as needed
+  },
+  logo: {
+      width: 200, // Set the desired width for your logo
+      height: 200, // Set the desired height for your logo
+      resizeMode: 'contain', // Adjust the image content mode as needed
+      marginBottom: 10, // Add margin if necessary
+  },
+  inputContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      borderWidth: 1,
+      borderColor: '#ccc',
+      borderRadius: 5,
+      marginBottom: 15,
+      paddingLeft: 10,
+      backgroundColor: 'white', // Set input field background color
+  },
+  icon: {
+      marginRight: 10,
+  },
+  input: {
+      flex: 1,
+      height: 40,
+      borderWidth: 0,
+  },
+  loginButton: {
+      backgroundColor: '#2d7f86',
+      borderRadius: 5,
+      paddingVertical: 10,
+      paddingHorizontal: 30,
+      marginTop: 15,
+  },
+  loginButtonText: {
+      color: 'white',
+      fontSize: 13,
+      fontWeight: 'bold',
+      textAlign: 'center',
+  },
+  errorText: {
+      color: 'red',
+      marginTop: 10,
+  },
 });

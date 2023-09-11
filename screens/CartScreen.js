@@ -124,7 +124,12 @@ const CartScreen = ({ navigation }) => {
       ))
     )}
     <Text style={styles.total}>Total Price: ${calculateTotal()}</Text>
-    <Button title="Proceed to Payment" onPress={handleProceedToPayment} />
+    <TouchableOpacity
+      style={styles.proceedButton}
+      onPress={handleProceedToPayment}
+    >
+      <Text style={styles.proceedButtonText}>Proceed to Payment</Text>
+    </TouchableOpacity>
     </ScrollView>
   );
 };
@@ -135,44 +140,20 @@ const Loading = () => (
   </View>
 );
 
-const CartItem = ({ item }) => (
-  <View style={styles.cartItemContainer}>
-    <Image source={imageMapping[item.name]} style={styles.cartItemImage} />
-    <View style={styles.cartItemInfo}>
-      <Text style={styles.itemName}>{item.name}</Text>
-      <Text style={styles.unitPrice}>Quantity: {item.quantity}</Text>
-      <Text style={styles.unitPrice}>Price: ${item.price.toFixed(2)}</Text>
-    </View>
-    <TouchableOpacity
-      onPress={() => removeItem(item.id)}
-    >
-      <Text style={styles.removeButtonText}>✘</Text>
-    </TouchableOpacity>
-  </View>
-);
-
-const TotalPrice = ({ amount }) => (
-  <Text style={styles.total}>Total Price: ${amount}</Text>
-);
-
-const ProceedButton = ({ navigation, total }) => (
-  <TouchableOpacity
-    onPress={() => navigation.navigate('PaymentScreen', { subtotal: total })}
-    style={styles.proceedButton}
-  >
-    <Text style={styles.buttonText}>Proceed to Payment</Text>
-  </TouchableOpacity>
-);
-
 const styles = StyleSheet.create({
   proceedButton: {
-    backgroundColor: '#19364d',
+    backgroundColor: '#2d7f86',
     borderRadius: 25,
-    paddingHorizontal: 20,
+    paddingHorizontal: 10,
     alignItems: 'center',
     justifyContent: 'center',
     height: 40, // Adjust the height as needed
   },
+  proceedButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },  
   buttonText: {
     color: 'white', // Text color
     fontSize: 16, // Adjust the font size as needed
@@ -203,6 +184,9 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 4,
     elevation: 5,
+  },
+  emptyCartMessage: {
+   fontSize: 16,
   },
   cartItemImage: {
     width: 80, // Increase the width of the item image
