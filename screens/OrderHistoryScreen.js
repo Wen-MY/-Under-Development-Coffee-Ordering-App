@@ -22,10 +22,14 @@ class OrderHistoryScreen extends Component {
       this.errorCallback
     );
   }
+  
   componentDidMount() {
     this.fetchId();
+    this.props.navigation.addListener('focus', this.handleRefresh);
   }
-
+  componentWillUnmount() {
+    this.props.navigation.removeListener('focus', this.handleRefresh);
+  }
   navigateToOrderDetails(order) {
     this.props.navigation.navigate('OrderDetails', { order });
   }
@@ -51,7 +55,6 @@ class OrderHistoryScreen extends Component {
       this.setState({ isLoading: false });
     }
   }
-
   fetchOrderHistory = async (id) => {
     try {
       this.db.transaction((tx) => {
@@ -128,11 +131,19 @@ class OrderHistoryScreen extends Component {
     if (orderHistory.length === 0) {
       return (
         <View style={styles.noOrdersContainer}>
+          <ScrollView
+            style={styles.container}
+            refreshControl={
+          <RefreshControl
+            refreshing={this.state.isRefreshing}
+            onRefresh={this.handleRefresh}
+          />
+        }>
           <Text style={styles.noOrdersText}>No orders available yet.</Text>
+          </ScrollView>
         </View>
       );
     }
-
     return (
       <ScrollView
         style={styles.container}

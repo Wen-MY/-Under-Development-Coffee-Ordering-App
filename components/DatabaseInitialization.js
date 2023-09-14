@@ -4,8 +4,8 @@ import jsonData from '../assets/CoffeeDescription/data.json';
 class DatabaseInitialization {
   _initializeDatabase() {
     // Delete the database for debugging purposes
-    
-    /*SQLite.deleteDatabase(
+    /*
+    SQLite.deleteDatabase(
       {
         name: 'coffeeDatabase',
         location: 'default',

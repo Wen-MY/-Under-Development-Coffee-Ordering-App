@@ -281,7 +281,7 @@ const CoffeeDetailScreen = ({route}) => {
           fontSize: 16,
           fontFamily: 'Montserrat-Regular',
           color: '#888',
-          marginBottom: 1,
+          margin: 5,
           textAlign: 'center',
         },
         coffeeImage: {

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { TouchableOpacity, View, Text, TextInput, Button, StyleSheet, Image } from 'react-native';
+import { TouchableOpacity, View, Text, TextInput, Button, StyleSheet, Image, NativeModules } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default class Login extends Component {

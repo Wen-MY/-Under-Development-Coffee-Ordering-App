@@ -54,10 +54,9 @@ const CustomDrawerContent = ({...props }) => {
       >
         <Avatar.Image
           source={require('./assets/otherImg/user.png')}
-          size={70}
+          size={80}
           style={styles.profileImage}
         />
-        <Text style={styles.userName}>Name</Text>
         </ImageBackground>
       <DrawerItemList {...props} />
       <DrawerItem label="Sign Out" onPress={handleSignOut}/>
@@ -111,7 +110,6 @@ const LoginStack = () => {
           headerShown: false,
         }}
       />
-
       <Stack.Screen name="Sign Up" component={SignUpScreen} options={{headerTitle:false}}/>
     </Stack.Navigator>
   );
@@ -125,14 +123,11 @@ function AppBottomStack() {
         tabBarActiveTintColor: 'white',
         tabBarActiveBackgroundColor: '#0f4c81',
         tabBarLabelStyle: {
-          fontSize: 20,
-        },
-        tabBarIconStyle: {
-          marginBottom: -10, // Adjust the negative margin to reduce space
+          fontSize: 22,
         },
         tabBarStyle: {
           backgroundColor: 'lightgrey',
-          height: 55,
+          height: 60,
           display: 
           getFocusedRouteNameFromRoute(route) === ('Coffee') ||
           getFocusedRouteNameFromRoute(route) === ('PaymentScreen') ||
@@ -236,10 +231,18 @@ export default function App() {
           setLoggedIn(false);
         }
       })
+      AsyncStorage.getItem('notification')
+      .then((notification) => {
+        if (notification === null) {
+          // User is logged in
+          AsyncStorage.setItem('notification','false')
+        } 
+        console.log("notification " + notification);
+      })
       .catch((error) => {
         console.error('AsyncStorage error:', error);
       });},[]);
-
+      
   const dbInit = new DatabaseInitialization();
   dbInit._initializeDatabase();
   console.log("Logged in " + loggedIn);
@@ -247,7 +250,7 @@ export default function App() {
     // Render a loading indicator while waiting for AsyncStorage
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="purple" />
+        <ActivityIndicator size="large" color="green" />
       </View>
     );
   }

@@ -1,14 +1,29 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, Switch, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const SettingScreen = () => {
   const [pushNotification, setPushNotification] = useState(false);
 
   const navigation = useNavigation();
-
-  const togglePushNotification = () => {
-    setPushNotification(!pushNotification);
+  const checkPushNotification = async() => {
+    const notification = await AsyncStorage.getItem('notification');
+    if(notification === 'true'){
+      togglePushNotification();
+    }
+  }
+  const togglePushNotification = async() => {
+    const newPushNotificationValue = !pushNotification;
+    setPushNotification(newPushNotificationValue);
+    if(newPushNotificationValue){
+      await AsyncStorage.setItem('notification','true');
+      console.log("notification: " + newPushNotificationValue)
+    }else{
+      await AsyncStorage.setItem('notification','false');
+      console.log("notification: " + newPushNotificationValue)
+    }
+    
   };
 
   return (

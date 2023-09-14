@@ -5,6 +5,7 @@ import {commonStyles} from "../style/CommonStyle"
 import { TouchableOpacity } from "react-native-gesture-handler";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import WeatherForecast from "../components/WeatherForecast";
+import NotificationComponent from '../components/NotificationComponent';
 
 
 const imagePaths = [
@@ -22,7 +23,8 @@ export default class HomeScreen extends Component{
         this.state = {
             width : Dimensions.get('screen').width,
             username : "Guest User",
-            balance : "0.00"
+            balance : "0.00",
+            notification: false,
         };
     }
     
@@ -46,10 +48,25 @@ export default class HomeScreen extends Component{
       });
     AsyncStorage.getItem('balance')
       .then((balance) => {
-        this.setState({ balance }); // Update the state with the retrieved username
+        this.setState({ balance }); // Update the state with the retrieved balance
       })
       .catch((error) => {
-        console.error('Error retrieving username:', error);
+        console.error('Error retrieving balance:', error);
+      });
+      this.props.navigation.addListener('focus', this.getSettingOption);
+  }
+  componentWillUnmount() {
+    this.props.navigation.removeListener('focus', this.getSettingOption);
+  }
+  getSettingOption = async() =>{
+      await AsyncStorage.getItem('notification')
+      .then((notification) => {
+        notification === 'true' ? 
+        this.setState({ notification : true }) :
+        this.setState({ notification : false });
+      })
+      .catch((error) => {
+        console.error('Error retrieving notification:', error);
       });
   }
   componentDidUpdate(){
@@ -73,6 +90,7 @@ export default class HomeScreen extends Component{
                     data={[...new Array(6).keys()]} // will change to photo if assets added
                     //data = {[...new Array(6).keys()].map(index => `../assets/otherImg/CarouselAd/${index}.png`)}
                     scrollAnimationDuration={1200}
+                    autoplayInterval={5000}
                     mode="parallax"
                     pagingEnabled={true}
                     //onSnapToItem={(index) => console.log('current index:', index)} //debug purpose
@@ -104,7 +122,11 @@ export default class HomeScreen extends Component{
                         </View>
                         <WeatherForecast style={{marginLeft: 10}}/>
                       </View>
+                      {this.state.notification ? (
+                            <NotificationComponent />
+                      ) : null}
                     </View>
+                    
                     {/* Order Now Box here */}
                     <View style={styles.boxContainer}>
                       <Text style={{textAlign:'center'}}>Our Nearest Store At</Text>
@@ -115,6 +137,7 @@ export default class HomeScreen extends Component{
                       </TouchableOpacity>
                       </View>
                     </View>
+                    
             </View>
 
         )
